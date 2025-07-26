@@ -35,11 +35,18 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+    // Check for admin email
+        $isAdmin = $request->email === 'admin@example.com'; // or any email you choose
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'UserName' => $request->name,
+            'Email' => $request->email,
+            'PasswordHash' => Hash::make($request->password),
+            'UserType' => $isAdmin ? 'Admin' : 'Student',
+            'IsAdmin' => $isAdmin,
         ]);
+
+    
 
         event(new Registered($user));
 
