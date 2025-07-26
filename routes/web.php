@@ -27,6 +27,9 @@ Route::get('/admin', function () {
     return view('admin');
 })->middleware(['auth', 'verified'])->name('admin.dashboard');
 
+Route::get('/home', [ItemController::class, 'index'])->name('user.home');
+
+
 Route::post('/register', function (Request $request) {
     $validated = $request->validate([
         'name' => 'required|string|max:255',
@@ -44,7 +47,7 @@ Route::post('/register', function (Request $request) {
 
     Auth::login($user);
 
-    return redirect('/dashboard'); // or wherever you want
+    return redirect('/user/home'); // or wherever you want
 });
 
 require __DIR__.'/auth.php';
