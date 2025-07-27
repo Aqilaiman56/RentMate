@@ -23,7 +23,7 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::get('/admin', function () {
+Route::get('/AdminDashboard', function () {
     return view('admin.AdminDashboard');
 })->middleware(['auth', 'verified'])->name('admin.AdminDashboard');
 
