@@ -19,6 +19,6 @@ public function index(Request $request)
         ->orderByDesc('DateAdded')
         ->paginate(9);
 
-    return view('home', compact('items', 'search'));
+    return view('HomePage', compact('items', 'search'));
 }
 }

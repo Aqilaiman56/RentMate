@@ -50,4 +50,15 @@ Route::post('/register', function (Request $request) {
     return redirect('/user/homepage'); // or wherever you want
 });
 
+// this one for navigation direction 
+Route::middleware('auth')->group(function () {
+    Route::get('/items', [ItemController::class, 'index'])->name('items.index');
+    Route::get('/chat', function() {
+        return view('chat.index');
+    })->name('chat');
+    Route::get('/notifications', function() {
+        return view('notifications.index'); 
+    })->name('notifications');
+});
+
 require __DIR__.'/auth.php';
