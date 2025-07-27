@@ -47,7 +47,7 @@ Route::post('/register', function (Request $request) {
 
     Auth::login($user);
 
-    return redirect('/user/home'); // or wherever you want
+    return redirect('/user/homepage'); // or wherever you want
 });
 
 require __DIR__.'/auth.php';
