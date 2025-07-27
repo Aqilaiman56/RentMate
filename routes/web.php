@@ -12,9 +12,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/homepage', function () {
+    return view('user.HomePage');
+})->middleware(['auth', 'verified'])->name('user.HomePage');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -24,10 +24,10 @@ Route::middleware('auth')->group(function () {
 
 
 Route::get('/admin', function () {
-    return view('admin');
-})->middleware(['auth', 'verified'])->name('admin.dashboard');
+    return view('admin.AdminDashboard');
+})->middleware(['auth', 'verified'])->name('admin.AdminDashboard');
 
-Route::get('/home', [ItemController::class, 'index'])->name('user.home');
+
 
 
 Route::post('/register', function (Request $request) {
