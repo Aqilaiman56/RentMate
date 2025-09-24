@@ -29,10 +29,11 @@ class AuthenticatedSessionController extends Controller
 
     // Redirect admin to admin dashboard
     if (auth()->user()->IsAdmin) {
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('admin.AdminDashboard');
     }
 
-    return redirect()->intended(route('dashboard', absolute: false));
+    // Redirect normal user to user home page
+    return redirect()->intended('/homepage');
 }
 
     /**

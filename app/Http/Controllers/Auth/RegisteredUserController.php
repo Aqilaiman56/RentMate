@@ -48,10 +48,17 @@ class RegisteredUserController extends Controller
 
     
 
-        event(new Registered($user));
+         event(new Registered($user));
 
-        Auth::login($user);
+            if ($isAdmin) {
+                Auth::login($user);
+                return redirect(route('admin.AdminDashboard', absolute: false));
+            }
 
-        return redirect(route('dashboard', absolute: false));
+               // Log out any existing user before redirecting to login
+            Auth::logout();
+
+            // For normal users, redirect to login page after registration
+            return redirect()->route('login')->with('status', 'Registration successful. Please log in.');
     }
 }
