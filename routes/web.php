@@ -47,7 +47,7 @@ Route::post('/register', function (Request $request) {
 
     Auth::login($user);
 
-    return redirect('/user/homepage'); // or wherever you want
+    return redirect('admin.AdminDashboard'); // or wherever you want
 });
 
 // this one for navigation direction 
