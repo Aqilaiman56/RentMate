@@ -109,4 +109,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/review/add', [ItemController::class, 'addReview'])->name('review.add');
 });
 
+// Admin Routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/listings', [AdminController::class, 'listings'])->name('listings');
+    Route::get('/deposits', [AdminController::class, 'deposits'])->name('deposits');
+    Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+    Route::get('/penalties', [AdminController::class, 'penalties'])->name('penalties');
+    Route::get('/taxes', [AdminController::class, 'taxes'])->name('taxes');
+
+      // Actions
+    Route::post('/reports/{penalty}/approve', [AdminController::class, 'approveReport'])->name('reports.approve');
+    Route::post('/reports/{penalty}/reject', [AdminController::class, 'rejectReport'])->name('reports.reject');
+});
+
+
 require __DIR__.'/auth.php';

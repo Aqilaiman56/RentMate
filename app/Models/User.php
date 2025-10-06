@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -26,5 +25,31 @@ class User extends Authenticatable
     public function getAuthPassword()
     {
         return $this->PasswordHash;
+    }
+
+    // Relationships
+    public function items()
+    {
+        return $this->hasMany(Item::class, 'UserID', 'UserID');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'UserID', 'UserID');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'UserID', 'UserID');
+    }
+
+    public function reportsMade()
+    {
+        return $this->hasMany(Penalty::class, 'ReportedByID', 'UserID');
+    }
+
+    public function reportsReceived()
+    {
+        return $this->hasMany(Penalty::class, 'ReportedUserID', 'UserID');
     }
 }

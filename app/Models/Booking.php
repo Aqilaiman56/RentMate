@@ -68,6 +68,14 @@ class Booking extends Model
     }
 
     /**
+ * Get penalties related to this booking
+ */
+public function penalties()
+{
+    return $this->hasMany(Penalty::class, 'BookingID', 'BookingID');
+}
+
+    /**
      * Scope to get bookings for a specific date range
      */
     public function scopeBetweenDates($query, $startDate, $endDate)
