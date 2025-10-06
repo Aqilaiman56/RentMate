@@ -19,12 +19,15 @@ class HomeController extends Controller
         $categories = Category::all();
         
         // Get all locations for the search dropdown (with fallback)
-        $locations = Location::all();
-        
-        // If no locations exist, create empty collection
-        if ($locations->isEmpty()) {
+        try {
+            $locations = Location::all();
+        } catch (\Exception $e) {
+            // If Location model doesn't exist or table missing, create empty collection
             $locations = collect([]);
         }
+        
+        // Debug: Check what we have
+        // dd($categories, $locations); // Uncomment this line to debug
         
         // Start building the query
         $query = Item::with(['location', 'category', 'user'])
@@ -79,6 +82,11 @@ class HomeController extends Controller
             }
         }
         
-        return view('user.HomePage', compact('items', 'categories', 'locations'));
+        // IMPORTANT: Pass all variables to the view
+        return view('user.HomePage', [
+            'items' => $items,
+            'categories' => $categories,
+            'locations' => $locations
+        ]);
     }
 }
