@@ -250,9 +250,9 @@
 </head>
 <body>
     <header class="header">
-        <a href="{{ route('HomePage') }}" class="logo">RentMate</a>
+        <a href="{{ route('user.HomePage') }}" class="logo">RentMate</a>
         
-        <form action="{{ route('home') }}" method="GET" class="search-bar">
+        <form action="{{ route('user.HomePage') }}" method="GET" class="search-bar">
             <input type="date" name="availability" class="search-input" placeholder="Availability" value="{{ request('availability') }}">
             <input type="text" name="search" class="search-input" placeholder="Item name" value="{{ request('search') }}">
             <select name="location" class="search-input">
@@ -279,12 +279,12 @@
 
     <div class="container">
         <div class="categories">
-            <a href="{{ route('home') }}" class="category-card {{ !request('category') ? 'active' : '' }}">
+            <a href="{{ route('user.HomePage') }}" class="category-card {{ !request('category') ? 'active' : '' }}">
                 <div class="category-icon">🏠</div>
                 <div class="category-name">All</div>
             </a>
             @foreach($categories as $category)
-                <a href="{{ route('home', ['category' => $category->CategoryID]) }}" 
+                <a href="{{ route('user.HomePage', ['category' => $category->CategoryID]) }}" 
                    class="category-card {{ request('category') == $category->CategoryID ? 'active' : '' }}">
                     <div class="category-icon">
                         @switch($category->CategoryName)
