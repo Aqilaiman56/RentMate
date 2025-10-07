@@ -10,6 +10,9 @@ use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Location;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -47,6 +50,112 @@ class AdminController extends Controller
             'taxCount',
             'totalTaxAmount'
         ));
+    }
+
+    /**
+     * Display admin profile
+     */
+    public function profile()
+    {
+        $admin = Auth::user();
+        
+        // Get admin activity stats
+        $resolvedReports = Penalty::where('ApprovedByAdminID', $admin->UserID)
+            ->where('ResolvedStatus', 1)
+            ->count();
+        
+        $totalPenaltiesIssued = Penalty::where('ApprovedByAdminID', $admin->UserID)
+            ->where('PenaltyAmount', '>', 0)
+            ->count();
+        
+        $recentActivity = Penalty::where('ApprovedByAdminID', $admin->UserID)
+            ->with(['reportedUser', 'item'])
+            ->orderBy('DateReported', 'desc')
+            ->limit(10)
+            ->get();
+
+        return view('admin.profile', compact(
+            'admin',
+            'resolvedReports',
+            'totalPenaltiesIssued',
+            'recentActivity'
+        ));
+    }
+
+    /**
+     * Update admin profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $admin = Auth::user();
+        
+        $validated = $request->validate([
+            'UserName' => 'required|string|max:255',
+            'Email' => 'required|email|unique:users,Email,' . $admin->UserID . ',UserID',
+            'PhoneNumber' => 'nullable|string|max:20',
+            'ProfileImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        // Handle profile image upload
+        if ($request->hasFile('ProfileImage')) {
+            // Delete old image if exists
+            if ($admin->ProfileImage) {
+                Storage::disk('public')->delete($admin->ProfileImage);
+            }
+            
+            $validated['ProfileImage'] = $request->file('ProfileImage')->store('profile_images', 'public');
+        }
+
+        $admin->update($validated);
+
+        return redirect()->route('admin.profile')->with('success', 'Profile updated successfully');
+    }
+
+    /**
+     * Display admin settings
+     */
+    public function settings()
+    {
+        $admin = Auth::user();
+        
+        // Get system settings
+        $totalUsers = User::where('IsAdmin', 0)->count();
+        $totalAdmins = User::where('IsAdmin', 1)->count();
+        $totalListings = Item::count();
+        $pendingReports = Penalty::where('ResolvedStatus', 0)->count();
+
+        return view('admin.settings', compact(
+            'admin',
+            'totalUsers',
+            'totalAdmins',
+            'totalListings',
+            'pendingReports'
+        ));
+    }
+
+    /**
+     * Update admin password
+     */
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        $admin = Auth::user();
+
+        // Check if current password is correct
+        if (!Hash::check($validated['current_password'], $admin->Password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        }
+
+        // Update password
+        $admin->update([
+            'Password' => Hash::make($validated['new_password'])
+        ]);
+
+        return back()->with('success', 'Password updated successfully');
     }
 
     /**
@@ -268,6 +377,7 @@ class AdminController extends Controller
             ->firstOrFail();
 
         // Add suspension logic here (you may need to add a 'suspended' field to users table)
+        // Example: $user->update(['is_suspended' => true, 'suspended_until' => now()->addDays(30)]);
         
         return redirect()->back()->with('success', 'User suspended successfully');
     }
@@ -291,11 +401,24 @@ class AdminController extends Controller
         
         // Delete image
         if ($item->ImagePath) {
-            \Storage::disk('public')->delete($item->ImagePath);
+            Storage::disk('public')->delete($item->ImagePath);
         }
         
         $item->delete();
         
         return redirect()->back()->with('success', 'Listing deleted successfully');
+    }
+
+    /**
+     * Logout admin
+     */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect()->route('login')->with('success', 'You have been logged out successfully');
     }
 }
