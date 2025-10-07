@@ -194,6 +194,19 @@ class ItemController extends Controller
         
         return redirect()->route('items.my')->with('success', 'Item deleted successfully!');
     }
+
+    /**
+ * Show user's listings (for user dashboard)
+ */
+public function userListings()
+{
+    $items = Item::where('UserID', auth()->id())
+        ->with(['location', 'category', 'bookings'])
+        ->orderBy('DateAdded', 'desc')
+        ->paginate(12);
+    
+    return view('user.listings', compact('items'));
+}
     
     /**
      * Add review to item

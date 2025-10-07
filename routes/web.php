@@ -215,6 +215,36 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
 
 /*
 |--------------------------------------------------------------------------
+| User Dashboard Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(function () {
+    
+    // User Profile Settings (Different from Admin Profile)
+    Route::get('/profile', [ProfileController::class, 'userProfile'])->name('profile');
+    Route::patch('/profile', [ProfileController::class, 'userUpdateProfile'])->name('profile.update');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    
+    // User Listings Management
+    Route::get('/listings', [ItemController::class, 'userListings'])->name('listings');
+    
+    // Add New Listing
+    Route::get('/add-listing', [ItemController::class, 'create'])->name('add-listing');
+    
+    // User Bookings
+    Route::get('/bookings', [BookingController::class, 'userBookings'])->name('bookings');
+    
+    // User Wishlist
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+    
+});
+
+// Inside the user middleware group
+Route::post('/report', [ProfileController::class, 'submitReport'])->name('report.submit');
+
+/*
+|--------------------------------------------------------------------------
 | Authentication Routes
 |--------------------------------------------------------------------------
 */

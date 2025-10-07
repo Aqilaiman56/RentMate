@@ -81,6 +81,30 @@
             border: none;
             cursor: pointer;
             font-size: 20px;
+            text-decoration: none;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .icon-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Profile Section with Dropdown */
+        .profile-section {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .profile-section:hover {
+            background-color: rgba(0, 0, 0, 0.05);
         }
 
         .profile-pic {
@@ -88,7 +112,76 @@
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
+        }
+
+        .profile-name {
+            font-weight: 500;
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        /* Dropdown Menu */
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
             cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .dropdown-item.logout:hover {
+            background-color: #fff5f5;
+        }
+
+        .dropdown-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout-form {
+            margin: 0;
+            padding: 0;
         }
 
         .container {
@@ -238,10 +331,6 @@
             font-size: 18px;
         }
 
-        .logout-form {
-            display: none;
-        }
-
         @media (max-width: 768px) {
             .search-bar {
                 display: none;
@@ -249,6 +338,10 @@
             
             .categories {
                 overflow-x: scroll;
+            }
+
+            .profile-name {
+                display: none;
             }
         }
     </style>
@@ -274,11 +367,46 @@
         <div class="header-icons">
             <a href="{{ route('notifications') }}" class="icon-btn">🔔</a>
             <a href="{{ route('messages.index') }}" class="icon-btn">✉️</a>
-            @if(auth()->user()->ProfileImage)
-                <img src="{{ asset('storage/' . auth()->user()->ProfileImage) }}" alt="Profile" class="profile-pic" onclick="showLogoutMenu()">
-            @else
-                <img src="https://via.placeholder.com/40" alt="Profile" class="profile-pic" onclick="showLogoutMenu()">
-            @endif
+            
+            <div class="profile-section" id="profileSection">
+                @if(auth()->user()->ProfileImage)
+                    <img src="{{ asset('storage/' . auth()->user()->ProfileImage) }}" alt="Profile" class="profile-pic">
+                @else
+                    <img src="https://via.placeholder.com/40" alt="Profile" class="profile-pic">
+                @endif
+                <span class="profile-name">{{ auth()->user()->UserName ?? 'User' }}</span>
+                
+                <!-- Dropdown Menu -->
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="{{ route('user.profile') }}" class="dropdown-item">
+                        <span class="dropdown-icon">👤</span>
+                        <span>Profile Settings</span>
+                    </a>
+                    <a href="{{ route('user.listings') }}" class="dropdown-item">
+                        <span class="dropdown-icon">📦</span>
+                        <span>My Listings</span>
+                    </a>
+                    <a href="{{ route('user.add-listing') }}" class="dropdown-item">
+                        <span class="dropdown-icon">➕</span>
+                        <span>Add Listing</span>
+                    </a>
+                    <a href="{{ route('user.bookings') }}" class="dropdown-item">
+                        <span class="dropdown-icon">📅</span>
+                        <span>My Bookings</span>
+                    </a>
+                    <a href="{{ route('user.wishlist') }}" class="dropdown-item">
+                        <span class="dropdown-icon">❤️</span>
+                        <span>Wishlist</span>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="logout-form">
+                        @csrf
+                        <button type="submit" class="dropdown-item logout" onclick="confirmLogout(event)">
+                            <span class="dropdown-icon">🚪</span>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -358,16 +486,42 @@
         @endif
     </div>
 
-    <form method="POST" action="{{ route('logout') }}" class="logout-form" id="logoutForm">
-        @csrf
-        <button type="submit">Log out</button>
-    </form>
-
     <script>
-        function showLogoutMenu() {
-            if(confirm('Do you want to logout?')) {
-                document.getElementById('logoutForm').submit();
+        // Profile Dropdown Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileSection = document.getElementById('profileSection');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            if (profileSection && profileDropdown) {
+                // Toggle dropdown on click
+                profileSection.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    profileDropdown.classList.toggle('show');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!profileSection.contains(e.target)) {
+                        profileDropdown.classList.remove('show');
+                    }
+                });
+                
+                // Prevent dropdown from closing when clicking inside it
+                profileDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
             }
+        });
+
+        // Logout Confirmation
+        function confirmLogout(event) {
+            event.preventDefault();
+            
+            if (confirm('Are you sure you want to logout?')) {
+                event.target.closest('form').submit();
+            }
+            
+            return false;
         }
 
         function toggleWishlist(event, itemId) {
