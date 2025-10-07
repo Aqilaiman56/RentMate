@@ -12,7 +12,7 @@ class Penalty extends Model
 {
     use HasFactory;
 
-    protected $table = 'penalties';
+    protected $table = 'penalty';
     protected $primaryKey = 'PenaltyID';
     public $timestamps = false;
 
