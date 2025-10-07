@@ -227,6 +227,14 @@
             text-decoration: none;
             transition: all 0.2s;
             border-bottom: 1px solid #F3F4F6;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            cursor: pointer;
         }
 
         .dropdown-item:last-child {
@@ -515,7 +523,7 @@
                         </a>
                         <form method="POST" action="{{ route('logout') }}" class="logout-form">
                             @csrf
-                            <button type="submit" class="dropdown-item logout">
+                            <button type="submit" class="dropdown-item logout" onclick="confirmLogout(event)">
                                 <span class="dropdown-icon">🚪</span>
                                 <span>Logout</span>
                             </button>
@@ -647,6 +655,16 @@
             const dropdown = document.getElementById('profileDropdown');
             dropdown.classList.toggle('active');
         }
+
+        function confirmLogout(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                event.target.closest('form').submit();
+            }
+        }
+
+        // Toggle dropdown when clicking profile section
+        document.getElementById('profileSection').addEventListener('click', toggleProfileDropdown);
 
         // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
