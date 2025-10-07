@@ -109,8 +109,13 @@
             background: white;
             border: 3px solid #4461F2;
             border-radius: 15px;
-            padding: 20px 25px;
-            min-width: 100px;
+            padding: 20px;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
