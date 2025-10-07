@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Item;
@@ -14,12 +15,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
-class AdminController extends Controller
+class DashboardController extends Controller
 {
     /**
      * Display the admin dashboard
      */
-    public function dashboard()
+    public function index()
     {
         // Get statistics
         $totalUsers = User::where('IsAdmin', 0)->count();
@@ -35,11 +36,11 @@ class AdminController extends Controller
         // Calculate tax from bookings (assuming 6% tax rate)
         $taxCount = Booking::where('Status', 'Approved')->count();
         $totalBookingRevenue = Booking::where('Status', 'Approved')
-            ->join('items', 'bookings.ItemID', '=', 'items.ItemID')
-            ->sum(DB::raw('DATEDIFF(bookings.EndDate, bookings.StartDate) * items.PricePerDay'));
+            ->join('items', 'booking.ItemID', '=', 'items.ItemID')
+            ->sum(DB::raw('DATEDIFF(booking.EndDate, booking.StartDate) * items.PricePerDay'));
         $totalTaxAmount = $totalBookingRevenue * 0.06; // 6% tax
 
-        return view('admin.dashboard', compact(
+        return view('admin.AdminDashboard', compact(
             'totalUsers',
             'totalListings',
             'totalDeposits',
@@ -159,179 +160,6 @@ class AdminController extends Controller
     }
 
     /**
-     * Display all users
-     */
-    public function users()
-    {
-        $users = User::where('IsAdmin', 0)
-            ->withCount(['items', 'bookings'])
-            ->orderBy('CreatedAt', 'desc')
-            ->paginate(20);
-
-        $totalUsers = User::where('IsAdmin', 0)->count();
-        $activeUsers = User::where('IsAdmin', 0)
-            ->where('CreatedAt', '>=', now()->subMonth())
-            ->count();
-        $usersWithListings = User::where('IsAdmin', 0)
-            ->has('items')
-            ->count();
-
-        return view('admin.users', compact(
-            'users', 
-            'totalUsers', 
-            'activeUsers',
-            'usersWithListings'
-        ));
-    }
-
-    /**
-     * Display all listings
-     */
-    public function listings()
-    {
-        $listings = Item::with(['user', 'category', 'location', 'bookings'])
-            ->withCount('bookings')
-            ->orderBy('DateAdded', 'desc')
-            ->paginate(20);
-
-        $totalListings = Item::count();
-        $availableListings = Item::where('Availability', 1)->count();
-        $totalValue = Item::sum('DepositAmount');
-        $avgPricePerDay = Item::avg('PricePerDay');
-
-        return view('admin.listings', compact(
-            'listings',
-            'totalListings',
-            'availableListings',
-            'totalValue',
-            'avgPricePerDay'
-        ));
-    }
-
-    /**
-     * Display all deposits
-     */
-    public function deposits()
-    {
-        $deposits = Item::with(['user', 'category', 'location'])
-            ->whereNotNull('DepositAmount')
-            ->where('DepositAmount', '>', 0)
-            ->orderBy('DepositAmount', 'desc')
-            ->paginate(20);
-
-        $totalDeposits = Item::sum('DepositAmount');
-        $averageDeposit = Item::avg('DepositAmount');
-        $depositCount = Item::where('DepositAmount', '>', 0)->count();
-        $highestDeposit = Item::max('DepositAmount');
-
-        return view('admin.deposits', compact(
-            'deposits',
-            'totalDeposits',
-            'averageDeposit',
-            'depositCount',
-            'highestDeposit'
-        ));
-    }
-
-    /**
-     * Display all reports
-     */
-    public function reports()
-    {
-        $reports = Penalty::with([
-            'reportedBy:UserID,UserName,Email,ProfileImage',
-            'reportedUser:UserID,UserName,Email,ProfileImage',
-            'item:ItemID,ItemName,ImagePath',
-            'booking',
-            'approvedByAdmin:UserID,UserName'
-        ])
-        ->orderBy('DateReported', 'desc')
-        ->paginate(20);
-
-        $totalReports = Penalty::count();
-        $pendingReports = Penalty::where('ResolvedStatus', 0)->count();
-        $resolvedReports = Penalty::where('ResolvedStatus', 1)->count();
-        $rejectedReports = Penalty::where('ResolvedStatus', 1)
-            ->where('PenaltyAmount', 0)
-            ->count();
-
-        return view('admin.reports', compact(
-            'reports',
-            'totalReports',
-            'pendingReports',
-            'resolvedReports',
-            'rejectedReports'
-        ));
-    }
-
-    /**
-     * Display all penalties
-     */
-    public function penalties()
-    {
-        $penalties = Penalty::with([
-            'reportedBy:UserID,UserName,Email,ProfileImage',
-            'reportedUser:UserID,UserName,Email,ProfileImage',
-            'item:ItemID,ItemName,ImagePath',
-            'booking',
-            'approvedByAdmin:UserID,UserName'
-        ])
-        ->whereNotNull('PenaltyAmount')
-        ->where('PenaltyAmount', '>', 0)
-        ->orderBy('DateReported', 'desc')
-        ->paginate(20);
-
-        $totalPenalties = Penalty::whereNotNull('PenaltyAmount')
-            ->where('PenaltyAmount', '>', 0)
-            ->count();
-        $totalPenaltyAmount = Penalty::sum('PenaltyAmount') ?? 0;
-        $averagePenalty = Penalty::where('PenaltyAmount', '>', 0)->avg('PenaltyAmount') ?? 0;
-        $highestPenalty = Penalty::max('PenaltyAmount') ?? 0;
-
-        return view('admin.penalties', compact(
-            'penalties',
-            'totalPenalties',
-            'totalPenaltyAmount',
-            'averagePenalty',
-            'highestPenalty'
-        ));
-    }
-
-    /**
-     * Display tax information
-     */
-    public function taxes()
-    {
-        // Get all approved bookings with calculated amounts
-        $taxTransactions = Booking::where('Status', 'Approved')
-            ->with(['user:UserID,UserName,Email', 'item:ItemID,ItemName,PricePerDay'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
-        // Calculate tax details
-        $taxCount = Booking::where('Status', 'Approved')->count();
-        
-        $bookings = Booking::where('Status', 'Approved')
-            ->join('items', 'bookings.ItemID', '=', 'items.ItemID')
-            ->select(
-                DB::raw('SUM(DATEDIFF(bookings.EndDate, bookings.StartDate) * items.PricePerDay) as total_revenue')
-            )
-            ->first();
-        
-        $totalRevenue = $bookings->total_revenue ?? 0;
-        $totalTaxAmount = $totalRevenue * 0.06; // 6% tax
-        $averageTaxPerTransaction = $taxCount > 0 ? $totalTaxAmount / $taxCount : 0;
-
-        return view('admin.taxes', compact(
-            'taxTransactions',
-            'taxCount',
-            'totalTaxAmount',
-            'totalRevenue',
-            'averageTaxPerTransaction'
-        ));
-    }
-
-    /**
      * Approve a report and apply penalty
      */
     public function approveReport(Request $request, $penaltyId)
@@ -390,7 +218,7 @@ class AdminController extends Controller
         $item = Item::findOrFail($itemId);
         
         // Check if item has active bookings
-        $hasActiveBookings = $item->bookings()
+        $hasActiveBookings = $item->booking()
             ->where('Status', 'Approved')
             ->where('EndDate', '>=', now())
             ->exists();
