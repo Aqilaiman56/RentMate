@@ -7,21 +7,33 @@
             <p class="header-description">Review and manage all deposit transactions from users</p>
         </div>
         <div class="header-actions">
-            <button class="btn btn-secondary" onclick="exportDeposits()">
+            <a href="{{ route('admin.deposits.export') }}" class="btn btn-secondary">
                 📥 Export Data
-            </button>
+            </a>
             <button class="btn btn-primary" onclick="generateReport()">
                 📊 Generate Report
             </button>
         </div>
     </div>
 
+    @if(session('success'))
+        <div class="alert alert-success">
+            ✓ {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-error">
+            ✗ {{ session('error') }}
+        </div>
+    @endif
+
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon blue">💰</div>
             <div class="stat-content">
-                <div class="stat-value">RM 45,680.00</div>
+                <div class="stat-value">RM {{ number_format($totalDeposits, 2) }}</div>
                 <div class="stat-label">Total Deposits</div>
             </div>
         </div>
@@ -29,7 +41,7 @@
         <div class="stat-card">
             <div class="stat-icon green">✓</div>
             <div class="stat-content">
-                <div class="stat-value">RM 38,450.00</div>
+                <div class="stat-value">RM {{ number_format($refundedAmount, 2) }}</div>
                 <div class="stat-label">Refunded</div>
             </div>
         </div>
@@ -37,7 +49,7 @@
         <div class="stat-card">
             <div class="stat-icon orange">⏳</div>
             <div class="stat-content">
-                <div class="stat-value">RM 5,230.00</div>
+                <div class="stat-value">RM {{ number_format($heldAmount, 2) }}</div>
                 <div class="stat-label">Held</div>
             </div>
         </div>
@@ -45,46 +57,51 @@
         <div class="stat-card">
             <div class="stat-icon red">⚠️</div>
             <div class="stat-content">
-                <div class="stat-value">RM 2,000.00</div>
+                <div class="stat-value">RM {{ number_format($forfeitedAmount, 2) }}</div>
                 <div class="stat-label">Forfeited</div>
             </div>
         </div>
     </div>
 
     <!-- Filters and Search -->
-    <div class="table-controls">
+    <form action="{{ route('admin.deposits') }}" method="GET" class="table-controls">
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Search deposits by user or item..." class="search-input" id="searchInput">
+            <input type="text" 
+                   name="search" 
+                   placeholder="Search deposits by user or item..." 
+                   class="search-input" 
+                   value="{{ request('search') }}">
         </div>
         <div class="filter-buttons">
-            <select class="filter-select" id="statusFilter">
-                <option value="all">All Status</option>
-                <option value="held">Held</option>
-                <option value="refunded">Refunded</option>
-                <option value="forfeited">Forfeited</option>
-                <option value="partial">Partial Refund</option>
+            <select class="filter-select" name="status" onchange="this.form.submit()">
+                <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>All Status</option>
+                <option value="held" {{ request('status') == 'held' ? 'selected' : '' }}>Held</option>
+                <option value="refunded" {{ request('status') == 'refunded' ? 'selected' : '' }}>Refunded</option>
+                <option value="forfeited" {{ request('status') == 'forfeited' ? 'selected' : '' }}>Forfeited</option>
+                <option value="partial" {{ request('status') == 'partial' ? 'selected' : '' }}>Partial Refund</option>
             </select>
-            <select class="filter-select" id="amountFilter">
-                <option value="all">All Amounts</option>
-                <option value="0-500">RM 0 - 500</option>
-                <option value="500-1000">RM 500 - 1,000</option>
-                <option value="1000+">RM 1,000+</option>
+            <select class="filter-select" name="amount" onchange="this.form.submit()">
+                <option value="all" {{ request('amount') == 'all' ? 'selected' : '' }}>All Amounts</option>
+                <option value="0-500" {{ request('amount') == '0-500' ? 'selected' : '' }}>RM 0 - 500</option>
+                <option value="500-1000" {{ request('amount') == '500-1000' ? 'selected' : '' }}>RM 500 - 1,000</option>
+                <option value="1000+" {{ request('amount') == '1000+' ? 'selected' : '' }}>RM 1,000+</option>
             </select>
-            <select class="filter-select" id="sortFilter">
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="amount-high">Highest Amount</option>
-                <option value="amount-low">Lowest Amount</option>
+            <select class="filter-select" name="sort" onchange="this.form.submit()">
+                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
+                <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                <option value="amount-high" {{ request('sort') == 'amount-high' ? 'selected' : '' }}>Highest Amount</option>
+                <option value="amount-low" {{ request('sort') == 'amount-low' ? 'selected' : '' }}>Lowest Amount</option>
             </select>
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
         </div>
-    </div>
+    </form>
 
     <!-- Deposits Table -->
     <div class="table-card">
         <div class="table-header">
             <h3 class="table-title">Deposit Transactions</h3>
-            <span class="table-count">Showing 10 deposits</span>
+            <span class="table-count">Showing {{ $deposits->count() }} of {{ $deposits->total() }} deposits</span>
         </div>
         <div class="table-container">
             <table class="data-table">
@@ -101,336 +118,129 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><span class="id-badge">#D001</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar blue">AM</div>
-                                <div class="user-info">
-                                    <div class="user-name">Ahmad Mahmud</div>
-                                    <div class="user-email">ahmad.m@university.edu.my</div>
+                    @forelse($deposits as $deposit)
+                        <tr>
+                            <td><span class="id-badge">#D{{ str_pad($deposit->DepositID, 3, '0', STR_PAD_LEFT) }}</span></td>
+                            <td>
+                                <div class="user-cell">
+                                    @if($deposit->booking->user->ProfileImage)
+                                        <img src="{{ asset('storage/' . $deposit->booking->user->ProfileImage) }}" 
+                                             alt="{{ $deposit->booking->user->UserName }}" 
+                                             class="user-avatar-img">
+                                    @else
+                                        <div class="user-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal', 'red', 'indigo'][$deposit->booking->user->UserID % 8] }}">
+                                            {{ strtoupper(substr($deposit->booking->user->UserName, 0, 2)) }}
+                                        </div>
+                                    @endif
+                                    <div class="user-info">
+                                        <div class="user-name">{{ $deposit->booking->user->UserName }}</div>
+                                        <div class="user-email">{{ $deposit->booking->user->Email }}</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">Gaming Laptop - ROG Strix</span>
-                                <span class="item-owner">Owner: Siti Lina</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge large">RM 500.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Oct 1 - Oct 7, 2025</span>
-                                <span class="period-duration">7 days</span>
-                            </div>
-                        </td>
-                        <td>Oct 1, 2025</td>
-                        <td><span class="status-badge status-held">Held</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(1)">👁️</button>
-                                <button class="btn-icon btn-refund" title="Process Refund" onclick="processRefund(1)">💰</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="id-badge">#D002</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar pink">SL</div>
-                                <div class="user-info">
-                                    <div class="user-name">Siti Lina</div>
-                                    <div class="user-email">siti.lina@university.edu.my</div>
+                            </td>
+                            <td>
+                                <div class="item-cell">
+                                    <span class="item-name">{{ $deposit->booking->item->ItemName }}</span>
+                                    <span class="item-owner">Owner: {{ $deposit->booking->item->user->UserName }}</span>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">Mountain Bike - Trek Marlin</span>
-                                <span class="item-owner">Owner: Tan Wei Ming</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge medium">RM 300.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Sep 25 - Oct 2, 2025</span>
-                                <span class="period-duration">8 days</span>
-                            </div>
-                        </td>
-                        <td>Sep 25, 2025</td>
-                        <td><span class="status-badge status-refunded">Refunded</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(2)">👁️</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="id-badge">#D003</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar green">TW</div>
-                                <div class="user-info">
-                                    <div class="user-name">Tan Wei Ming</div>
-                                    <div class="user-email">tan.wei@university.edu.my</div>
+                            </td>
+                            <td>
+                                <span class="amount-badge {{ $deposit->DepositAmount < 200 ? 'small' : ($deposit->DepositAmount < 600 ? 'medium' : 'large') }}">
+                                    RM {{ number_format($deposit->DepositAmount, 2) }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="period-cell">
+                                    <span class="period-dates">
+                                        {{ $deposit->booking->StartDate->format('M d') }} - {{ $deposit->booking->EndDate->format('M d, Y') }}
+                                    </span>
+                                    <span class="period-duration">
+                                        {{ $deposit->booking->StartDate->diffInDays($deposit->booking->EndDate) }} days
+                                    </span>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">Canon EOS 90D DSLR Camera</span>
-                                <span class="item-owner">Owner: Lee Chong</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge large">RM 1,200.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Oct 3 - Oct 6, 2025</span>
-                                <span class="period-duration">4 days</span>
-                            </div>
-                        </td>
-                        <td>Oct 3, 2025</td>
-                        <td><span class="status-badge status-held">Held</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(3)">👁️</button>
-                                <button class="btn-icon btn-refund" title="Process Refund" onclick="processRefund(3)">💰</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="id-badge">#D004</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar orange">RK</div>
-                                <div class="user-info">
-                                    <div class="user-name">Raj Kumar</div>
-                                    <div class="user-email">raj.k@university.edu.my</div>
+                            </td>
+                            <td>{{ $deposit->DateCollected->format('M d, Y') }}</td>
+                            <td>
+                                <span class="status-badge status-{{ $deposit->Status }}">
+                                    {{ ucfirst($deposit->Status) }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-view" 
+                                            title="View Details" 
+                                            onclick="viewDeposit({{ $deposit->DepositID }})">
+                                        👁️
+                                    </button>
+                                    @if($deposit->Status === 'held')
+                                        <form action="{{ route('admin.deposits.refund', $deposit->DepositID) }}" 
+                                              method="POST" 
+                                              style="display: inline;"
+                                              onsubmit="return confirm('Process refund for RM {{ number_format($deposit->DepositAmount, 2) }}?')">
+                                            @csrf
+                                            <button type="submit" class="btn-icon btn-refund" title="Process Refund">
+                                                💰
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">Epson Portable Projector</span>
-                                <span class="item-owner">Owner: Kevin Chen</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge medium">RM 400.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Sep 20 - Sep 25, 2025</span>
-                                <span class="period-duration">6 days</span>
-                            </div>
-                        </td>
-                        <td>Sep 20, 2025</td>
-                        <td><span class="status-badge status-forfeited">Forfeited</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(4)">👁️</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="id-badge">#D005</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar purple">NZ</div>
-                                <div class="user-info">
-                                    <div class="user-name">Nurul Zahra</div>
-                                    <div class="user-email">nurul.z@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">Engineering Textbooks Set</span>
-                                <span class="item-owner">Owner: Fatimah Ali</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge small">RM 100.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Sep 28 - Oct 5, 2025</span>
-                                <span class="period-duration">8 days</span>
-                            </div>
-                        </td>
-                        <td>Sep 28, 2025</td>
-                        <td><span class="status-badge status-refunded">Refunded</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(5)">👁️</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="id-badge">#D006</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar teal">LC</div>
-                                <div class="user-info">
-                                    <div class="user-name">Lee Chong</div>
-                                    <div class="user-email">lee.chong@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">DJI Mini 3 Pro Drone</span>
-                                <span class="item-owner">Owner: Ahmad Mahmud</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge large">RM 800.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Oct 2 - Oct 5, 2025</span>
-                                <span class="period-duration">4 days</span>
-                            </div>
-                        </td>
-                        <td>Oct 2, 2025</td>
-                        <td><span class="status-badge status-held">Held</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(6)">👁️</button>
-                                <button class="btn-icon btn-refund" title="Process Refund" onclick="processRefund(6)">💰</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="id-badge">#D007</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar red">FA</div>
-                                <div class="user-info">
-                                    <div class="user-name">Fatimah Ali</div>
-                                    <div class="user-email">fatimah.a@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">Study Desk with Storage</span>
-                                <span class="item-owner">Owner: Nurul Zahra</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge small">RM 150.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Sep 15 - Sep 22, 2025</span>
-                                <span class="period-duration">8 days</span>
-                            </div>
-                        </td>
-                        <td>Sep 15, 2025</td>
-                        <td><span class="status-badge status-partial">Partial Refund</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(7)">👁️</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="id-badge">#D008</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar indigo">KC</div>
-                                <div class="user-info">
-                                    <div class="user-name">Kevin Chen</div>
-                                    <div class="user-email">kevin.chen@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">Professional Tennis Racket</span>
-                                <span class="item-owner">Owner: Siti Lina</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge small">RM 200.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Sep 18 - Sep 23, 2025</span>
-                                <span class="period-duration">6 days</span>
-                            </div>
-                        </td>
-                        <td>Sep 18, 2025</td>
-                        <td><span class="status-badge status-refunded">Refunded</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(8)">👁️</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="id-badge">#D009</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar blue">AM</div>
-                                <div class="user-info">
-                                    <div class="user-name">Ahmad Mahmud</div>
-                                    <div class="user-email">ahmad.m@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">Camping Tent - 4 Person</span>
-                                <span class="item-owner">Owner: Raj Kumar</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge medium">RM 250.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Oct 4 - Oct 8, 2025</span>
-                                <span class="period-duration">5 days</span>
-                            </div>
-                        </td>
-                        <td>Oct 4, 2025</td>
-                        <td><span class="status-badge status-held">Held</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(9)">👁️</button>
-                                <button class="btn-icon btn-refund" title="Process Refund" onclick="processRefund(9)">💰</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="id-badge">#D010</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar pink">SL</div>
-                                <div class="user-info">
-                                    <div class="user-name">Siti Lina</div>
-                                    <div class="user-email">siti.lina@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="item-cell">
-                                <span class="item-name">Portable Speaker - JBL</span>
-                                <span class="item-owner">Owner: Lee Chong</span>
-                            </div>
-                        </td>
-                        <td><span class="amount-badge small">RM 180.00</span></td>
-                        <td>
-                            <div class="period-cell">
-                                <span class="period-dates">Sep 12 - Sep 19, 2025</span>
-                                <span class="period-duration">8 days</span>
-                            </div>
-                        </td>
-                        <td>Sep 12, 2025</td>
-                        <td><span class="status-badge status-refunded">Refunded</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Details" onclick="viewDeposit(10)">👁️</button>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 60px; color: #6b7280;">
+                                <p style="font-size: 18px; font-weight: 600;">No deposits found</p>
+                                <p style="margin-top: 10px;">Try adjusting your filters</p>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 
+    <!-- Pagination -->
+    @if($deposits->hasPages())
+        <div class="pagination-container">
+            {{ $deposits->appends(request()->query())->links() }}
+        </div>
+    @endif
+
     <style>
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 0 20px 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .pagination-container {
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .user-avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -840,6 +650,8 @@
             cursor: pointer;
             border: none;
             transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-primary {
@@ -863,38 +675,59 @@
     </style>
 
     <script>
-        function exportDeposits() {
-            alert('Exporting deposits data...');
-            console.log('Export deposits functionality');
+        function viewDeposit(id) {
+            fetch(`/admin/deposits/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const deposit = data.deposit;
+                        alert(`Deposit Details #D${id.toString().padStart(3, '0')}
+                        
+User: ${deposit.user.name} (${deposit.user.email})
+Item: ${deposit.item.name}
+Owner: ${deposit.item.owner}
+
+Amount: RM ${deposit.amount}
+Status: ${deposit.status}
+Date Collected: ${deposit.date_collected}
+${deposit.refund_date !== 'N/A' ? 'Refund Date: ' + deposit.refund_date : ''}
+
+Booking Period: ${deposit.booking.start_date} to ${deposit.booking.end_date}
+Duration: ${deposit.booking.duration}
+
+Notes: ${deposit.notes}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load deposit details');
+                });
         }
 
         function generateReport() {
-            alert('Generating financial report...');
-            console.log('Generate report functionality');
-        }
+            fetch('/admin/deposits-report')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const report = data.report;
+                        alert(`Financial Report - Deposits
+                        
+Total Deposits: RM ${parseFloat(report.total_deposits).toFixed(2)}
+Refunded: RM ${parseFloat(report.refunded).toFixed(2)}
+Held: RM ${parseFloat(report.held).toFixed(2)}
+Forfeited: RM ${parseFloat(report.forfeited).toFixed(2)}
+Partial Refunds: RM ${parseFloat(report.partial).toFixed(2)}
 
-        function viewDeposit(id) {
-            alert('View deposit details for ID: D00' + id + '\n\nDetails:\n- Transaction breakdown\n- Booking information\n- User contact details\n- Item condition report');
-            console.log('Viewing deposit:', id);
-        }
+Total Transactions: ${report.total_transactions}
 
-        function processRefund(id) {
-            const confirmation = confirm('Process refund for deposit D00' + id + '?\n\nThis will:\n- Release the deposit to the user\n- Update transaction status\n- Send confirmation email');
-            if (confirmation) {
-                alert('Refund processed successfully for D00' + id);
-                console.log('Processing refund for deposit:', id);
-            }
+Monthly Breakdown:
+${report.monthly_breakdown.map(m => `${m.month_name}: RM ${parseFloat(m.total).toFixed(2)} (${m.count} transactions)`).join('\n')}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to generate report');
+                });
         }
-
-        // Search functionality
-        document.getElementById('searchInput')?.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('.data-table tbody tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
     </script>
 @endsection
