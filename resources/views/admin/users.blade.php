@@ -16,284 +16,140 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon blue">👥</div>
-            <div class="stat-content">
-                <div class="stat-value">156</div>
-                <div class="stat-label">Total Users</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon green">✓</div>
-            <div class="stat-content">
-                <div class="stat-value">142</div>
-                <div class="stat-label">Active Users</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon orange">👨‍🎓</div>
-            <div class="stat-content">
-                <div class="stat-value">98</div>
-                <div class="stat-label">Students</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon purple">👨‍🏫</div>
-            <div class="stat-content">
-                <div class="stat-value">44</div>
-                <div class="stat-label">Staff</div>
-            </div>
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">👥</div>
+        <div class="stat-content">
+            <div class="stat-value">{{ $totalUsers }}</div>
+            <div class="stat-label">Total Users</div>
         </div>
     </div>
 
-    <!-- Filters and Search -->
-    <div class="table-controls">
-        <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Search users by name or email..." class="search-input" id="searchInput">
-        </div>
-        <div class="filter-buttons">
-            <select class="filter-select" id="userTypeFilter">
-                <option value="all">All Types</option>
-                <option value="student">Students</option>
-                <option value="staff">Staff</option>
-            </select>
-            <select class="filter-select" id="statusFilter">
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="suspended">Suspended</option>
-            </select>
-            <select class="filter-select" id="sortFilter">
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="name-az">Name (A-Z)</option>
-                <option value="name-za">Name (Z-A)</option>
-            </select>
+    <div class="stat-card">
+        <div class="stat-icon green">✓</div>
+        <div class="stat-content">
+            <div class="stat-value">{{ $activeUsers }}</div>
+            <div class="stat-label">Active This Month</div>
         </div>
     </div>
 
-    <!-- Users Table -->
-    <div class="table-card">
-        <div class="table-header">
-            <h3 class="table-title">User Accounts</h3>
-            <span class="table-count">Showing 8 users</span>
-        </div>
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>User Type</th>
-                        <th>Phone</th>
-                        <th>Listings</th>
-                        <th>Bookings</th>
-                        <th>Joined Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar blue">AM</div>
-                                <div class="user-info">
-                                    <div class="user-name">Ahmad Mahmud</div>
-                                    <div class="user-email">ahmad.m@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="type-badge student">👨‍🎓 Student</span></td>
-                        <td>+60 12-345 6789</td>
-                        <td><span class="count-badge">5</span></td>
-                        <td><span class="count-badge">12</span></td>
-                        <td>Jan 15, 2024</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Profile" onclick="viewUser(1)">👁️</button>
-                                <button class="btn-icon btn-edit" title="Edit User" onclick="editUser(1)">✏️</button>
-                                <button class="btn-icon btn-more" title="More Actions" onclick="showMoreActions(1)">⋮</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar pink">SL</div>
-                                <div class="user-info">
-                                    <div class="user-name">Siti Lina</div>
-                                    <div class="user-email">siti.lina@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="type-badge student">👨‍🎓 Student</span></td>
-                        <td>+60 11-234 5678</td>
-                        <td><span class="count-badge">3</span></td>
-                        <td><span class="count-badge">8</span></td>
-                        <td>Feb 3, 2024</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Profile" onclick="viewUser(2)">👁️</button>
-                                <button class="btn-icon btn-edit" title="Edit User" onclick="editUser(2)">✏️</button>
-                                <button class="btn-icon btn-more" title="More Actions" onclick="showMoreActions(2)">⋮</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar green">TW</div>
-                                <div class="user-info">
-                                    <div class="user-name">Tan Wei Ming</div>
-                                    <div class="user-email">tan.wei@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="type-badge staff">👨‍🏫 Staff</span></td>
-                        <td>+60 19-876 5432</td>
-                        <td><span class="count-badge">7</span></td>
-                        <td><span class="count-badge">15</span></td>
-                        <td>Dec 12, 2023</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Profile" onclick="viewUser(3)">👁️</button>
-                                <button class="btn-icon btn-edit" title="Edit User" onclick="editUser(3)">✏️</button>
-                                <button class="btn-icon btn-more" title="More Actions" onclick="showMoreActions(3)">⋮</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar orange">RK</div>
-                                <div class="user-info">
-                                    <div class="user-name">Raj Kumar</div>
-                                    <div class="user-email">raj.k@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="type-badge student">👨‍🎓 Student</span></td>
-                        <td>+60 16-543 2109</td>
-                        <td><span class="count-badge">2</span></td>
-                        <td><span class="count-badge">6</span></td>
-                        <td>Mar 8, 2024</td>
-                        <td><span class="status-badge status-suspended">Suspended</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Profile" onclick="viewUser(4)">👁️</button>
-                                <button class="btn-icon btn-edit" title="Edit User" onclick="editUser(4)">✏️</button>
-                                <button class="btn-icon btn-more" title="More Actions" onclick="showMoreActions(4)">⋮</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar purple">NZ</div>
-                                <div class="user-info">
-                                    <div class="user-name">Nurul Zahra</div>
-                                    <div class="user-email">nurul.z@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="type-badge student">👨‍🎓 Student</span></td>
-                        <td>+60 13-987 6543</td>
-                        <td><span class="count-badge">4</span></td>
-                        <td><span class="count-badge">10</span></td>
-                        <td>Jan 20, 2024</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Profile" onclick="viewUser(5)">👁️</button>
-                                <button class="btn-icon btn-edit" title="Edit User" onclick="editUser(5)">✏️</button>
-                                <button class="btn-icon btn-more" title="More Actions" onclick="showMoreActions(5)">⋮</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar teal">LC</div>
-                                <div class="user-info">
-                                    <div class="user-name">Lee Chong</div>
-                                    <div class="user-email">lee.chong@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="type-badge staff">👨‍🏫 Staff</span></td>
-                        <td>+60 17-234 8901</td>
-                        <td><span class="count-badge">6</span></td>
-                        <td><span class="count-badge">9</span></td>
-                        <td>Nov 5, 2023</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Profile" onclick="viewUser(6)">👁️</button>
-                                <button class="btn-icon btn-edit" title="Edit User" onclick="editUser(6)">✏️</button>
-                                <button class="btn-icon btn-more" title="More Actions" onclick="showMoreActions(6)">⋮</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar red">FA</div>
-                                <div class="user-info">
-                                    <div class="user-name">Fatimah Ali</div>
-                                    <div class="user-email">fatimah.a@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="type-badge student">👨‍🎓 Student</span></td>
-                        <td>+60 14-567 8901</td>
-                        <td><span class="count-badge">1</span></td>
-                        <td><span class="count-badge">4</span></td>
-                        <td>Apr 12, 2024</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Profile" onclick="viewUser(7)">👁️</button>
-                                <button class="btn-icon btn-edit" title="Edit User" onclick="editUser(7)">✏️</button>
-                                <button class="btn-icon btn-more" title="More Actions" onclick="showMoreActions(7)">⋮</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar indigo">KC</div>
-                                <div class="user-info">
-                                    <div class="user-name">Kevin Chen</div>
-                                    <div class="user-email">kevin.chen@university.edu.my</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="type-badge staff">👨‍🏫 Staff</span></td>
-                        <td>+60 18-345 6789</td>
-                        <td><span class="count-badge">8</span></td>
-                        <td><span class="count-badge">14</span></td>
-                        <td>Oct 1, 2023</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="View Profile" onclick="viewUser(8)">👁️</button>
-                                <button class="btn-icon btn-edit" title="Edit User" onclick="editUser(8)">✏️</button>
-                                <button class="btn-icon btn-more" title="More Actions" onclick="showMoreActions(8)">⋮</button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="stat-card">
+        <div class="stat-icon orange">👨‍💼</div>
+        <div class="stat-content">
+            <div class="stat-value">{{ $regularUserCount }}</div>
+            <div class="stat-label">Regular Users</div>
         </div>
     </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple">🔐</div>
+        <div class="stat-content">
+            <div class="stat-value">{{ $adminCount }}</div>
+            <div class="stat-label">Administrators</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<form action="{{ route('admin.users') }}" method="GET" class="table-controls">
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" 
+               name="search" 
+               placeholder="Search users by name or email..." 
+               class="search-input" 
+               value="{{ request('search') }}">
+    </div>
+    <div class="filter-buttons">
+        <select class="filter-select" name="user_type" onchange="this.form.submit()">
+            <option value="all" {{ request('user_type') == 'all' ? 'selected' : '' }}>All Types</option>
+            <option value="User" {{ request('user_type') == 'User' ? 'selected' : '' }}>Users</option>
+            <option value="Admin" {{ request('user_type') == 'Admin' ? 'selected' : '' }}>Admins</option>
+        </select>
+        <select class="filter-select" name="sort" onchange="this.form.submit()">
+            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
+            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
+            <option value="name-az" {{ request('sort') == 'name-az' ? 'selected' : '' }}>Name (A-Z)</option>
+            <option value="name-za" {{ request('sort') == 'name-za' ? 'selected' : '' }}>Name (Z-A)</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Apply Filters</button>
+    </div>
+</form>
+
+<!-- Users Table -->
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">User Accounts</h3>
+        <span class="table-count">Showing {{ $users->count() }} of {{ $users->total() }} users</span>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>User Type</th>
+                    <th>Joined Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($users as $user)
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                @if($user->ProfileImage)
+                                    <img src="{{ asset('storage/' . $user->ProfileImage) }}" 
+                                         alt="{{ $user->UserName }}" 
+                                         class="user-avatar-img">
+                                @else
+                                    <div class="user-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal'][($user->UserID) % 6] }}">
+                                        {{ strtoupper(substr($user->UserName, 0, 2)) }}
+                                    </div>
+                                @endif
+                                <div class="user-info">
+                                    <div class="user-name">{{ $user->UserName }}</div>
+                                    <div class="user-email">{{ $user->Email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="type-badge {{ $user->IsAdmin ? 'admin' : 'user' }}">
+                                {{ $user->IsAdmin ? '🔐 Admin' : '👤 User' }}
+                            </span>
+                        </td>
+                        <td>{{ $user->CreatedAt ? \Carbon\Carbon::parse($user->CreatedAt)->format('M d, Y') : 'N/A' }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ route('admin.users.show', $user->UserID) }}" 
+                                   class="btn-icon btn-view" 
+                                   title="View Profile">👁️</a>
+                                
+                                <button class="btn-icon btn-more" 
+                                        title="More Actions" 
+                                        onclick="showMoreActions({{ $user->UserID }}, '{{ $user->UserName }}')">⋮</button>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px; color: #6b7280;">
+                            No users found
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if($users->hasPages())
+        <div class="pagination-container">
+            {{ $users->appends(request()->query())->links() }}
+        </div>
+    @endif
+</div>
+
 
     <style>
         .header {
@@ -607,6 +463,30 @@
             background: #fee2e2;
             color: #991b1b;
         }
+
+
+        .type-badge.user {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.type-badge.admin {
+    background: #fce7f3;
+    color: #9f1239;
+}
+
+.user-avatar-img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.pagination-container {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
 
         /* Action Buttons */
         .action-buttons {

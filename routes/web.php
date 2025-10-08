@@ -157,61 +157,111 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Admin Routes (with inline admin check)
+| Admin Routes
 |--------------------------------------------------------------------------
 */
 
 Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(function () {
-    // Admin check wrapper
+    
+    // Dashboard
     Route::get('/', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(AdminDashboardController::class)->index();
+        return app(App\Http\Controllers\Admin\DashboardController::class)->index();
     })->name('dashboard');
     
-    Route::get('/users', function() {
+    // Users Management
+    Route::get('/users', function(Illuminate\Http\Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(AdminUsersController::class)->index();
+        return app(App\Http\Controllers\Admin\UsersController::class)->index($request);
     })->name('users');
     
+    Route::get('/users/export', function() {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(App\Http\Controllers\Admin\UsersController::class)->export();
+    })->name('users.export');
+    
+    Route::get('/users/{id}', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(App\Http\Controllers\Admin\UsersController::class)->show($id);
+    })->name('users.show');
+    
+    Route::delete('/users/{id}', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(App\Http\Controllers\Admin\UsersController::class)->destroy($id);
+    })->name('users.destroy');
+    
+    // Listings
     Route::get('/listings', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(AdminListingsController::class)->index();
+        return app(App\Http\Controllers\Admin\ListingsController::class)->index();
     })->name('listings');
     
+    // Deposits
     Route::get('/deposits', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(AdminDepositsController::class)->index();
+        return app(App\Http\Controllers\Admin\DepositsController::class)->index();
     })->name('deposits');
     
+    // Reports
     Route::get('/reports', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(AdminReportsController::class)->index();
+        return app(App\Http\Controllers\Admin\ReportsController::class)->index();
     })->name('reports');
     
+    // Penalties
     Route::get('/penalties', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(AdminPenaltiesController::class)->index();
+        return app(App\Http\Controllers\Admin\PenaltiesController::class)->index();
     })->name('penalties');
     
+    // Taxes
     Route::get('/taxes', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(AdminTaxesController::class)->index();
+        return app(App\Http\Controllers\Admin\TaxesController::class)->index();
     })->name('taxes');
-});
+
+        // Listings Management
+        Route::get('/listings', function(Illuminate\Http\Request $request) {
+            if (!auth()->user()->IsAdmin) {
+                abort(403, 'Unauthorized access. Admin only.');
+            }
+            return app(App\Http\Controllers\Admin\ListingsController::class)->index($request);
+        })->name('listings');
+
+        Route::get('/listings/export', function() {
+            if (!auth()->user()->IsAdmin) {
+                abort(403, 'Unauthorized access. Admin only.');
+            }
+            return app(App\Http\Controllers\Admin\ListingsController::class)->export();
+        })->name('listings.export');
+
+        Route::delete('/listings/{id}', function($id) {
+            if (!auth()->user()->IsAdmin) {
+                abort(403, 'Unauthorized access. Admin only.');
+            }
+            return app(App\Http\Controllers\Admin\ListingsController::class)->destroy($id);
+        })->name('listings.destroy');
+ });
 
 /*
 |--------------------------------------------------------------------------

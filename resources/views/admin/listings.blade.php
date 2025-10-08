@@ -16,12 +16,37 @@
         </div>
     </div>
 
+
+    <div class="header">
+        <div class="header-content">
+            <h1 class="header-title">Listings Management</h1>
+            <p class="header-description">View and manage all property and item listings on the platform</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ route('admin.listings.export') }}" class="btn btn-secondary">
+                📥 Export Data
+            </a>
+        </div>
+    </div>
+
+    @if(session('success'))
+        <div class="alert alert-success">
+            ✓ {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-error">
+            ✗ {{ session('error') }}
+        </div>
+    @endif
+
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon blue">📦</div>
             <div class="stat-content">
-                <div class="stat-value">248</div>
+                <div class="stat-value">{{ $totalListings }}</div>
                 <div class="stat-label">Total Listings</div>
             </div>
         </div>
@@ -29,7 +54,7 @@
         <div class="stat-card">
             <div class="stat-icon green">✓</div>
             <div class="stat-content">
-                <div class="stat-value">215</div>
+                <div class="stat-value">{{ $activeListings }}</div>
                 <div class="stat-label">Active Listings</div>
             </div>
         </div>
@@ -37,333 +62,145 @@
         <div class="stat-card">
             <div class="stat-icon orange">⏳</div>
             <div class="stat-content">
-                <div class="stat-value">18</div>
-                <div class="stat-label">Pending Review</div>
+                <div class="stat-value">{{ $unavailableListings }}</div>
+                <div class="stat-label">Unavailable</div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon purple">💰</div>
             <div class="stat-content">
-                <div class="stat-value">RM 45,680</div>
+                <div class="stat-value">RM {{ number_format($totalDeposits, 2) }}</div>
                 <div class="stat-label">Total Deposits</div>
             </div>
         </div>
     </div>
 
     <!-- Filters and Search -->
-    <div class="table-controls">
+    <form action="{{ route('admin.listings') }}" method="GET" class="table-controls">
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Search listings by name or owner..." class="search-input" id="searchInput">
+            <input type="text" 
+                   name="search"
+                   placeholder="Search listings by name or owner..." 
+                   class="search-input" 
+                   value="{{ request('search') }}">
         </div>
         <div class="filter-buttons">
-            <select class="filter-select" id="categoryFilter">
-                <option value="all">All Categories</option>
-                <option value="electronics">Electronics</option>
-                <option value="sports">Sports Equipment</option>
-                <option value="books">Books & Stationery</option>
-                <option value="furniture">Furniture</option>
+            <select class="filter-select" name="category" onchange="this.form.submit()">
+                <option value="all" {{ request('category') == 'all' ? 'selected' : '' }}>All Categories</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->CategoryID }}" {{ request('category') == $category->CategoryID ? 'selected' : '' }}>
+                        {{ $category->CategoryName }}
+                    </option>
+                @endforeach
             </select>
-            <select class="filter-select" id="statusFilter">
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="unavailable">Unavailable</option>
+            <select class="filter-select" name="status" onchange="this.form.submit()">
+                <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>All Status</option>
+                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                <option value="unavailable" {{ request('status') == 'unavailable' ? 'selected' : '' }}>Unavailable</option>
             </select>
-            <select class="filter-select" id="sortFilter">
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="price-low">Price: Low to High</option>
+            <select class="filter-select" name="sort" onchange="this.form.submit()">
+                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
+                <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                <option value="price-high" {{ request('sort') == 'price-high' ? 'selected' : '' }}>Price: High to Low</option>
+                <option value="price-low" {{ request('sort') == 'price-low' ? 'selected' : '' }}>Price: Low to High</option>
             </select>
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
         </div>
-    </div>
+    </form>
 
-    <!-- Listings Grid/Table -->
+    <!-- Listings Grid -->
     <div class="listings-grid">
-        <!-- Listing Card 1 -->
-        <div class="listing-card">
-            <div class="listing-image">
-                <img src="https://via.placeholder.com/300x200/3b82f6/ffffff?text=Gaming+Laptop" alt="Gaming Laptop">
-                <span class="listing-badge badge-active">Active</span>
-            </div>
-            <div class="listing-content">
-                <div class="listing-category">💻 Electronics</div>
-                <h3 class="listing-title">Gaming Laptop - ROG Strix</h3>
-                <div class="listing-owner">
-                    <div class="owner-avatar blue">AM</div>
-                    <span>Ahmad Mahmud</span>
+        @forelse($items as $item)
+            <div class="listing-card">
+                <div class="listing-image">
+                    @if($item->ImagePath)
+                        <img src="{{ asset('storage/' . $item->ImagePath) }}" alt="{{ $item->ItemName }}">
+                    @else
+                        <img src="https://via.placeholder.com/300x200/3b82f6/ffffff?text={{ urlencode($item->ItemName) }}" alt="{{ $item->ItemName }}">
+                    @endif
+                    <span class="listing-badge {{ $item->Availability ? 'badge-active' : 'badge-unavailable' }}">
+                        {{ $item->Availability ? 'Active' : 'Unavailable' }}
+                    </span>
                 </div>
-                <div class="listing-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Price/Day:</span>
-                        <span class="detail-value">RM 45.00</span>
+                <div class="listing-content">
+                    <div class="listing-category">
+                        {{ $item->category->CategoryName ?? 'Uncategorized' }}
                     </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Deposit:</span>
-                        <span class="detail-value">RM 500.00</span>
+                    <h3 class="listing-title">{{ $item->ItemName }}</h3>
+                    <div class="listing-owner">
+                        @if($item->user->ProfileImage)
+                            <img src="{{ asset('storage/' . $item->user->ProfileImage) }}" 
+                                 alt="{{ $item->user->UserName }}" 
+                                 style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                        @else
+                            <div class="owner-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal'][$item->UserID % 6] }}">
+                                {{ strtoupper(substr($item->user->UserName, 0, 2)) }}
+                            </div>
+                        @endif
+                        <span>{{ $item->user->UserName ?? 'Unknown' }}</span>
                     </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bookings:</span>
-                        <span class="detail-value">12</span>
+                    <div class="listing-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Price/Day:</span>
+                            <span class="detail-value">RM {{ number_format($item->PricePerDay, 2) }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Deposit:</span>
+                            <span class="detail-value">RM {{ number_format($item->DepositAmount, 2) }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Bookings:</span>
+                            <span class="detail-value">{{ $item->bookings->count() }}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="listing-actions">
-                    <button class="btn-action btn-view" onclick="viewListing(1)">👁️ View</button>
-                    <button class="btn-action btn-edit" onclick="editListing(1)">✏️ Edit</button>
-                    <button class="btn-action btn-more" onclick="showMoreActions(1)">⋮</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Listing Card 2 -->
-        <div class="listing-card">
-            <div class="listing-image">
-                <img src="https://via.placeholder.com/300x200/10b981/ffffff?text=DSLR+Camera" alt="DSLR Camera">
-                <span class="listing-badge badge-active">Active</span>
-            </div>
-            <div class="listing-content">
-                <div class="listing-category">📷 Electronics</div>
-                <h3 class="listing-title">Canon EOS 90D DSLR Camera</h3>
-                <div class="listing-owner">
-                    <div class="owner-avatar pink">SL</div>
-                    <span>Siti Lina</span>
-                </div>
-                <div class="listing-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Price/Day:</span>
-                        <span class="detail-value">RM 80.00</span>
+                    <div class="listing-actions">
+                        <a href="{{ route('item.details', $item->ItemID) }}" class="btn-action btn-view">👁️ View</a>
+                        <button class="btn-action btn-more" onclick="showMoreActions({{ $item->ItemID }}, '{{ $item->ItemName }}')">⋮</button>
                     </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Deposit:</span>
-                        <span class="detail-value">RM 1,200.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bookings:</span>
-                        <span class="detail-value">8</span>
-                    </div>
-                </div>
-                <div class="listing-actions">
-                    <button class="btn-action btn-view" onclick="viewListing(2)">👁️ View</button>
-                    <button class="btn-action btn-edit" onclick="editListing(2)">✏️ Edit</button>
-                    <button class="btn-action btn-more" onclick="showMoreActions(2)">⋮</button>
                 </div>
             </div>
-        </div>
-
-        <!-- Listing Card 3 -->
-        <div class="listing-card">
-            <div class="listing-image">
-                <img src="https://via.placeholder.com/300x200/f97316/ffffff?text=Mountain+Bike" alt="Mountain Bike">
-                <span class="listing-badge badge-active">Active</span>
+        @empty
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #6b7280;">
+                <p style="font-size: 18px; font-weight: 600;">No listings found</p>
+                <p style="margin-top: 10px;">Try adjusting your filters</p>
             </div>
-            <div class="listing-content">
-                <div class="listing-category">🚴 Sports Equipment</div>
-                <h3 class="listing-title">Mountain Bike - Trek Marlin 7</h3>
-                <div class="listing-owner">
-                    <div class="owner-avatar green">TW</div>
-                    <span>Tan Wei Ming</span>
-                </div>
-                <div class="listing-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Price/Day:</span>
-                        <span class="detail-value">RM 25.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Deposit:</span>
-                        <span class="detail-value">RM 300.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bookings:</span>
-                        <span class="detail-value">15</span>
-                    </div>
-                </div>
-                <div class="listing-actions">
-                    <button class="btn-action btn-view" onclick="viewListing(3)">👁️ View</button>
-                    <button class="btn-action btn-edit" onclick="editListing(3)">✏️ Edit</button>
-                    <button class="btn-action btn-more" onclick="showMoreActions(3)">⋮</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Listing Card 4 -->
-        <div class="listing-card">
-            <div class="listing-image">
-                <img src="https://via.placeholder.com/300x200/a855f7/ffffff?text=Study+Desk" alt="Study Desk">
-                <span class="listing-badge badge-pending">Pending</span>
-            </div>
-            <div class="listing-content">
-                <div class="listing-category">🪑 Furniture</div>
-                <h3 class="listing-title">Study Desk with Storage</h3>
-                <div class="listing-owner">
-                    <div class="owner-avatar orange">RK</div>
-                    <span>Raj Kumar</span>
-                </div>
-                <div class="listing-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Price/Day:</span>
-                        <span class="detail-value">RM 15.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Deposit:</span>
-                        <span class="detail-value">RM 150.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bookings:</span>
-                        <span class="detail-value">0</span>
-                    </div>
-                </div>
-                <div class="listing-actions">
-                    <button class="btn-action btn-view" onclick="viewListing(4)">👁️ View</button>
-                    <button class="btn-action btn-edit" onclick="editListing(4)">✏️ Edit</button>
-                    <button class="btn-action btn-more" onclick="showMoreActions(4)">⋮</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Listing Card 5 -->
-        <div class="listing-card">
-            <div class="listing-image">
-                <img src="https://via.placeholder.com/300x200/ec4899/ffffff?text=Textbooks" alt="Engineering Textbooks">
-                <span class="listing-badge badge-active">Active</span>
-            </div>
-            <div class="listing-content">
-                <div class="listing-category">📚 Books & Stationery</div>
-                <h3 class="listing-title">Engineering Textbooks Set</h3>
-                <div class="listing-owner">
-                    <div class="owner-avatar purple">NZ</div>
-                    <span>Nurul Zahra</span>
-                </div>
-                <div class="listing-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Price/Day:</span>
-                        <span class="detail-value">RM 10.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Deposit:</span>
-                        <span class="detail-value">RM 100.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bookings:</span>
-                        <span class="detail-value">10</span>
-                    </div>
-                </div>
-                <div class="listing-actions">
-                    <button class="btn-action btn-view" onclick="viewListing(5)">👁️ View</button>
-                    <button class="btn-action btn-edit" onclick="editListing(5)">✏️ Edit</button>
-                    <button class="btn-action btn-more" onclick="showMoreActions(5)">⋮</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Listing Card 6 -->
-        <div class="listing-card">
-            <div class="listing-image">
-                <img src="https://via.placeholder.com/300x200/14b8a6/ffffff?text=Projector" alt="Projector">
-                <span class="listing-badge badge-active">Active</span>
-            </div>
-            <div class="listing-content">
-                <div class="listing-category">🎥 Electronics</div>
-                <h3 class="listing-title">Epson Portable Projector</h3>
-                <div class="listing-owner">
-                    <div class="owner-avatar teal">LC</div>
-                    <span>Lee Chong</span>
-                </div>
-                <div class="listing-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Price/Day:</span>
-                        <span class="detail-value">RM 35.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Deposit:</span>
-                        <span class="detail-value">RM 400.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bookings:</span>
-                        <span class="detail-value">9</span>
-                    </div>
-                </div>
-                <div class="listing-actions">
-                    <button class="btn-action btn-view" onclick="viewListing(6)">👁️ View</button>
-                    <button class="btn-action btn-edit" onclick="editListing(6)">✏️ Edit</button>
-                    <button class="btn-action btn-more" onclick="showMoreActions(6)">⋮</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Listing Card 7 -->
-        <div class="listing-card">
-            <div class="listing-image">
-                <img src="https://via.placeholder.com/300x200/ef4444/ffffff?text=Tennis+Racket" alt="Tennis Racket">
-                <span class="listing-badge badge-unavailable">Unavailable</span>
-            </div>
-            <div class="listing-content">
-                <div class="listing-category">🎾 Sports Equipment</div>
-                <h3 class="listing-title">Professional Tennis Racket</h3>
-                <div class="listing-owner">
-                    <div class="owner-avatar red">FA</div>
-                    <span>Fatimah Ali</span>
-                </div>
-                <div class="listing-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Price/Day:</span>
-                        <span class="detail-value">RM 20.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Deposit:</span>
-                        <span class="detail-value">RM 200.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bookings:</span>
-                        <span class="detail-value">4</span>
-                    </div>
-                </div>
-                <div class="listing-actions">
-                    <button class="btn-action btn-view" onclick="viewListing(7)">👁️ View</button>
-                    <button class="btn-action btn-edit" onclick="editListing(7)">✏️ Edit</button>
-                    <button class="btn-action btn-more" onclick="showMoreActions(7)">⋮</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Listing Card 8 -->
-        <div class="listing-card">
-            <div class="listing-image">
-                <img src="https://via.placeholder.com/300x200/6366f1/ffffff?text=Drone" alt="Drone">
-                <span class="listing-badge badge-active">Active</span>
-            </div>
-            <div class="listing-content">
-                <div class="listing-category">🚁 Electronics</div>
-                <h3 class="listing-title">DJI Mini 3 Pro Drone</h3>
-                <div class="listing-owner">
-                    <div class="owner-avatar indigo">KC</div>
-                    <span>Kevin Chen</span>
-                </div>
-                <div class="listing-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Price/Day:</span>
-                        <span class="detail-value">RM 60.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Deposit:</span>
-                        <span class="detail-value">RM 800.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bookings:</span>
-                        <span class="detail-value">14</span>
-                    </div>
-                </div>
-                <div class="listing-actions">
-                    <button class="btn-action btn-view" onclick="viewListing(8)">👁️ View</button>
-                    <button class="btn-action btn-edit" onclick="editListing(8)">✏️ Edit</button>
-                    <button class="btn-action btn-more" onclick="showMoreActions(8)">⋮</button>
-                </div>
-            </div>
-        </div>
+        @endforelse
     </div>
+
+    <!-- Pagination -->
+    @if($items->hasPages())
+        <div class="pagination-container">
+            {{ $items->appends(request()->query())->links() }}
+        </div>
+    @endif
 
     <style>
+        /* Add alert styles */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 0 20px 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .pagination-container {
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -734,43 +571,35 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+
     </style>
 
     <script>
-        function exportListings() {
-            alert('Exporting listings data...');
-            console.log('Export listings functionality');
+        function showMoreActions(id, name) {
+            if (confirm(`Select action for "${name}":\n\nClick OK to delete listing\nClick Cancel to go back`)) {
+                if (confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
+                    // Create and submit delete form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/listings/${id}`;
+                    
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
+                    
+                    const methodField = document.createElement('input');
+                    methodField.type = 'hidden';
+                    methodField.name = '_method';
+                    methodField.value = 'DELETE';
+                    
+                    form.appendChild(csrfToken);
+                    form.appendChild(methodField);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
         }
-
-        function addNewListing() {
-            alert('Add new listing form will open here');
-            console.log('Add new listing functionality');
-        }
-
-        function viewListing(id) {
-            alert('View listing details for ID: ' + id);
-            console.log('Viewing listing:', id);
-        }
-
-        function editListing(id) {
-            alert('Edit listing form for ID: ' + id);
-            console.log('Editing listing:', id);
-        }
-
-        function showMoreActions(id) {
-            alert('More actions for listing ID: ' + id + '\n- Feature Listing\n- Mark Unavailable\n- Delete Listing\n- View Reports');
-            console.log('More actions for listing:', id);
-        }
-
-        // Search functionality
-        document.getElementById('searchInput')?.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.listing-card');
-            
-            cards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
     </script>
 @endsection

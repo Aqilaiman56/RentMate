@@ -22,7 +22,7 @@ class Item extends Model
         'Availability',
         'ImagePath',
         'DepositAmount',
-        'PricePerDay', // Add this if you have it in your table
+        'PricePerDay',
         'DateAdded'
     ];
 
