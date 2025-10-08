@@ -30,6 +30,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
+
 // User Homepage (Authenticated)
 Route::get('/homepage', [HomeController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -209,13 +211,49 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     })->name('listings');
     
     // Deposits
-    Route::get('/deposits', function() {
+    Route::get('/deposits', function(Illuminate\Http\Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\DepositsController::class)->index();
+        return app(App\Http\Controllers\Admin\DepositsController::class)->index($request);
     })->name('deposits');
-    
+
+    Route::get('/deposits/export', function() {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(App\Http\Controllers\Admin\DepositsController::class)->export();
+    })->name('deposits.export');
+
+    Route::get('/deposits/report', function() {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(App\Http\Controllers\Admin\DepositsController::class)->generateReport();
+    })->name('deposits.report');
+
+    Route::get('/deposits/{id}', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(App\Http\Controllers\Admin\DepositsController::class)->show($id);
+    })->name('deposits.show');
+
+    Route::post('/deposits/{id}/refund', function($id, Illuminate\Http\Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(App\Http\Controllers\Admin\DepositsController::class)->refund($request, $id);
+    })->name('deposits.refund');
+
+    Route::post('/deposits/{id}/forfeit', function($id, Illuminate\Http\Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(App\Http\Controllers\Admin\DepositsController::class)->forfeit($request, $id);
+    })->name('deposits.forfeit');
+
+
     // Reports
     Route::get('/reports', function() {
         if (!auth()->user()->IsAdmin) {

@@ -162,7 +162,7 @@
             border: 3px solid #4461F2;
             border-radius: 15px;
             padding: 20px;
-            width: 120px;
+            min-width: 120px;
             height: 120px;
             display: flex;
             flex-direction: column;
@@ -265,6 +265,9 @@
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .item-location {
@@ -279,6 +282,19 @@
         .item-price {
             font-size: 18px;
             font-weight: 700;
+        }
+
+        .item-category-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(68, 97, 242, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 1;
         }
 
         .features {
@@ -339,6 +355,22 @@
             opacity: 0.9;
         }
 
+        .no-items {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+        }
+
+        .no-items-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .no-items-text {
+            font-size: 16px;
+        }
+
         @media (max-width: 768px) {
             .hero-title {
                 font-size: 32px;
@@ -358,6 +390,7 @@
 
             .categories {
                 overflow-x: scroll;
+                justify-content: flex-start;
             }
 
             .header {
@@ -376,10 +409,14 @@
         
         @if (Route::has('login'))
             <div class="auth-buttons">
-                <a href="{{ route('login') }}" class="btn btn-login">Log in</a>
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="btn btn-register">Register</a>
-                @endif
+                @auth
+                    <a href="{{ route('user.HomePage') }}" class="btn btn-primary">Dashboard</a>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-login">Log in</a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="btn btn-register">Register</a>
+                    @endif
+                @endauth
             </div>
         @endif
     </header>
@@ -390,108 +427,94 @@
             Join our community of renters and lenders. Find what you need or earn money by renting out items you own.
         </p>
         <div class="cta-buttons">
-            <a href="{{ route('register') }}" class="btn-cta btn-primary">Get Started</a>
-            <a href="{{ route('login') }}" class="btn-cta btn-secondary">Browse Items</a>
+            @auth
+                <a href="{{ route('items.index') }}" class="btn-cta btn-primary">Browse Items</a>
+                <a href="{{ route('items.create') }}" class="btn-cta btn-secondary">List an Item</a>
+            @else
+                <a href="{{ route('register') }}" class="btn-cta btn-primary">Get Started</a>
+                <a href="{{ route('login') }}" class="btn-cta btn-secondary">Browse Items</a>
+            @endauth
         </div>
     </div>
 
     <div class="container">
-        <h2 class="section-title">Popular Categories</h2>
-        
-        <div class="categories">
-            <div class="category-card">
-                <div class="category-icon">🎮</div>
-                <div class="category-name">Gaming</div>
+        @if($categories->count() > 0)
+            <h2 class="section-title">Popular Categories</h2>
+            
+            <div class="categories">
+                @php
+                    $categoryIcons = [
+                        'Gaming' => '🎮',
+                        'Music Instruments' => '🎵',
+                        'Computer & Laptop' => '💻',
+                        'Camera & Photography' => '📷',
+                        'Attire & Fashion' => '👔',
+                        'Books & Education' => '📚',
+                        'Event & Party' => '🎁',
+                        'Sport & Outdoor' => '⚽',
+                        'Electronics & Gadgets' => '⚡',
+                    ];
+                @endphp
+                
+                @foreach($categories as $category)
+                    <div class="category-card">
+                        <div class="category-icon">
+                            {{ $categoryIcons[$category->CategoryName] ?? '📦' }}
+                        </div>
+                        <div class="category-name">{{ $category->CategoryName }}</div>
+                    </div>
+                @endforeach
             </div>
-            <div class="category-card">
-                <div class="category-icon">🎵</div>
-                <div class="category-name">Music</div>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">💻</div>
-                <div class="category-name">Computer</div>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">📷</div>
-                <div class="category-name">Photography</div>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">👔</div>
-                <div class="category-name">Attire</div>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">📚</div>
-                <div class="category-name">Books</div>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">🎁</div>
-                <div class="category-name">Events</div>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">⚽</div>
-                <div class="category-name">Sport</div>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">⚡</div>
-                <div class="category-name">Electric</div>
-            </div>
-        </div>
+        @endif
 
         <h2 class="section-title">Featured Items</h2>
         
-        <div class="items-grid">
-            <div class="item-card">
-                <img src="https://via.placeholder.com/300x200/4461F2/fff?text=Gaming+Console" class="item-image">
-                <div class="item-details">
-                    <div class="item-title">PlayStation 5</div>
-                    <div class="item-location">📍 Kuala Lumpur</div>
-                    <div class="item-price">RM 50.00 / day</div>
-                </div>
-                <div class="item-overlay">
-                    <div class="item-overlay-text">Sign up to view details</div>
-                    <a href="{{ route('register') }}" class="btn btn-register" style="pointer-events: all;">Join Now</a>
-                </div>
+        @if($featuredItems->count() > 0)
+            <div class="items-grid">
+                @foreach($featuredItems as $item)
+                    <div class="item-card">
+                        <span class="item-category-badge">{{ $item->category->CategoryName ?? 'Other' }}</span>
+                        
+                        @if($item->ImagePath)
+                            <img src="{{ asset('storage/' . $item->ImagePath) }}" 
+                                 alt="{{ $item->ItemName }}" 
+                                 class="item-image">
+                        @else
+                            <img src="https://via.placeholder.com/300x200/4461F2/fff?text={{ urlencode($item->ItemName) }}" 
+                                 class="item-image">
+                        @endif
+                        
+                        <div class="item-details">
+                            <div class="item-title">{{ $item->ItemName }}</div>
+                            <div class="item-location">
+                                📍 {{ $item->location->City ?? 'Malaysia' }}
+                            </div>
+                            <div class="item-price">RM {{ number_format($item->PricePerDay, 2) }} / day</div>
+                        </div>
+                        
+                        @guest
+                            <div class="item-overlay">
+                                <div class="item-overlay-text">Sign up to view details</div>
+                                <a href="{{ route('register') }}" class="btn btn-register" style="pointer-events: all;">Join Now</a>
+                            </div>
+                        @else
+                            <div class="item-overlay">
+                                <div class="item-overlay-text">View Item Details</div>
+                                <a href="{{ route('item.details', $item->ItemID) }}" class="btn btn-register" style="pointer-events: all;">View Now</a>
+                            </div>
+                        @endguest
+                    </div>
+                @endforeach
             </div>
-
-            <div class="item-card">
-                <img src="https://via.placeholder.com/300x200/764ba2/fff?text=DSLR+Camera" class="item-image">
-                <div class="item-details">
-                    <div class="item-title">Canon EOS R6</div>
-                    <div class="item-location">📍 Penang</div>
-                    <div class="item-price">RM 120.00 / day</div>
-                </div>
-                <div class="item-overlay">
-                    <div class="item-overlay-text">Sign up to view details</div>
-                    <a href="{{ route('register') }}" class="btn btn-register" style="pointer-events: all;">Join Now</a>
-                </div>
+        @else
+            <div class="no-items">
+                <h3 class="no-items-title">No Items Available Yet</h3>
+                <p class="no-items-text">Be the first to list an item on RentMate!</p>
+                @auth
+                    <a href="{{ route('items.create') }}" class="btn-cta btn-primary" style="margin-top: 20px;">List Your First Item</a>
+                @endauth
             </div>
-
-            <div class="item-card">
-                <img src="https://via.placeholder.com/300x200/667eea/fff?text=MacBook+Pro" class="item-image">
-                <div class="item-details">
-                    <div class="item-title">MacBook Pro M2</div>
-                    <div class="item-location">📍 Johor Bahru</div>
-                    <div class="item-price">RM 80.00 / day</div>
-                </div>
-                <div class="item-overlay">
-                    <div class="item-overlay-text">Sign up to view details</div>
-                    <a href="{{ route('register') }}" class="btn btn-register" style="pointer-events: all;">Join Now</a>
-                </div>
-            </div>
-
-            <div class="item-card">
-                <img src="https://via.placeholder.com/300x200/f093fb/fff?text=Guitar" class="item-image">
-                <div class="item-details">
-                    <div class="item-title">Fender Stratocaster</div>
-                    <div class="item-location">📍 Selangor</div>
-                    <div class="item-price">RM 35.00 / day</div>
-                </div>
-                <div class="item-overlay">
-                    <div class="item-overlay-text">Sign up to view details</div>
-                    <a href="{{ route('register') }}" class="btn btn-register" style="pointer-events: all;">Join Now</a>
-                </div>
-            </div>
-        </div>
+        @endif
 
         <div class="features">
             <h2 class="section-title">Why Choose RentMate?</h2>
@@ -522,7 +545,11 @@
         <div class="cta-section">
             <h2 class="cta-section-title">Ready to Get Started?</h2>
             <p class="cta-section-text">Join thousands of users who are already renting and lending on RentMate</p>
-            <a href="{{ route('register') }}" class="btn-cta btn-secondary">Create Free Account</a>
+            @auth
+                <a href="{{ route('items.index') }}" class="btn-cta btn-secondary">Browse All Items</a>
+            @else
+                <a href="{{ route('register') }}" class="btn-cta btn-secondary">Create Free Account</a>
+            @endauth
         </div>
     </div>
 </body>
