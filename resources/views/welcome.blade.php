@@ -148,6 +148,28 @@
             margin-bottom: 40px;
         }
 
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .clear-filter {
+            background: #ef4444;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .clear-filter:hover {
+            background: #dc2626;
+        }
+
         .categories {
             display: flex;
             gap: 15px;
@@ -171,12 +193,19 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
         }
 
         .category-card:hover {
             background: #4461F2;
             color: white;
             transform: translateY(-2px);
+        }
+
+        .category-card.active {
+            background: #4461F2;
+            color: white;
         }
 
         .category-icon {
@@ -400,6 +429,11 @@
             .container {
                 padding: 20px;
             }
+
+            .category-header {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -439,35 +473,47 @@
 
     <div class="container">
         @if($categories->count() > 0)
-            <h2 class="section-title">Popular Categories</h2>
+            <div class="category-header">
+                <h2 class="section-title" style="margin-bottom: 0;">Popular Categories</h2>
+                @if($selectedCategory)
+                    <a href="{{ route('welcome') }}" class="clear-filter">✕ Clear Filter</a>
+                @endif
+            </div>
             
             <div class="categories">
                 @php
                     $categoryIcons = [
                         'Gaming' => '🎮',
-                        'Music Instruments' => '🎵',
-                        'Computer & Laptop' => '💻',
-                        'Camera & Photography' => '📷',
-                        'Attire & Fashion' => '👔',
-                        'Books & Education' => '📚',
-                        'Event & Party' => '🎁',
-                        'Sport & Outdoor' => '⚽',
-                        'Electronics & Gadgets' => '⚡',
+                        'Music' => '🎵',
+                        'Computer' => '💻',
+                        'Camera' => '📷',
+                        'Attire' => '👔',
+                        'Books' => '📚',
+                        'Event' => '🎁',
+                        'Sports' => '⚽',
+                        'Electric' => '⚡',
                     ];
                 @endphp
                 
                 @foreach($categories as $category)
-                    <div class="category-card">
+                    <a href="{{ route('welcome', ['category' => $category->CategoryID]) }}" 
+                       class="category-card {{ $selectedCategory && $selectedCategory->CategoryID == $category->CategoryID ? 'active' : '' }}">
                         <div class="category-icon">
                             {{ $categoryIcons[$category->CategoryName] ?? '📦' }}
                         </div>
                         <div class="category-name">{{ $category->CategoryName }}</div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
         @endif
 
-        <h2 class="section-title">Featured Items</h2>
+        <h2 class="section-title">
+            @if($selectedCategory)
+                {{ $selectedCategory->CategoryName }} Items
+            @else
+                Featured Items
+            @endif
+        </h2>
         
         @if($featuredItems->count() > 0)
             <div class="items-grid">
@@ -508,11 +554,9 @@
             </div>
         @else
             <div class="no-items">
-                <h3 class="no-items-title">No Items Available Yet</h3>
-                <p class="no-items-text">Be the first to list an item on RentMate!</p>
-                @auth
-                    <a href="{{ route('items.create') }}" class="btn-cta btn-primary" style="margin-top: 20px;">List Your First Item</a>
-                @endauth
+                <h3 class="no-items-title">No Items Available in This Category</h3>
+                <p class="no-items-text">Try browsing other categories or check back later!</p>
+                <a href="{{ route('welcome') }}" class="btn-cta btn-primary" style="margin-top: 20px;">View All Items</a>
             </div>
         @endif
 
