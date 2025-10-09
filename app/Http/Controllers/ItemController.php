@@ -8,6 +8,7 @@ use App\Models\Review;
 use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Location;
+use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
@@ -46,12 +47,15 @@ class ItemController extends Controller
             ->get(['StartDate', 'EndDate'])
             ->map(function($booking) {
                 return [
-                    'start' => $booking->StartDate->format('Y-m-d'),
-                    'end' => $booking->EndDate->format('Y-m-d')
+                    'start' => $booking->StartDate ? $booking->StartDate->format('Y-m-d') : null,
+                    'end' => $booking->EndDate ? $booking->EndDate->format('Y-m-d') : null
                 ];
+            })
+            ->filter(function($booking) {
+                return $booking['start'] && $booking['end'];
             });
         
-        return view('item-details', compact(
+        return view('user.item-details', compact(
             'item', 
             'averageRating', 
             'totalReviews', 
@@ -61,16 +65,16 @@ class ItemController extends Controller
     }
     
     /**
-     * Show user's listed items
+     * Show user's listed items (My Listings page)
      */
     public function myItems()
     {
         $items = Item::where('UserID', auth()->id())
-            ->with(['location', 'category', 'bookings'])
+            ->with(['location', 'category', 'bookings', 'reviews'])
             ->orderBy('DateAdded', 'desc')
-            ->get();
+            ->paginate(12);
         
-        return view('items.my-items', compact('items'));
+        return view('user.listings', compact('items'));
     }
     
     /**
@@ -81,7 +85,7 @@ class ItemController extends Controller
         $categories = Category::all();
         $locations = Location::all();
         
-        return view('items.create', compact('categories', 'locations'));
+        return view('user.add-listing', compact('categories', 'locations'));
     }
     
     /**
@@ -97,7 +101,7 @@ class ItemController extends Controller
             'DepositAmount' => 'required|numeric|min:0',
             'PricePerDay' => 'required|numeric|min:0',
             'ImagePath' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'Availability' => 'boolean'
+            'Availability' => 'nullable|boolean'
         ]);
         
         // Handle image upload
@@ -127,7 +131,7 @@ class ItemController extends Controller
         $categories = Category::all();
         $locations = Location::all();
         
-        return view('items.edit', compact('item', 'categories', 'locations'));
+        return view('user.edit-listing', compact('item', 'categories', 'locations'));
     }
     
     /**
@@ -147,19 +151,21 @@ class ItemController extends Controller
             'DepositAmount' => 'required|numeric|min:0',
             'PricePerDay' => 'required|numeric|min:0',
             'ImagePath' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'Availability' => 'boolean'
+            'Availability' => 'nullable|boolean'
         ]);
         
         // Handle image upload if new image provided
         if ($request->hasFile('ImagePath')) {
             // Delete old image
             if ($item->ImagePath) {
-                \Storage::disk('public')->delete($item->ImagePath);
+                Storage::disk('public')->delete($item->ImagePath);
             }
             
             $imagePath = $request->file('ImagePath')->store('items', 'public');
             $validated['ImagePath'] = $imagePath;
         }
+        
+        $validated['Availability'] = $request->has('Availability') ? 1 : 0;
         
         $item->update($validated);
         
@@ -182,12 +188,13 @@ class ItemController extends Controller
             ->exists();
         
         if ($hasActiveBookings) {
-            return back()->with('error', 'Cannot delete item with active bookings');
+            return redirect()->route('items.my')
+                ->with('error', 'Cannot delete item with active bookings');
         }
         
         // Delete image
         if ($item->ImagePath) {
-            \Storage::disk('public')->delete($item->ImagePath);
+            Storage::disk('public')->delete($item->ImagePath);
         }
         
         $item->delete();
@@ -196,17 +203,17 @@ class ItemController extends Controller
     }
 
     /**
- * Show user's listings (for user dashboard)
- */
-public function userListings()
-{
-    $items = Item::where('UserID', auth()->id())
-        ->with(['location', 'category', 'bookings'])
-        ->orderBy('DateAdded', 'desc')
-        ->paginate(12);
-    
-    return view('user.listings', compact('items'));
-}
+     * Show user's listings (for user dashboard)
+     */
+    public function userListings()
+    {
+        $items = Item::where('UserID', auth()->id())
+            ->with(['location', 'category', 'bookings'])
+            ->orderBy('DateAdded', 'desc')
+            ->paginate(12);
+        
+        return view('user.listings', compact('items'));
+    }
     
     /**
      * Add review to item
