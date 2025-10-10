@@ -74,6 +74,7 @@ class WishlistController extends Controller
         ]);
     }
     
+    
     /**
      * Remove item from wishlist
      */
@@ -86,17 +87,30 @@ class WishlistController extends Controller
             ->delete();
         
         if ($deleted) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Item removed from wishlist'
-            ]);
+            // Check if it's an AJAX request
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Item removed from wishlist'
+                ]);
+            }
+            
+            return redirect()->route('wishlist.index')
+                ->with('success', 'Item removed from wishlist');
         }
         
-        return response()->json([
-            'success' => false,
-            'message' => 'Item not found in wishlist'
-        ], 404);
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item not found in wishlist'
+            ], 404);
+        }
+        
+        return redirect()->route('wishlist.index')
+            ->with('error', 'Item not found in wishlist');
     }
+    
+
     
     /**
      * Display user's wishlist
@@ -110,6 +124,6 @@ class WishlistController extends Controller
             ->orderBy('DateAdded', 'desc')
             ->get();
         
-        return view('wishlist.index', compact('wishlistItems'));
+        return view('user.wishlist', compact('wishlistItems')); 
     }
 }

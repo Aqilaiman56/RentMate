@@ -320,10 +320,6 @@
                 <div class="stat-label">Total Bookings</div>
                 <div class="stat-value">{{ $items->sum(fn($item) => $item->bookings->count()) }}</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Revenue</div>
-                <div class="stat-value">RM {{ number_format($items->sum('PricePerDay') * 30, 2) }}</div>
-            </div>
         </div>
 
         <div class="listings-grid">

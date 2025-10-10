@@ -107,18 +107,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/booking/{id}', [BookingController::class, 'show'])->name('booking.show');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Wishlist Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist/toggle/{itemId}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-    Route::post('/wishlist/add/{itemId}', [WishlistController::class, 'add'])->name('wishlist.add');
-    Route::delete('/wishlist/remove/{itemId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -412,6 +400,13 @@ Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(fu
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
     
 });
+
+    // Wishlist Actions (AJAX routes - don't need user prefix)
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::post('/wishlist/toggle/{itemId}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+        Route::post('/wishlist/add/{itemId}', [WishlistController::class, 'add'])->name('wishlist.add');
+        Route::delete('/wishlist/remove/{itemId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+    });
 
 // Inside the user middleware group
 Route::post('/report', [ProfileController::class, 'submitReport'])->name('report.submit');

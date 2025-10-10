@@ -88,6 +88,7 @@ class ProfileController extends Controller
             'UserName' => 'required|string|max:255',
             'Email' => 'required|email|unique:users,Email,' . $user->UserID . ',UserID',
             'PhoneNumber' => 'nullable|string|max:20',
+            'Location' => 'nullable|string|max:255', // Added
             'ProfileImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -105,40 +106,41 @@ class ProfileController extends Controller
 
         return Redirect::route('user.profile')->with('success', 'Profile updated successfully');
     }
+    
 
-    /**
- * Submit a report against another user
- */
-public function submitReport(Request $request): RedirectResponse
-{
-    $validated = $request->validate([
-        'ReportedUserID' => 'required|exists:users,UserID',
-        'BookingID' => 'nullable|exists:booking,BookingID',
-        'ItemID' => 'nullable|exists:items,ItemID',
-        'Description' => 'required|string|max:1000',
-        'EvidencePath' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-    ]);
+        /**
+     * Submit a report against another user
+     */
+    public function submitReport(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'ReportedUserID' => 'required|exists:users,UserID',
+            'BookingID' => 'nullable|exists:booking,BookingID',
+            'ItemID' => 'nullable|exists:items,ItemID',
+            'Description' => 'required|string|max:1000',
+            'EvidencePath' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
 
-    // Handle evidence upload
-    if ($request->hasFile('EvidencePath')) {
-        $validated['EvidencePath'] = $request->file('EvidencePath')->store('evidence', 'public');
+        // Handle evidence upload
+        if ($request->hasFile('EvidencePath')) {
+            $validated['EvidencePath'] = $request->file('EvidencePath')->store('evidence', 'public');
+        }
+
+        \App\Models\Penalty::create([
+            'ReportedByID' => auth()->id(),
+            'ReportedUserID' => $validated['ReportedUserID'],
+            'BookingID' => $validated['BookingID'] ?? null,
+            'ItemID' => $validated['ItemID'] ?? null,
+            'Description' => $validated['Description'],
+            'EvidencePath' => $validated['EvidencePath'] ?? null,
+            'PenaltyAmount' => null,
+            'ResolvedStatus' => 0,
+            'DateReported' => now(),
+            'ApprovedByAdminID' => null
+        ]);
+
+        return Redirect::route('user.profile')->with('success', 'Report submitted successfully. Admin will review it soon.');
     }
-
-    \App\Models\Penalty::create([
-        'ReportedByID' => auth()->id(),
-        'ReportedUserID' => $validated['ReportedUserID'],
-        'BookingID' => $validated['BookingID'] ?? null,
-        'ItemID' => $validated['ItemID'] ?? null,
-        'Description' => $validated['Description'],
-        'EvidencePath' => $validated['EvidencePath'] ?? null,
-        'PenaltyAmount' => null,
-        'ResolvedStatus' => 0,
-        'DateReported' => now(),
-        'ApprovedByAdminID' => null
-    ]);
-
-    return Redirect::route('user.profile')->with('success', 'Report submitted successfully. Admin will review it soon.');
-}
 
 
     /**

@@ -9,19 +9,37 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $table = 'users'; // Custom table name
-    protected $primaryKey = 'UserID'; // Custom primary key
-    public $timestamps = false;
+    protected $table = 'users';
+    protected $primaryKey = 'UserID';
+    
+    // Only use CreatedAt, disable UpdatedAt
+    public $timestamps = true;
+    const CREATED_AT = 'CreatedAt';
+    const UPDATED_AT = null; // Disable UpdatedAt
 
     protected $fillable = [
-        'UserName', 'Email', 'PasswordHash', 'ProfileImage', 'UserType', 'IsAdmin'
+        'UserName', 
+        'Email', 
+        'PasswordHash', 
+        'Password',
+        'ProfileImage', 
+        'PhoneNumber',
+        'Location',
+        'UserType', 
+        'IsAdmin'
     ];
 
     protected $hidden = [
-        'PasswordHash'
+        'PasswordHash',
+        'Password',
+        'remember_token'
     ];
 
-    // Override default password field
+    protected $casts = [
+        'CreatedAt' => 'datetime',
+        'IsAdmin' => 'boolean',
+    ];
+
     public function getAuthPassword()
     {
         return $this->PasswordHash;

@@ -148,95 +148,162 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 30px 40px;
+            padding: 30px 20px;
         }
 
         .profile-header {
             background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 20px;
         }
 
         .profile-avatar {
-            width: 120px;
-            height: 120px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid #4461F2;
+            border: 3px solid #4461F2;
+            flex-shrink: 0;
         }
 
         .profile-info h1 {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 700;
             color: #1f2937;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .profile-info p {
-            font-size: 16px;
+            font-size: 14px;
             color: #6B7280;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Clickable stat cards */
+        .stat-card-link {
+            cursor: pointer;
+        }
+
+        .stat-card-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(68, 97, 242, 0.08) 0%, rgba(68, 97, 242, 0.03) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 0;
+        }
+
+        .stat-card-link:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card-link:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(68, 97, 242, 0.2);
+        }
+
+        .stat-card-link:hover .stat-number {
+            color: #3651E2;
+        }
+
+        .stat-card-link::after {
+            content: '→';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 16px;
+            color: #4461F2;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .stat-card-link:hover::after {
+            opacity: 1;
+            transform: translateX(3px);
         }
 
         .stat-number {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: #4461F2;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s;
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: 13px;
             color: #6B7280;
             font-weight: 500;
+            position: relative;
+            z-index: 1;
         }
 
         .profile-form {
             background: white;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .form-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             color: #1f2937;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+            margin-bottom: 20px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
         }
 
         .form-label {
@@ -246,11 +313,12 @@
         }
 
         .form-input {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: 2px solid #E5E7EB;
             border-radius: 8px;
             font-size: 14px;
             transition: border-color 0.2s;
+            font-family: 'Inter', sans-serif;
         }
 
         .form-input:focus {
@@ -259,20 +327,21 @@
         }
 
         .form-actions {
-            margin-top: 30px;
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: flex-end;
+            padding-top: 10px;
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             border: none;
             transition: all 0.2s;
+            text-decoration: none;
         }
 
         .btn-primary {
@@ -301,6 +370,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             font-weight: 500;
+            font-size: 14px;
         }
 
         .error-message {
@@ -310,6 +380,21 @@
             border-radius: 8px;
             margin-bottom: 20px;
             font-weight: 500;
+            font-size: 14px;
+        }
+
+        .error-message ul {
+            margin-left: 20px;
+        }
+
+        .error-message li {
+            margin-bottom: 4px;
+        }
+
+        .file-input-help {
+            color: #6B7280;
+            font-size: 12px;
+            margin-top: 4px;
         }
 
         @media (max-width: 768px) {
@@ -322,8 +407,16 @@
                 display: none;
             }
 
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
             .form-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px 15px;
             }
         }
     </style>
@@ -382,28 +475,31 @@
             @if($user->ProfileImage)
                 <img src="{{ asset('storage/' . $user->ProfileImage) }}" alt="Profile Picture" class="profile-avatar">
             @else
-                <img src="https://via.placeholder.com/120" alt="Profile Picture" class="profile-avatar">
+                <img src="https://via.placeholder.com/80" alt="Profile Picture" class="profile-avatar">
             @endif
 
             <div class="profile-info">
                 <h1>{{ $user->UserName }}</h1>
-                <p>{{ $user->Email }}</p>
+                <p>📧 {{ $user->Email }}</p>
                 @if($user->PhoneNumber)
                     <p>📞 {{ $user->PhoneNumber }}</p>
                 @endif
-                <p>Member since {{ $user->created_at->format('M Y') }}</p>
+                @if($user->Location)
+                    <p>📍 {{ $user->Location }}</p>
+                @endif
+                <p>🗓️ Member since {{ $user->CreatedAt->format('M Y') }}</p>
             </div>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card">
+            <a href="{{ route('user.listings') }}" class="stat-card stat-card-link">
                 <div class="stat-number">{{ $totalListings }}</div>
                 <div class="stat-label">Total Listings</div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="{{ route('user.bookings') }}" class="stat-card stat-card-link">
                 <div class="stat-number">{{ $totalBookings }}</div>
                 <div class="stat-label">Total Bookings</div>
-            </div>
+            </a>
             <div class="stat-card">
                 <div class="stat-number">{{ $totalReviews }}</div>
                 <div class="stat-label">Total Reviews</div>
@@ -418,7 +514,7 @@
 
             @if(session('success'))
                 <div class="success-message">
-                    {{ session('success') }}
+                    ✓ {{ session('success') }}
                 </div>
             @endif
 
@@ -434,30 +530,35 @@
 
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="UserName" class="form-label">Full Name</label>
+                    <label for="UserName" class="form-label">Full Name *</label>
                     <input type="text" id="UserName" name="UserName" value="{{ old('UserName', $user->UserName) }}" class="form-input" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="Email" class="form-label">Email Address</label>
+                    <label for="Email" class="form-label">Email Address *</label>
                     <input type="email" id="Email" name="Email" value="{{ old('Email', $user->Email) }}" class="form-input" required>
                 </div>
 
                 <div class="form-group">
                     <label for="PhoneNumber" class="form-label">Phone Number</label>
-                    <input type="tel" id="PhoneNumber" name="PhoneNumber" value="{{ old('PhoneNumber', $user->PhoneNumber) }}" class="form-input">
+                    <input type="tel" id="PhoneNumber" name="PhoneNumber" value="{{ old('PhoneNumber', $user->PhoneNumber) }}" class="form-input" placeholder="+60123456789">
                 </div>
 
                 <div class="form-group">
+                    <label for="Location" class="form-label">Location</label>
+                    <input type="text" id="Location" name="Location" value="{{ old('Location', $user->Location) }}" class="form-input" placeholder="e.g., Inside or outside UMS">
+                </div>
+
+                <div class="form-group full-width">
                     <label for="ProfileImage" class="form-label">Profile Picture</label>
                     <input type="file" id="ProfileImage" name="ProfileImage" class="form-input" accept="image/*">
-                    <small style="color: #6B7280; font-size: 12px;">Leave empty to keep current image. Max 2MB, JPG/PNG/GIF only.</small>
+                    <small class="file-input-help">Leave empty to keep current image. Max 2MB, JPG/PNG/GIF only.</small>
                 </div>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Update Profile</button>
                 <a href="{{ route('user.HomePage') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Update Profile</button>
             </div>
         </form>
     </div>

@@ -23,17 +23,11 @@ class Wishlist extends Model
         'DateAdded' => 'datetime'
     ];
 
-    /**
-     * Get the user that owns the wishlist entry
-     */
     public function user()
     {
         return $this->belongsTo(User::class, 'UserID', 'UserID');
     }
 
-    /**
-     * Get the item in the wishlist
-     */
     public function item()
     {
         return $this->belongsTo(Item::class, 'ItemID', 'ItemID');
