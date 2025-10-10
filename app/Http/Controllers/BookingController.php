@@ -64,6 +64,16 @@ class BookingController extends Controller
         return redirect()->route('user.bookings')->with('success', 'Booking request submitted!');
     }
 
+        // Create tax record
+        Tax::create([
+            'BookingID' => $booking->BookingID,
+            'UserID' => $booking->UserID,
+            'TaxAmount' => 1.00,
+            'DateCollected' => now(),
+            'TaxType' => 'Booking Tax',
+            'Description' => 'Tax for booking #' . $booking->BookingID,
+        ]);
+
     /**
      * Show booking details
      */

@@ -267,7 +267,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     })->name('deposits.forfeit');
 
 
-    // Reports
+    
     // Reports Management
     Route::get('/reports', function(Illuminate\Http\Request $request) {
         if (!auth()->user()->IsAdmin) {
@@ -342,13 +342,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         $controller = new App\Http\Controllers\Admin\PenaltiesController();
         return $controller->export();
     })->name('penalties.export');
-    // Taxes
-    Route::get('/taxes', function() {
-        if (!auth()->user()->IsAdmin) {
-            abort(403, 'Unauthorized access. Admin only.');
-        }
-        return app(App\Http\Controllers\Admin\TaxesController::class)->index();
-    })->name('taxes');
+   
 
         // Listings Management
         Route::get('/listings', function(Illuminate\Http\Request $request) {
@@ -371,7 +365,26 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
             }
             return app(App\Http\Controllers\Admin\ListingsController::class)->destroy($id);
         })->name('listings.destroy');
+
+        // Taxes Management
+        Route::get('/taxes', function(Illuminate\Http\Request $request) {
+            if (!auth()->user()->IsAdmin) {
+                abort(403);
+            }
+            $controller = new App\Http\Controllers\Admin\TaxesController();
+            return $controller->index($request);
+        })->name('taxes');
+
+        Route::get('/taxes-export', function(Illuminate\Http\Request $request) {
+            if (!auth()->user()->IsAdmin) {
+                abort(403);
+            }
+            $controller = new App\Http\Controllers\Admin\TaxesController();
+            return $controller->export($request);
+        })->name('taxes.export');
  });
+
+        
 
 /*
 |--------------------------------------------------------------------------

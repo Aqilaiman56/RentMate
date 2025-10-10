@@ -67,13 +67,21 @@ class Booking extends Model
         return $query->where('Status', 'Approved');
     }
 
-    /**
- * Get penalties related to this booking
- */
-public function penalties()
-{
-    return $this->hasMany(Penalty::class, 'BookingID', 'BookingID');
-}
+        /**
+     * Get penalties related to this booking
+     */
+    public function penalties()
+    {
+        return $this->hasMany(Penalty::class, 'BookingID', 'BookingID');
+    }
+
+        /**
+     * Get the tax for this booking
+     */
+    public function tax()
+    {
+        return $this->hasOne(Tax::class, 'BookingID', 'BookingID');
+    }
 
     /**
      * Scope to get bookings for a specific date range
