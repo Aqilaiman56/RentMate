@@ -268,21 +268,80 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
 
 
     // Reports
-    Route::get('/reports', function() {
+    // Reports Management
+    Route::get('/reports', function(Illuminate\Http\Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\ReportsController::class)->index();
+        $controller = new App\Http\Controllers\Admin\ReportsController();
+        return $controller->index($request);
     })->name('reports');
-    
-    // Penalties
-    Route::get('/penalties', function() {
+
+    Route::get('/reports/{id}', function($id) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\PenaltiesController::class)->index();
+        $controller = new App\Http\Controllers\Admin\ReportsController();
+        return $controller->show($id);
+    })->name('reports.show');
+
+    Route::post('/reports/{id}/resolve', function($id, Illuminate\Http\Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        $controller = new App\Http\Controllers\Admin\ReportsController();
+        return $controller->resolve($request, $id);
+    })->name('reports.resolve');
+
+    Route::post('/reports/{id}/dismiss', function($id, Illuminate\Http\Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        $controller = new App\Http\Controllers\Admin\ReportsController();
+        return $controller->dismiss($request, $id);
+    })->name('reports.dismiss');
+
+    Route::get('/reports-export', function() {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        $controller = new App\Http\Controllers\Admin\ReportsController();
+        return $controller->export();
+    })->name('reports.export');
+        
+
+   // Penalties Management
+    Route::get('/penalties', function(Illuminate\Http\Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403);
+        }
+        $controller = new App\Http\Controllers\Admin\PenaltiesController();
+        return $controller->index($request);
     })->name('penalties');
-    
+
+    Route::get('/penalties/{id}', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403);
+        }
+        $controller = new App\Http\Controllers\Admin\PenaltiesController();
+        return $controller->show($id);
+    })->name('penalties.show');
+
+    Route::post('/penalties/{id}/resolve', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403);
+        }
+        $controller = new App\Http\Controllers\Admin\PenaltiesController();
+        return $controller->resolve($id);
+    })->name('penalties.resolve');
+
+    Route::get('/penalties-export', function() {
+        if (!auth()->user()->IsAdmin) {
+            abort(403);
+        }
+        $controller = new App\Http\Controllers\Admin\PenaltiesController();
+        return $controller->export();
+    })->name('penalties.export');
     // Taxes
     Route::get('/taxes', function() {
         if (!auth()->user()->IsAdmin) {

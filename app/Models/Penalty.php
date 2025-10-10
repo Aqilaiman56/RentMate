@@ -5,9 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Penalty Model
- */
 class Penalty extends Model
 {
     use HasFactory;
@@ -17,6 +14,7 @@ class Penalty extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'ReportID',  // Add this
         'ReportedByID',
         'ReportedUserID',
         'BookingID',
@@ -34,6 +32,14 @@ class Penalty extends Model
         'PenaltyAmount' => 'decimal:2',
         'ResolvedStatus' => 'boolean'
     ];
+
+    /**
+     * Get the related report
+     */
+    public function report()
+    {
+        return $this->belongsTo(Report::class, 'ReportID', 'ReportID');
+    }
 
     /**
      * Get the user who reported
