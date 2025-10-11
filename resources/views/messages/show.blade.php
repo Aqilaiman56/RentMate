@@ -76,6 +76,69 @@
         background: #e5e7eb;
     }
 
+    .item-reference {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin: 15px 20px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #4461F2;
+    }
+
+    .item-reference-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .item-reference-info {
+        flex: 1;
+    }
+
+    .item-reference-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 5px;
+    }
+
+    .item-reference-price {
+        font-size: 14px;
+        color: #4461F2;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .item-reference-label {
+        font-size: 12px;
+        color: #6b7280;
+        background: #f3f4f6;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .item-reference-link {
+        background: #4461F2;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: background-color 0.2s;
+    }
+
+    .item-reference-link:hover {
+        background: #3651E2;
+    }
+
     .chat-messages {
         flex: 1;
         background: #f9fafb;
@@ -129,6 +192,29 @@
 
     .message.sent .message-time {
         text-align: right;
+    }
+
+    .message-item-ref {
+        background: rgba(68, 97, 242, 0.1);
+        border-left: 3px solid #4461F2;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 8px;
+        font-size: 12px;
+    }
+
+    .message.sent .message-item-ref {
+        background: rgba(255, 255, 255, 0.2);
+        border-left-color: white;
+    }
+
+    .message-item-name {
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .message-item-price {
+        opacity: 0.8;
     }
 
     .chat-input-container {
@@ -208,6 +294,16 @@
         .message {
             max-width: 85%;
         }
+
+        .item-reference {
+            flex-direction: column;
+            margin: 15px 10px;
+        }
+
+        .item-reference-image {
+            width: 100%;
+            height: 150px;
+        }
     }
 </style>
 @endpush
@@ -233,6 +329,31 @@
         <a href="{{ route('messages.index') }}" class="back-btn">← Back</a>
     </div>
 
+    @if($item)
+        <div class="item-reference">
+            @if($item->ImagePath)
+                <img src="{{ asset('storage/' . $item->ImagePath) }}" 
+                     alt="{{ $item->ItemName }}" 
+                     class="item-reference-image"
+                     onerror="this.src='https://via.placeholder.com/80'">
+            @else
+                <img src="https://via.placeholder.com/80" 
+                     alt="{{ $item->ItemName }}" 
+                     class="item-reference-image">
+            @endif
+            
+            <div class="item-reference-info">
+                <div class="item-reference-label">💬 Discussing about:</div>
+                <div class="item-reference-title">{{ $item->ItemName }}</div>
+                <div class="item-reference-price">RM {{ number_format($item->PricePerDay, 2) }} / day</div>
+            </div>
+            
+            <a href="{{ route('item.details', $item->ItemID) }}" class="item-reference-link" target="_blank">
+                View Item
+            </a>
+        </div>
+    @endif
+
     <div class="chat-messages" id="chatMessages">
         @php
             $lastDate = null;
@@ -255,6 +376,13 @@
                 <div>
                     <div class="message-bubble">
                         {{ $message->MessageContent }}
+                        
+                        @if($message->item)
+                            <div class="message-item-ref">
+                                <div class="message-item-name">📦 {{ $message->item->ItemName }}</div>
+                                <div class="message-item-price">RM {{ number_format($message->item->PricePerDay, 2) }}/day</div>
+                            </div>
+                        @endif
                     </div>
                     <div class="message-time">
                         {{ $message->SentAt->format('g:i A') }}
@@ -268,6 +396,9 @@
         <form action="{{ route('messages.send') }}" method="POST" class="chat-input-form" id="messageForm">
             @csrf
             <input type="hidden" name="receiver_id" value="{{ $otherUser->UserID }}">
+            @if($item)
+                <input type="hidden" name="item_id" value="{{ $item->ItemID }}">
+            @endif
             <input type="text" 
                    name="message" 
                    class="chat-input" 
@@ -312,11 +443,23 @@
             if (data.success) {
                 // Add message to chat
                 const message = data.message;
+                let itemRefHTML = '';
+                
+                if (message.item) {
+                    itemRefHTML = `
+                        <div class="message-item-ref">
+                            <div class="message-item-name">📦 ${message.item.ItemName}</div>
+                            <div class="message-item-price">RM ${parseFloat(message.item.PricePerDay).toFixed(2)}/day</div>
+                        </div>
+                    `;
+                }
+                
                 const messageHTML = `
                     <div class="message sent">
                         <div>
                             <div class="message-bubble">
                                 ${message.MessageContent}
+                                ${itemRefHTML}
                             </div>
                             <div class="message-time">
                                 Just now
@@ -348,11 +491,23 @@
             .then(data => {
                 if (data.success && data.messages.length > 0) {
                     data.messages.forEach(message => {
+                        let itemRefHTML = '';
+                        
+                        if (message.item) {
+                            itemRefHTML = `
+                                <div class="message-item-ref">
+                                    <div class="message-item-name">📦 ${message.item.ItemName}</div>
+                                    <div class="message-item-price">RM ${parseFloat(message.item.PricePerDay).toFixed(2)}/day</div>
+                                </div>
+                            `;
+                        }
+                        
                         const messageHTML = `
                             <div class="message received">
                                 <div>
                                     <div class="message-bubble">
                                         ${message.MessageContent}
+                                        ${itemRefHTML}
                                     </div>
                                     <div class="message-time">
                                         Just now

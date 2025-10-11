@@ -49,7 +49,7 @@ class MessageController extends Controller
     /**
      * Display conversation with specific user
      */
-    public function show($userId)
+    public function show(Request $request, $userId)
     {
         $currentUser = auth()->id();
         $otherUser = User::findOrFail($userId);
@@ -65,9 +65,15 @@ class MessageController extends Controller
             ->where('IsRead', false)
             ->update(['IsRead' => true]);
         
-        return view('messages.show', compact('messages', 'otherUser'));
+        // Get item if provided in request
+        $item = null;
+        if ($request->has('item_id')) {
+            $item = \App\Models\Item::find($request->item_id);
+        }
+        
+        return view('messages.show', compact('messages', 'otherUser', 'item'));
     }
-
+    
     /**
      * Send a message
      */
@@ -102,14 +108,13 @@ class MessageController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => $message->load(['sender', 'receiver'])
+                'message' => $message->load(['sender', 'receiver', 'item'])
             ]);
         }
 
         return redirect()->route('messages.show', $validated['receiver_id'])
             ->with('success', 'Message sent successfully');
     }
-
     /**
      * Get new messages (for AJAX polling)
      */

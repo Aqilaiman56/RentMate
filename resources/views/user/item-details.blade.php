@@ -578,7 +578,7 @@
                     </div>
                 </div>
                     @if(auth()->id() !== $item->UserID)
-                        <button class="contact-owner-btn" onclick="window.location.href='{{ route('messages.show', $item->user->UserID) }}'">
+                        <button class="contact-owner-btn" onclick="window.location.href='{{ route('messages.show', ['userId' => $item->user->UserID, 'item_id' => $item->ItemID]) }}'">
                             💬 Contact Owner
                         </button>
                     @else
