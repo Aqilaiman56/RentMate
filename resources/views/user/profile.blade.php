@@ -530,7 +530,7 @@
 
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="UserName" class="form-label">Full Name *</label>
+                    <label for="UserName" class="form-label">User Name*</label>
                     <input type="text" id="UserName" name="UserName" value="{{ old('UserName', $user->UserName) }}" class="form-input" required>
                 </div>
 

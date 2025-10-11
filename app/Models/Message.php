@@ -5,9 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Message Model
- */
 class Message extends Model
 {
     use HasFactory;
@@ -19,14 +16,14 @@ class Message extends Model
     protected $fillable = [
         'SenderID',
         'ReceiverID',
-        'Content',
-        'Timestamp',
+        'ItemID',
+        'MessageContent',
         'IsRead',
-        'BookingID'
+        'SentAt'
     ];
 
     protected $casts = [
-        'Timestamp' => 'datetime',
+        'SentAt' => 'datetime',
         'IsRead' => 'boolean'
     ];
 
@@ -47,43 +44,37 @@ class Message extends Model
     }
 
     /**
-     * Get the related booking (if any)
+     * Get the related item
      */
-    public function booking()
+    public function item()
     {
-        return $this->belongsTo(Booking::class, 'BookingID', 'BookingID');
+        return $this->belongsTo(Item::class, 'ItemID', 'ItemID');
+    }
+
+        public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'SenderID', 'UserID');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'ReceiverID', 'UserID');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'UserID', 'UserID');
     }
 
     /**
-     * Mark message as read
+     * Scope to get conversation between two users
      */
-    public function markAsRead()
-    {
-        $this->IsRead = true;
-        $this->save();
-    }
-
-    /**
-     * Scope to get unread messages
-     */
-    public function scopeUnread($query)
-    {
-        return $query->where('IsRead', 0);
-    }
-
-    /**
-     * Scope to get messages between two users
-     */
-    public function scopeBetweenUsers($query, $userId1, $userId2)
+    public function scopeConversation($query, $userId1, $userId2)
     {
         return $query->where(function($q) use ($userId1, $userId2) {
-            $q->where(function($q2) use ($userId1, $userId2) {
-                $q2->where('SenderID', $userId1)
-                   ->where('ReceiverID', $userId2);
-            })->orWhere(function($q2) use ($userId1, $userId2) {
-                $q2->where('SenderID', $userId2)
-                   ->where('ReceiverID', $userId1);
-            });
-        })->orderBy('Timestamp', 'asc');
+            $q->where('SenderID', $userId1)->where('ReceiverID', $userId2);
+        })->orWhere(function($q) use ($userId1, $userId2) {
+            $q->where('SenderID', $userId2)->where('ReceiverID', $userId1);
+        })->orderBy('SentAt', 'asc');
     }
 }

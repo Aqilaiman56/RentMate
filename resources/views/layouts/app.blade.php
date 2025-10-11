@@ -239,7 +239,7 @@
         </form>
 
         <div class="header-icons">
-            <a href="{{ route('notifications') }}" class="icon-btn">🔔</a>
+            <a href="{{ route('notifications.index') }}" class="icon-btn">🔔</a>
             <a href="{{ route('messages.index') }}" class="icon-btn">✉️</a>
             
             <div class="profile-section" id="profileSection">

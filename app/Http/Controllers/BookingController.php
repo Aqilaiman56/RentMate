@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Item;
+use App\Models\Notification;
 
 class BookingController extends Controller
 {
@@ -52,6 +53,19 @@ class BookingController extends Controller
             ->diffInDays(\Carbon\Carbon::parse($validated['EndDate'])) + 1;
         $totalPrice = $days * $item->PricePerDay;
 
+           // Create notification for item owner
+        $item = Item::find($booking->ItemID);
+        if ($item && $item->UserID != auth()->id()) {
+            Notification::create([
+            'UserID' => $item->UserID,
+            'Type' => 'booking',
+            'Title' => 'New Booking',
+            'Content' => auth()->user()->UserName . ' booked your item: ' . $item->ItemName,
+            'RelatedID' => $booking->BookingID,
+            'RelatedType' => 'booking',
+            'CreatedAt' => now()
+        ]);
+        }
         $booking = Booking::create([
             'UserID' => auth()->id(),
             'ItemID' => $validated['ItemID'],

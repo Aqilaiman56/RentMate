@@ -6,6 +6,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UsersController as AdminUsersController;
 use App\Http\Controllers\Admin\ListingsController as AdminListingsController;
@@ -122,20 +123,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Message/Chat Routes
+| Message and Notification Routes
 |--------------------------------------------------------------------------
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/chat', function() {
-        return view('chat.index');
-    })->name('chat');
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     
+    // Messages
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/{userId}', [MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages/send', [MessageController::class, 'send'])->name('messages.send');
+    Route::get('/messages/new/{userId}', [MessageController::class, 'getNewMessages'])->name('messages.new');
+    Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount'])->name('messages.unreadCount');
 });
-
 /*
 |--------------------------------------------------------------------------
 | Review Routes
@@ -372,49 +378,75 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         })->name('taxes.export');
  });
 
-        
+            /*
+    |--------------------------------------------------------------------------
+    | Message Routes
+    |--------------------------------------------------------------------------
+    */
 
-/*
-|--------------------------------------------------------------------------
-| User Dashboard Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(function () {
-    
-    // User Profile Settings (Different from Admin Profile)
-    Route::get('/profile', [ProfileController::class, 'userProfile'])->name('profile');
-    Route::patch('/profile', [ProfileController::class, 'userUpdateProfile'])->name('profile.update');
-    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-    
-    // User Listings Management
-    Route::get('/listings', [ItemController::class, 'userListings'])->name('listings');
-    
-    // Add New Listing
-    Route::get('/add-listing', [ItemController::class, 'create'])->name('add-listing');
-    
-    // User Bookings
-    Route::get('/bookings', [BookingController::class, 'userBookings'])->name('bookings');
-    
-    // User Wishlist
-    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
-    
-});
-
-    // Wishlist Actions (AJAX routes - don't need user prefix)
     Route::middleware(['auth', 'verified'])->group(function () {
-        Route::post('/wishlist/toggle/{itemId}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-        Route::post('/wishlist/add/{itemId}', [WishlistController::class, 'add'])->name('wishlist.add');
-        Route::delete('/wishlist/remove/{itemId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+        Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+        Route::get('/messages/{userId}', [MessageController::class, 'show'])->name('messages.show');
+        Route::post('/messages/send', [MessageController::class, 'send'])->name('messages.send');
+        Route::get('/messages/new/{userId}', [MessageController::class, 'getNewMessages'])->name('messages.new');
+        Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount'])->name('messages.unreadCount');
     });
 
-// Inside the user middleware group
-Route::post('/report', [ProfileController::class, 'submitReport'])->name('report.submit');
+    /*
+    |--------------------------------------------------------------------------
+    | Notification Routes
+    |--------------------------------------------------------------------------
+    */
 
-/*
-|--------------------------------------------------------------------------
-| Authentication Routes
-|--------------------------------------------------------------------------
-*/
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+        Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
+        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    });
 
-require __DIR__.'/auth.php';
+    /*
+    |--------------------------------------------------------------------------
+    | User Dashboard Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(function () {
+        
+        // User Profile Settings (Different from Admin Profile)
+        Route::get('/profile', [ProfileController::class, 'userProfile'])->name('profile');
+        Route::patch('/profile', [ProfileController::class, 'userUpdateProfile'])->name('profile.update');
+        Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+        
+        // User Listings Management
+        Route::get('/listings', [ItemController::class, 'userListings'])->name('listings');
+        
+        // Add New Listing
+        Route::get('/add-listing', [ItemController::class, 'create'])->name('add-listing');
+        
+        // User Bookings
+        Route::get('/bookings', [BookingController::class, 'userBookings'])->name('bookings');
+        
+        // User Wishlist
+        Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+        
+    });
+
+        // Wishlist Actions (AJAX routes - don't need user prefix)
+        Route::middleware(['auth', 'verified'])->group(function () {
+            Route::post('/wishlist/toggle/{itemId}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+            Route::post('/wishlist/add/{itemId}', [WishlistController::class, 'add'])->name('wishlist.add');
+            Route::delete('/wishlist/remove/{itemId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+        });
+
+    // Inside the user middleware group
+    Route::post('/report', [ProfileController::class, 'submitReport'])->name('report.submit');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Routes
+    |--------------------------------------------------------------------------
+    */
+
+    require __DIR__.'/auth.php';
