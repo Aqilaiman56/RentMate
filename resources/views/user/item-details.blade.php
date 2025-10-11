@@ -577,9 +577,15 @@
                         <p>Owner • Member since {{ $item->user && $item->user->created_at ? $item->user->created_at->format('Y') : 'N/A' }}</p>
                     </div>
                 </div>
-                <button class="contact-owner-btn" onclick="window.location.href='{{ route('messages.index') }}'">
-                    💬 Contact Owner
-                </button>
+                    @if(auth()->id() !== $item->UserID)
+                        <button class="contact-owner-btn" onclick="window.location.href='{{ route('messages.show', $item->user->UserID) }}'">
+                            💬 Contact Owner
+                        </button>
+                    @else
+                        <button class="contact-owner-btn" disabled style="background: #e5e7eb; color: #9ca3af; cursor: not-allowed;">
+                            💬 This is Your Item
+                        </button>
+                    @endif
             </div>
 
             <div class="booking-card">

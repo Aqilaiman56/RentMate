@@ -2,7 +2,9 @@
 
 @section('title', 'Chat with ' . $otherUser->UserName . ' - RentMate')
 
-@php($hideSearch = true)
+@php
+    $hideSearch = true;
+@endphp
 
 @push('styles')
 <style>
