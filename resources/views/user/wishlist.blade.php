@@ -2,7 +2,9 @@
 
 @section('title', 'My Wishlist - RentMate')
 
-@php($hideSearch = true)
+@php
+    $hideSearch = true;
+@endphp
 
 @push('styles')
 <style>
@@ -312,59 +314,54 @@
     @if($wishlistItems->count() > 0)
         <div class="wishlist-grid">
             @foreach($wishlistItems as $wishlist)
-                @php
-                    $item = $wishlist->item;
-                @endphp
-                <div class="wishlist-card" id="wishlist-item-{{ $item->ItemID }}">
-                    @if($item->ImagePath)
-                        <img src="{{ asset('storage/' . $item->ImagePath) }}" 
-                             alt="{{ $item->ItemName }}" 
+                <div class="wishlist-card" id="wishlist-item-{{ $wishlist->item->ItemID }}">
+                    @if($wishlist->item->ImagePath)
+                        <img src="{{ asset('storage/' . $wishlist->item->ImagePath) }}" 
+                             alt="{{ $wishlist->item->ItemName }}" 
                              class="item-image"
-                             onerror="this.src='https://via.placeholder.com/300x220/4461F2/fff?text={{ urlencode($item->ItemName) }}'">
+                             onerror="this.src='https://via.placeholder.com/300x220/4461F2/fff?text={{ urlencode($wishlist->item->ItemName) }}'">
                     @else
-                        <img src="https://via.placeholder.com/300x220/4461F2/fff?text={{ urlencode($item->ItemName) }}" 
-                             alt="{{ $item->ItemName }}" 
+                        <img src="https://via.placeholder.com/300x220/4461F2/fff?text={{ urlencode($wishlist->item->ItemName) }}" 
+                             alt="{{ $wishlist->item->ItemName }}" 
                              class="item-image">
                     @endif
                     
-                    <!-- Wishlist Heart Button -->
                     <div class="wishlist-badge loved" 
-                         onclick="removeFromWishlist({{ $item->ItemID }})"
+                         onclick="removeFromWishlist({{ $wishlist->item->ItemID }})"
                          title="Remove from wishlist">
                         ❤️
                     </div>
 
-                    <!-- Availability Badge -->
-                    <span class="availability-badge {{ $item->Availability ? 'badge-available' : 'badge-unavailable' }}">
-                        {{ $item->Availability ? 'Available' : 'Unavailable' }}
+                    <span class="availability-badge {{ $wishlist->item->Availability ? 'badge-available' : 'badge-unavailable' }}">
+                        {{ $wishlist->item->Availability ? 'Available' : 'Unavailable' }}
                     </span>
 
                     <div class="item-content">
-                        <h3 class="item-title">{{ $item->ItemName }}</h3>
+                        <h3 class="item-title">{{ $wishlist->item->ItemName }}</h3>
                         
                         <div class="item-details">
                             <div class="item-detail">
                                 <span>📍</span>
-                                <span>{{ $item->location->LocationName ?? 'Location N/A' }}</span>
+                                <span>{{ $wishlist->item->location->LocationName ?? 'Location N/A' }}</span>
                             </div>
                             <div class="item-detail">
                                 <span>🏷️</span>
-                                <span>{{ $item->category->CategoryName ?? 'Category N/A' }}</span>
+                                <span>{{ $wishlist->item->category->CategoryName ?? 'Category N/A' }}</span>
                             </div>
                         </div>
 
                         <div class="item-price">
-                            RM {{ number_format($item->PricePerDay, 2) }} / day
+                            RM {{ number_format($wishlist->item->PricePerDay, 2) }} / day
                         </div>
 
                         <div class="item-meta">
                             <div class="meta-item">
                                 <span>⭐</span>
-                                <span>{{ number_format($item->reviews->avg('Rating') ?? 0, 1) }} ({{ $item->reviews->count() }})</span>
+                                <span>{{ number_format($wishlist->item->reviews->avg('Rating') ?? 0, 1) }} ({{ $wishlist->item->reviews->count() }})</span>
                             </div>
                             <div class="meta-item">
                                 <span>📅</span>
-                                <span>{{ $item->bookings->count() }} bookings</span>
+                                <span>{{ $wishlist->item->bookings->count() }} bookings</span>
                             </div>
                         </div>
 
@@ -374,10 +371,10 @@
                         </div>
 
                         <div class="item-actions">
-                            <a href="{{ route('item.details', $item->ItemID) }}" class="action-btn btn-view">
+                            <a href="{{ route('item.details', $wishlist->item->ItemID) }}" class="action-btn btn-view">
                                 👁️ View Details
                             </a>
-                            <button onclick="removeFromWishlist({{ $item->ItemID }})" class="action-btn btn-remove">
+                            <button onclick="removeFromWishlist({{ $wishlist->item->ItemID }})" class="action-btn btn-remove">
                                 🗑️ Remove
                             </button>
                         </div>
@@ -390,7 +387,7 @@
             <div class="empty-icon">💔</div>
             <h2 class="empty-title">Your Wishlist is Empty</h2>
             <p class="empty-text">Start adding items you love to your wishlist and find them easily later!</p>
-            <a href="{{ route('items.index') }}" class="browse-btn">
+            <a href="{{ route('user.HomePage') }}" class="browse-btn">
                 <span>🔍</span>
                 Browse Items
             </a>
@@ -402,50 +399,76 @@
 @push('scripts')
 <script>
     function removeFromWishlist(itemId) {
+        console.log('Removing item:', itemId); // Debug log
+        
         if (!confirm('Are you sure you want to remove this item from your wishlist?')) {
             return;
         }
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken) {
+            console.error('CSRF token not found');
+            alert('Security token not found. Please refresh the page.');
+            return;
+        }
+
+        console.log('Sending delete request...'); // Debug log
 
         fetch(`/wishlist/remove/${itemId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status); // Debug log
+            console.log('Response ok:', response.ok); // Debug log
+            
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('Error response:', text);
+                    throw new Error(`Server error: ${response.status}`);
+                });
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Response data:', data); // Debug log
+            
             if (data.success) {
-                // Remove the card with animation
                 const card = document.getElementById(`wishlist-item-${itemId}`);
-                card.style.transition = 'all 0.3s ease';
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.8)';
-                
-                setTimeout(() => {
-                    card.remove();
+                if (card) {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
                     
-                    // Update count
-                    const countElement = document.querySelector('.wishlist-count');
-                    const currentCount = parseInt(countElement.textContent);
-                    const newCount = currentCount - 1;
-                    countElement.textContent = `${newCount} item(s) in your wishlist`;
-                    
-                    // Show empty state if no items left
-                    if (newCount === 0) {
-                        location.reload();
-                    }
-                }, 300);
+                    setTimeout(() => {
+                        card.remove();
+                        
+                        const countElement = document.querySelector('.wishlist-count');
+                        if (countElement) {
+                            const currentCount = parseInt(countElement.textContent);
+                            const newCount = currentCount - 1;
+                            countElement.textContent = `${newCount} item(s) in your wishlist`;
+                            
+                            if (newCount === 0) {
+                                location.reload();
+                            }
+                        }
+                    }, 300);
+                }
 
-                // Show success message
                 showAlert('success', data.message);
             } else {
                 showAlert('error', data.message || 'Failed to remove item from wishlist');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            showAlert('error', 'An error occurred. Please try again.');
+            console.error('Fetch error:', error); // Debug log
+            showAlert('error', 'An error occurred: ' + error.message);
         });
     }
 
@@ -456,13 +479,16 @@
         
         const container = document.querySelector('.wishlist-container');
         const header = container.querySelector('.page-header');
-        header.after(alertDiv);
         
-        setTimeout(() => {
-            alertDiv.style.transition = 'opacity 0.3s ease';
-            alertDiv.style.opacity = '0';
-            setTimeout(() => alertDiv.remove(), 300);
-        }, 3000);
+        if (container && header) {
+            header.after(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.style.transition = 'opacity 0.3s ease';
+                alertDiv.style.opacity = '0';
+                setTimeout(() => alertDiv.remove(), 300);
+            }, 3000);
+        }
     }
 </script>
 @endpush
