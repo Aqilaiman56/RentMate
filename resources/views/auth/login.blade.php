@@ -1,298 +1,260 @@
 {{-- resources/views/auth/login.blade.php --}}
 <x-guest-layout>
     <div class="rentmate-login-container">
-        <!-- Left Section with Illustration -->
+        <!-- Left Section with Branding -->
         <div class="rentmate-left-section">
-            <div class="rentmate-illustration">
-                <!-- Brand Logo -->
-                <div class="rentmate-brand-logo">
-                    <h1>Rent<span>Mate</span></h1>
+            <div class="rentmate-brand">
+                <h1 class="rentmate-logo">RentMate</h1>
+                <p class="rentmate-tagline">Rent Anything, Anytime</p>
+                <div class="rentmate-features">
+                    <div class="rentmate-feature-item">
+                        <div class="rentmate-feature-icon">🔒</div>
+                        <div class="rentmate-feature-text">Safe & Secure</div>
+                    </div>
+                    <div class="rentmate-feature-item">
+                        <div class="rentmate-feature-icon">💰</div>
+                        <div class="rentmate-feature-text">Earn Extra Income</div>
+                    </div>
+                    <div class="rentmate-feature-item">
+                        <div class="rentmate-feature-icon">⚡</div>
+                        <div class="rentmate-feature-text">Quick & Easy</div>
+                    </div>
                 </div>
-
-                <!-- Abstract shapes and characters -->
-                <div class="rentmate-shape rentmate-shape-1"></div>
-                <div class="rentmate-shape rentmate-shape-2"></div>
-                <div class="rentmate-shape rentmate-shape-3"></div>
-                <div class="rentmate-shape rentmate-shape-4"></div>
-                <div class="rentmate-shape rentmate-shape-5"></div>
-                <div class="rentmate-shape rentmate-shape-6"></div>
-                
-                <div class="rentmate-character rentmate-character-1"></div>
-                <div class="rentmate-character rentmate-character-2"></div>
             </div>
         </div>
 
         <!-- Right Section with Login Form -->
         <div class="rentmate-right-section">
-            <div class="rentmate-login-form">
+            <div class="rentmate-login-card">
                 <div class="rentmate-form-header">
-                    <h2>Login Account</h2>
+                    <h2>Welcome Back</h2>
+                    <p>Login to your account</p>
                 </div>
 
                 <!-- Session Status -->
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form method="POST" action="{{ route('login') }}">
+                <form method="POST" action="{{ route('login') }}" class="rentmate-form">
                     @csrf
 
                     <!-- Email Address -->
                     <div class="rentmate-form-group">
-                        <x-input-label for="email" :value="__('Username')" class="rentmate-label" />
-                        <x-text-input id="email" 
-                                    class="rentmate-form-input" 
-                                    type="email" 
-                                    name="email" 
-                                    :value="old('email')" 
-                                    required 
-                                    autofocus 
-                                    autocomplete="username"
-                                    placeholder="Username" />
-                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        <label for="email" class="rentmate-label">Email Address</label>
+                        <input id="email" 
+                               class="rentmate-input" 
+                               type="email" 
+                               name="email" 
+                               value="{{ old('email') }}" 
+                               required 
+                               autofocus 
+                               autocomplete="username"
+                               placeholder="Enter your email">
+                        <x-input-error :messages="$errors->get('email')" class="rentmate-error" />
                     </div>
 
                     <!-- Password -->
                     <div class="rentmate-form-group">
-                        <x-input-label for="password" :value="__('Password')" class="rentmate-label" />
-                        <div class="rentmate-password-container">
-                            <x-text-input id="password"
-                                        class="rentmate-form-input"
-                                        type="password"
-                                        name="password"
-                                        required 
-                                        autocomplete="current-password"
-                                        placeholder="8+ characters" />
+                        <label for="password" class="rentmate-label">Password</label>
+                        <div class="rentmate-password-wrapper">
+                            <input id="password"
+                                   class="rentmate-input"
+                                   type="password"
+                                   name="password"
+                                   required 
+                                   autocomplete="current-password"
+                                   placeholder="Enter your password">
                             <button type="button" class="rentmate-password-toggle" onclick="togglePassword()">
-                                👁️
+                                <span class="rentmate-eye-icon">👁️</span>
                             </button>
                         </div>
-                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                        <x-input-error :messages="$errors->get('password')" class="rentmate-error" />
                     </div>
 
-                    <!-- Remember Me -->
-                    <div class="rentmate-remember-section">
-                        <label for="remember_me" class="rentmate-remember-label">
-                            <input id="remember_me" type="checkbox" class="rentmate-checkbox" name="remember">
-                            <span class="rentmate-remember-text">{{ __('Remember me') }}</span>
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="rentmate-form-options">
+                        <label class="rentmate-remember">
+                            <input type="checkbox" name="remember" class="rentmate-checkbox">
+                            <span>Remember me</span>
                         </label>
-                    </div>
-
-                    <!-- Terms Text -->
-                    <div class="rentmate-terms-text">
-                        By signing up you agree to <a href="#" class="rentmate-terms-link">terms and conditions</a> at zoho.
-                    </div>
-
-                    <!-- Login Button and Forgot Password -->
-                    <div class="rentmate-form-actions">
-                        <x-primary-button class="rentmate-login-btn">
-                            {{ __('Login') }}
-                        </x-primary-button>
-
                         @if (Route::has('password.request'))
-                            <div class="rentmate-forgot-password">
-                                <a class="rentmate-forgot-link" href="{{ route('password.request') }}">
-                                    {{ __('Forgot your password?') }}
-                                </a>
-                            </div>
+                            <a href="{{ route('password.request') }}" class="rentmate-forgot">
+                                Forgot password?
+                            </a>
                         @endif
                     </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" class="rentmate-btn-primary">
+                        Login
+                    </button>
                 </form>
 
-                <div class="rentmate-create-account">
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="rentmate-create-link">Create Account</a>
-                    @endif
+                <!-- Create Account -->
+                <div class="rentmate-signup-section">
+                    <p>Don't have an account? 
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}" class="rentmate-signup-link">Create Account</a>
+                        @endif
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 
     <style>
-        /* Override guest layout default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         .rentmate-login-container {
             display: flex;
             min-height: 100vh;
             width: 100vw;
             margin: -2rem;
-            background: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
-        /* Left Section */
+        /* Left Section - Branding */
         .rentmate-left-section {
             flex: 1;
-            background: linear-gradient(135deg, #f5f0eb 0%, #e8ddd4 100%);
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, #4461F2 0%, #3651E2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: 3rem;
+            color: white;
         }
 
-        .rentmate-illustration {
-            position: relative;
-            width: 100%;
+        .rentmate-brand {
             max-width: 500px;
-            height: 100%;
-            max-height: 600px;
+            text-align: center;
         }
 
-        .rentmate-brand-logo {
-            position: absolute;
-            top: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
+        .rentmate-logo {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
         }
 
-        .rentmate-brand-logo h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            color: #2d5aa0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            margin: 0;
+        .rentmate-tagline {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4rem;
         }
 
-        .rentmate-brand-logo h1 span {
-            color: #1a1a1a;
+        .rentmate-features {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            text-align: left;
         }
 
-        /* Abstract shapes */
-        .rentmate-shape {
-            position: absolute;
-            border-radius: 20px;
+        .rentmate-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
         }
 
-        .rentmate-shape-1 {
-            width: 120px;
-            height: 80px;
-            background: #4a90e2;
-            top: 10%;
-            left: 5%;
-            transform: rotate(-15deg);
+        .rentmate-feature-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
         }
 
-        .rentmate-shape-2 {
-            width: 100px;
-            height: 100px;
-            background: #ff8a80;
-            top: 15%;
-            right: 10%;
-            border-radius: 50%;
+        .rentmate-feature-icon {
+            font-size: 2rem;
         }
 
-        .rentmate-shape-3 {
-            width: 80px;
-            height: 120px;
-            background: #81c784;
-            bottom: 20%;
-            left: 10%;
-            transform: rotate(25deg);
+        .rentmate-feature-text {
+            font-size: 1.1rem;
+            font-weight: 500;
         }
 
-        .rentmate-shape-4 {
-            width: 90px;
-            height: 90px;
-            background: #ffb74d;
-            bottom: 10%;
-            right: 15%;
-            border-radius: 50%;
-        }
-
-        .rentmate-shape-5 {
-            width: 60px;
-            height: 100px;
-            background: #ba68c8;
-            top: 30%;
-            left: 25%;
-            transform: rotate(-30deg);
-        }
-
-        .rentmate-shape-6 {
-            width: 110px;
-            height: 70px;
-            background: #4db6ac;
-            top: 45%;
-            right: 20%;
-            transform: rotate(15deg);
-        }
-
-        .rentmate-character {
-            position: absolute;
-            width: 80px;
-            height: 120px;
-            border-radius: 40px 40px 10px 10px;
-        }
-
-        .rentmate-character-1 {
-            bottom: 25%;
-            left: 30%;
-            background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
-        }
-
-        .rentmate-character-2 {
-            bottom: 30%;
-            right: 25%;
-            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
-        }
-
-        /* Right Section */
+        /* Right Section - Form */
         .rentmate-right-section {
             flex: 1;
-            background: white;
+            background: #F5F7FF;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 2rem;
         }
 
-        .rentmate-login-form {
+        .rentmate-login-card {
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .rentmate-form-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .rentmate-form-header h2 {
             font-size: 2rem;
             font-weight: 700;
-            color: #1a1a1a;
-            margin: 0;
+            color: #1E3A5F;
+            margin-bottom: 0.5rem;
         }
 
-        /* Form Styles */
+        .rentmate-form-header p {
+            font-size: 1rem;
+            color: #6B7280;
+        }
+
+        .rentmate-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
         .rentmate-form-group {
-            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .rentmate-label {
-            display: block !important;
-            font-size: 0.95rem !important;
-            font-weight: 500 !important;
-            color: #374151 !important;
-            margin-bottom: 0.5rem !important;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #374151;
         }
 
-        .rentmate-form-input {
-            width: 100% !important;
-            padding: 0.875rem 1rem !important;
-            border: 2px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            font-size: 1rem !important;
-            background: #f9fafb !important;
-            transition: all 0.2s ease !important;
+        .rentmate-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.2s;
+            font-family: inherit;
         }
 
-        .rentmate-form-input:focus {
-            outline: none !important;
-            border-color: #3b82f6 !important;
-            background: white !important;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        .rentmate-input:focus {
+            outline: none;
+            border-color: #4461F2;
+            box-shadow: 0 0 0 3px rgba(68, 97, 242, 0.1);
         }
 
-        .rentmate-password-container {
+        .rentmate-input::placeholder {
+            color: #9CA3AF;
+        }
+
+        .rentmate-password-wrapper {
             position: relative;
         }
 
@@ -304,142 +266,165 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #9ca3af;
-            font-size: 1.1rem;
+            padding: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .rentmate-remember-section {
-            margin: 1rem 0;
+        .rentmate-eye-icon {
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
         }
 
-        .rentmate-remember-label {
-            display: flex !important;
-            align-items: center !important;
-            gap: 0.5rem !important;
+        .rentmate-password-toggle:hover .rentmate-eye-icon {
+            opacity: 1;
+        }
+
+        .rentmate-form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rentmate-remember {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+            cursor: pointer;
         }
 
         .rentmate-checkbox {
-            width: auto !important;
-            margin: 0 !important;
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+            accent-color: #4461F2;
         }
 
-        .rentmate-remember-text {
+        .rentmate-forgot {
             font-size: 0.875rem;
-            color: #6b7280;
+            color: #4461F2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
         }
 
-        .rentmate-terms-text {
-            font-size: 0.875rem;
-            color: #6b7280;
-            text-align: center;
-            margin: 1.5rem 0;
-        }
-
-        .rentmate-terms-link {
-            color: #3b82f6;
+        .rentmate-forgot:hover {
+            color: #3651E2;
             text-decoration: underline;
         }
 
-        .rentmate-form-actions {
-            margin-bottom: 1.5rem;
+        .rentmate-btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #4461F2 0%, #3651E2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            margin-top: 0.5rem;
         }
 
-        .rentmate-login-btn {
-            width: 100% !important;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
-            color: white !important;
-            border: none !important;
-            padding: 1rem !important;
-            border-radius: 12px !important;
-            font-size: 1.1rem !important;
-            font-weight: 600 !important;
-            justify-content: center !important;
-            margin-bottom: 1rem !important;
-            transition: all 0.2s ease !important;
+        .rentmate-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(68, 97, 242, 0.3);
         }
 
-        .rentmate-login-btn:hover {
-            transform: translateY(-1px) !important;
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3) !important;
+        .rentmate-btn-primary:active {
+            transform: translateY(0);
         }
 
-        .rentmate-forgot-password {
+        .rentmate-signup-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #E5E7EB;
             text-align: center;
         }
 
-        .rentmate-forgot-link {
-            color: #6b7280 !important;
-            text-decoration: underline !important;
-            font-size: 0.875rem !important;
+        .rentmate-signup-section p {
+            font-size: 0.95rem;
+            color: #6B7280;
         }
 
-        .rentmate-forgot-link:hover {
-            color: #3b82f6 !important;
+        .rentmate-signup-link {
+            color: #4461F2;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s;
         }
 
-        .rentmate-create-account {
-            text-align: center;
+        .rentmate-signup-link:hover {
+            color: #3651E2;
+            text-decoration: underline;
         }
 
-        .rentmate-create-link {
-            color: #6b7280 !important;
-            text-decoration: underline !important;
-            font-weight: 500 !important;
+        .rentmate-error {
+            color: #EF4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
         }
-
-        .rentmate-create-link:hover {
-            color: #3b82f6 !important;
-        }
-
-        /* Animations */
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(var(--rotation, 0deg)); }
-            100% { transform: translateY(-10px) rotate(var(--rotation, 0deg)); }
-        }
-
-        .rentmate-shape, .rentmate-character {
-            animation: float 3s ease-in-out infinite alternate;
-        }
-
-        .rentmate-shape-1 { animation-delay: 0s; }
-        .rentmate-shape-2 { animation-delay: 0.2s; }
-        .rentmate-shape-3 { animation-delay: 0.4s; }
-        .rentmate-shape-4 { animation-delay: 0.6s; }
-        .rentmate-shape-5 { animation-delay: 0.8s; }
-        .rentmate-shape-6 { animation-delay: 1s; }
-        .rentmate-character-1 { animation-delay: 1.2s; }
-        .rentmate-character-2 { animation-delay: 1.4s; }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
+        @media (max-width: 968px) {
             .rentmate-login-container {
                 flex-direction: column;
-                margin: -1rem;
             }
 
             .rentmate-left-section {
-                min-height: 200px;
-                flex: none;
+                padding: 2rem;
+                min-height: auto;
             }
 
-            .rentmate-brand-logo h1 {
-                font-size: 2rem;
+            .rentmate-logo {
+                font-size: 2.5rem;
+            }
+
+            .rentmate-tagline {
+                font-size: 1.2rem;
+                margin-bottom: 2rem;
+            }
+
+            .rentmate-features {
+                flex-direction: row;
+                gap: 1rem;
+                overflow-x: auto;
+            }
+
+            .rentmate-feature-item {
+                min-width: 200px;
             }
 
             .rentmate-right-section {
-                flex: none;
-                min-height: calc(100vh - 200px);
-                padding: 1rem;
+                padding: 2rem 1rem;
             }
 
-            .rentmate-shape, .rentmate-character {
-                display: none;
+            .rentmate-login-card {
+                padding: 2rem;
             }
         }
 
         @media (max-width: 480px) {
+            .rentmate-login-container {
+                margin: -1rem;
+            }
+
+            .rentmate-login-card {
+                padding: 1.5rem;
+            }
+
             .rentmate-form-header h2 {
                 font-size: 1.5rem;
+            }
+
+            .rentmate-features {
+                flex-direction: column;
             }
         }
     </style>
@@ -447,14 +432,14 @@
     <script>
         function togglePassword() {
             const passwordInput = document.getElementById('password');
-            const toggleBtn = document.querySelector('.rentmate-password-toggle');
+            const eyeIcon = document.querySelector('.rentmate-eye-icon');
             
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                toggleBtn.textContent = '🙈';
+                eyeIcon.textContent = '🙈';
             } else {
                 passwordInput.type = 'password';
-                toggleBtn.textContent = '👁️';
+                eyeIcon.textContent = '👁️';
             }
         }
     </script>
