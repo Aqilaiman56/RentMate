@@ -52,6 +52,19 @@ class Booking extends Model
     }
 
     /**
+     * Payment & deposit
+     */
+        public function payment()
+    {
+        return $this->hasOne(Payment::class, 'BookingID', 'BookingID');
+    }
+
+    public function deposit()
+    {
+        return $this->hasOne(Deposit::class, 'BookingID', 'BookingID');
+    }
+
+    /**
      * Check if booking is active
      */
     public function isActive()

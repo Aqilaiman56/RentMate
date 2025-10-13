@@ -19,6 +19,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,20 +107,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/booking/create', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('/booking/{id}', [BookingController::class, 'show'])->name('booking.show');
+    Route::post('/booking/{id}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
+    Route::post('/booking/{id}/complete', [BookingController::class, 'complete'])->name('booking.complete');
+});
+
+Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(function () {
+    Route::get('/bookings', [BookingController::class, 'userBookings'])->name('bookings');
 });
 
 
-/*
-|--------------------------------------------------------------------------
-| Booking Routes
-|--------------------------------------------------------------------------
-*/
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::post('/booking/create', [BookingController::class, 'create'])->name('booking.create');
-    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::get('/booking/{id}', [BookingController::class, 'show'])->name('booking.show');
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -151,6 +148,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/review/add', [ItemController::class, 'addReview'])->name('review.add');
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Payment Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Payment routes
+    Route::post('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');
+    Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::get('/payment/status/{bookingId}', [PaymentController::class, 'checkStatus'])->name('payment.status');
+    Route::post('/payment/{id}/refund', [PaymentController::class, 'refund'])->name('payment.refund');
+    Route::get('/payment/history/{bookingId}', [PaymentController::class, 'history'])->name('payment.history');
+});
+
+// Payment callback (no auth required)
+Route::any('/payment/callback', [PaymentController::class, 'paymentCallback'])->name('payment.callback');
 
 /*
 |--------------------------------------------------------------------------
