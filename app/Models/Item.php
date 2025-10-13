@@ -11,7 +11,7 @@ class Item extends Model
 
     protected $table = 'items';
     protected $primaryKey = 'ItemID';
-    public $timestamps = false; // Since you have DateAdded instead
+    public $timestamps = false;
 
     protected $fillable = [
         'UserID',
@@ -19,22 +19,22 @@ class Item extends Model
         'Description',
         'CategoryID',
         'LocationID',
-        'Availability',
-        'ImagePath',
         'DepositAmount',
         'PricePerDay',
+        'ImagePath',
+        'Availability',
         'DateAdded'
     ];
 
     protected $casts = [
         'DateAdded' => 'datetime',
-        'DepositAmount' => 'decimal:2',
+        'Availability' => 'boolean',
         'PricePerDay' => 'decimal:2',
-        'Availability' => 'boolean'
+        'DepositAmount' => 'decimal:2'
     ];
 
     /**
-     * Get the user that owns the item
+     * Relationship to User (Owner)
      */
     public function user()
     {
@@ -42,7 +42,7 @@ class Item extends Model
     }
 
     /**
-     * Get the category of the item
+     * Relationship to Category
      */
     public function category()
     {
@@ -50,7 +50,7 @@ class Item extends Model
     }
 
     /**
-     * Get the location of the item
+     * Relationship to Location
      */
     public function location()
     {
@@ -58,7 +58,7 @@ class Item extends Model
     }
 
     /**
-     * Get the bookings for the item
+     * Relationship to Bookings
      */
     public function bookings()
     {
@@ -66,7 +66,7 @@ class Item extends Model
     }
 
     /**
-     * Get the reviews for the item
+     * Relationship to Reviews
      */
     public function reviews()
     {
@@ -74,48 +74,39 @@ class Item extends Model
     }
 
     /**
-     * Get users who wishlisted this item
+     * Relationship to Wishlists
      */
-    public function wishlistedBy()
+    public function wishlists()
     {
-        return $this->belongsToMany(User::class, 'wishlist', 'ItemID', 'UserID')
-            ->withTimestamps();
+        return $this->hasMany(Wishlist::class, 'ItemID', 'ItemID');
     }
 
     /**
-     * Get average rating for the item
+     * Relationship to Messages (if applicable)
      */
-    public function averageRating()
+    public function messages()
     {
-        return $this->reviews()->avg('Rating');
+        return $this->hasMany(Message::class, 'ItemID', 'ItemID');
     }
 
     /**
-     * Get total reviews count
+     * Check if item is in user's wishlist
      */
-    public function totalReviews()
+    public function isInWishlist($userId)
     {
-        return $this->reviews()->count();
+        return $this->wishlists()->where('UserID', $userId)->exists();
     }
 
     /**
-     * Check if item is available
-     */
-    public function isAvailable()
-    {
-        return $this->Availability == 1;
-    }
-
-    /**
-     * Scope to get only available items
+     * Scope for available items
      */
     public function scopeAvailable($query)
     {
-        return $query->where('Availability', 1);
+        return $query->where('Availability', true);
     }
 
     /**
-     * Scope to get items by category
+     * Scope for items by category
      */
     public function scopeByCategory($query, $categoryId)
     {
@@ -123,11 +114,43 @@ class Item extends Model
     }
 
     /**
-     * Scope to search items
+     * Scope for items by location
      */
-    public function scopeSearch($query, $term)
+    public function scopeByLocation($query, $locationId)
     {
-        return $query->where('ItemName', 'LIKE', "%{$term}%")
-                    ->orWhere('Description', 'LIKE', "%{$term}%");
+        return $query->where('LocationID', $locationId);
+    }
+
+    /**
+     * Get average rating
+     */
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->avg('Rating') ?? 0;
+    }
+
+    /**
+     * Get total reviews count
+     */
+    public function getTotalReviewsAttribute()
+    {
+        return $this->reviews()->count();
+    }
+
+    /**
+     * Boot method to set default values
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($item) {
+            if (empty($item->DateAdded)) {
+                $item->DateAdded = now();
+            }
+            if (!isset($item->Availability)) {
+                $item->Availability = true;
+            }
+        });
     }
 }

@@ -108,6 +108,10 @@
         color: #FF6B6B;
     }
 
+    .heart-btn.active {
+        color: #FF6B6B;
+    }
+
     .item-location {
         display: flex;
         align-items: center;
@@ -145,6 +149,10 @@
         padding: 60px 20px;
         color: #6B7280;
         font-size: 18px;
+    }
+
+    .pagination-wrapper {
+        margin-top: 50px;
     }
 
     @media (max-width: 768px) {
@@ -195,7 +203,7 @@
             <div class="item-details">
                 <div class="item-header">
                     <div class="item-title">{{ $item->ItemName }}</div>
-                    <button class="heart-btn" onclick="toggleWishlist(event, {{ $item->ItemID }})">
+                    <button class="heart-btn {{ $item->isInWishlist ? 'active' : '' }}" onclick="toggleWishlist(event, {{ $item->ItemID }})">
                         @if($item->isInWishlist)
                             ♥
                         @else
@@ -225,8 +233,8 @@
 </div>
 
 @if($items->hasPages())
-    <div style="margin-top: 40px; display: flex; justify-content: center;">
-        {{ $items->links() }}
+    <div class="pagination-wrapper">
+        @include('components.pagination', ['paginator' => $items])
     </div>
 @endif
 @endsection
@@ -249,10 +257,10 @@
             const heartBtn = event.target;
             if(data.added) {
                 heartBtn.textContent = '♥';
-                heartBtn.style.color = '#FF6B6B';
+                heartBtn.classList.add('active');
             } else {
                 heartBtn.textContent = '♡';
-                heartBtn.style.color = 'white';
+                heartBtn.classList.remove('active');
             }
         })
         .catch(error => {

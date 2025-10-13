@@ -18,6 +18,8 @@ class BookingController extends Controller
      */
     public function confirm(Request $request)
     {
+        \Log::info('Confirm method called', $request->all());
+        
         $validated = $request->validate([
             'item_id' => 'required|exists:items,ItemID',
             'start_date' => 'required|date|after_or_equal:today',

@@ -192,11 +192,27 @@ class ItemController extends Controller
                 ->with('error', 'Cannot delete item with active bookings');
         }
         
-        // Delete image
+        // Delete related records first to avoid foreign key constraint errors
+        
+        // 1. Delete wishlist entries
+        $item->wishlists()->delete();
+        
+        // 2. Delete reviews
+        $item->reviews()->delete();
+        
+        // 3. Delete bookings (only past/cancelled ones since we checked for active ones above)
+        $item->bookings()->delete();
+        
+        // 4. Delete messages related to this item (if you have a messages table with ItemID)
+        // Uncomment the line below if you have messages relationship
+        // $item->messages()->delete();
+        
+        // 5. Delete image from storage
         if ($item->ImagePath) {
             Storage::disk('public')->delete($item->ImagePath);
         }
         
+        // 6. Finally delete the item itself
         $item->delete();
         
         return redirect()->route('items.my')->with('success', 'Item deleted successfully!');

@@ -19,6 +19,8 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(180deg, #E8EEFF 0%, #F5F7FF 100%);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
@@ -194,6 +196,8 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 30px 40px;
+            flex: 1;
+            width: 100%;
         }
 
         @media (max-width: 768px) {
@@ -287,6 +291,9 @@
     <div class="main-content">
         @yield('content')
     </div>
+
+    {{-- Include Footer --}}
+    @include('components.footer')
 
     <script>
         // Profile Dropdown Toggle
