@@ -596,11 +596,24 @@
                 
                 <div class="deposit-info">
                     💰 Refundable deposit: RM {{ number_format($item->DepositAmount, 2) }}
+                    <br>
+                    <small style="color: #9ca3af; font-size: 12px;">Pay deposit online • Rental fee to owner</small>
                 </div>
 
                 @if($item->Availability)
-                    <form action="{{ route('bookings.store') }}" method="POST" class="booking-form" id="bookingForm">
+                    <form action="{{ route('booking.confirm') }}" method="POST" class="booking-form" id="bookingForm">
                         @csrf
+
+                        @if($errors->any())
+                            <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                                <ul style="margin: 0; padding-left: 20px;">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <input type="hidden" name="item_id" value="{{ $item->ItemID }}">
                         
                         <div class="form-group">
@@ -615,20 +628,28 @@
 
                         <div class="total-calculation" id="totalCalculation" style="display: none;">
                             <div class="calc-row">
-                                <span>RM {{ number_format($item->PricePerDay, 2) }} × <span id="numDays">0</span> days</span>
+                                <span>Rental (RM {{ number_format($item->PricePerDay, 2) }} × <span id="numDays">0</span> days)</span>
                                 <span id="rentalTotal">RM 0.00</span>
                             </div>
-                            <div class="calc-row">
-                                <span>Deposit</span>
+                            <div class="calc-row" style="color: #f59e0b; font-weight: 600;">
+                                <span>💵 Pay to Owner</span>
+                                <span id="payToOwner">RM 0.00</span>
+                            </div>
+                            <div class="calc-row" style="border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
+                                <span>Deposit (Online)</span>
                                 <span>RM {{ number_format($item->DepositAmount, 2) }}</span>
                             </div>
-                            <div class="calc-row total">
-                                <span>Total</span>
-                                <span id="grandTotal">RM {{ number_format($item->DepositAmount, 2) }}</span>
+                            <div class="calc-row">
+                                <span>Tax (Online)</span>
+                                <span>RM 1.00</span>
+                            </div>
+                            <div class="calc-row total" style="background: #eff6ff; padding: 8px; border-radius: 6px; margin-top: 8px;">
+                                <span>Pay Online Now</span>
+                                <span id="payOnline">RM {{ number_format($item->DepositAmount + 1.00, 2) }}</span>
                             </div>
                         </div>
 
-                        <button type="submit" class="book-now-btn">Book Now</button>
+                        <button type="submit" class="book-now-btn">Review Booking</button>
                     </form>
                 @else
                     <div style="text-align: center; padding: 20px; color: #9ca3af;">
@@ -695,9 +716,11 @@
 <script>
     const pricePerDay = {{ $item->PricePerDay }};
     const depositAmount = {{ $item->DepositAmount }};
-    
+    const taxAmount = 1.00;
+
     document.getElementById('start_date').addEventListener('change', calculateTotal);
     document.getElementById('end_date').addEventListener('change', calculateTotal);
+    
 
     function calculateTotal() {
         const startDate = new Date(document.getElementById('start_date').value);
@@ -706,11 +729,12 @@
         if (startDate && endDate && endDate > startDate) {
             const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
             const rentalTotal = pricePerDay * days;
-            const grandTotal = rentalTotal + depositAmount;
+            const payOnline = depositAmount + taxAmount;
 
             document.getElementById('numDays').textContent = days;
             document.getElementById('rentalTotal').textContent = 'RM ' + rentalTotal.toFixed(2);
-            document.getElementById('grandTotal').textContent = 'RM ' + grandTotal.toFixed(2);
+            document.getElementById('payToOwner').textContent = 'RM ' + rentalTotal.toFixed(2);
+            document.getElementById('payOnline').textContent = 'RM ' + payOnline.toFixed(2);
             document.getElementById('totalCalculation').style.display = 'block';
         } else {
             document.getElementById('totalCalculation').style.display = 'none';
@@ -741,5 +765,22 @@
             alert('Please login to add items to wishlist');
         });
     }
+
+    // DEBUG: Check if form submits
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('bookingForm');
+        
+        form.addEventListener('submit', function(e) {
+            console.log('=== FORM SUBMITTING ===');
+            console.log('Item ID:', document.querySelector('input[name="item_id"]').value);
+            console.log('Start Date:', document.querySelector('input[name="start_date"]').value);
+            console.log('End Date:', document.querySelector('input[name="end_date"]').value);
+            console.log('Action:', form.action);
+            console.log('Method:', form.method);
+            
+            // Don't prevent default - let it submit
+        });
+    });
+    
 </script>
 @endpush

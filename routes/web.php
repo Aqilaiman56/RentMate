@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -19,7 +20,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\PaymentController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +104,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/booking/confirm', [BookingController::class, 'confirm'])->name('booking.confirm');
     Route::post('/bookings/store', [BookingController::class, 'store'])->name('bookings.store');
     Route::post('/booking/create', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
@@ -441,7 +443,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::get('/add-listing', [ItemController::class, 'create'])->name('add-listing');
         
         // User Bookings
-        Route::get('/bookings', [BookingController::class, 'userBookings'])->name('bookings');
+        Route::get('/user/bookings', [BookingController::class, 'userBookings'])->name('user.bookings');
         
         // User Wishlist
         Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');

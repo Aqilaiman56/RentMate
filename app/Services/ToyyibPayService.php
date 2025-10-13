@@ -51,6 +51,8 @@ class ToyyibPayService
 
             $result = json_decode($response->getBody()->getContents(), true);
 
+            Log::info('ToyyibPay Create Bill Response:', $result);
+
             if (isset($result[0]['BillCode'])) {
                 return [
                     'success' => true,
@@ -61,7 +63,8 @@ class ToyyibPayService
 
             return [
                 'success' => false,
-                'message' => 'Failed to create bill'
+                'message' => 'Failed to create bill',
+                'response' => $result
             ];
 
         } catch (\Exception $e) {
@@ -92,14 +95,5 @@ class ToyyibPayService
             Log::error('ToyyibPay Get Transactions Error: ' . $e->getMessage());
             return null;
         }
-    }
-
-    /**
-     * Verify payment signature
-     */
-    public function verifySignature($data)
-    {
-        // ToyyibPay verification logic
-        return true;
     }
 }

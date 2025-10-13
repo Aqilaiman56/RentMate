@@ -14,6 +14,59 @@ use Illuminate\Support\Facades\DB;
 class BookingController extends Controller
 {
     /**
+     * Show booking confirmation before payment
+     */
+    public function confirm(Request $request)
+    {
+        $validated = $request->validate([
+            'item_id' => 'required|exists:items,ItemID',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after:start_date'
+        ]);
+
+        $item = Item::with(['user', 'location', 'category'])->findOrFail($validated['item_id']);
+
+        // Check if item is available
+        if (!$item->Availability) {
+            return back()->with('error', 'This item is not available for booking.');
+        }
+
+        // Check if user is trying to book their own item
+        if ($item->UserID == auth()->id()) {
+            return back()->with('error', 'You cannot book your own item.');
+        }
+
+        // Calculate rental period
+        $startDate = Carbon::parse($validated['start_date']);
+        $endDate = Carbon::parse($validated['end_date']);
+        $days = $startDate->diffInDays($endDate);
+
+        if ($days < 1) {
+            $days = 1;
+        }
+
+        // Calculate amounts
+        $rentalAmount = $item->PricePerDay * $days;
+        $depositAmount = $item->DepositAmount;
+        $taxAmount = 1.00;
+        $totalAmount = $depositAmount + $taxAmount;
+
+        // Prepare booking data
+        $bookingData = [
+            'item' => $item,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'days' => $days,
+            'rental_amount' => $rentalAmount,
+            'deposit_amount' => $depositAmount,
+            'tax_amount' => $taxAmount,
+            'total_amount' => $totalAmount
+        ];
+
+        return view('bookings.confirm', $bookingData);
+    }
+
+    /**
      * Store a new booking
      */
     public function store(Request $request)
@@ -132,22 +185,6 @@ class BookingController extends Controller
     }
 
     /**
-     * Display all bookings (for bookings index page)
-     */
-    public function index()
-    {
-        $bookings = Booking::with(['item.user', 'item.location', 'user'])
-            ->where('UserID', auth()->id())
-            ->orWhereHas('item', function($query) {
-                $query->where('UserID', auth()->id());
-            })
-            ->orderBy('BookingDate', 'desc')
-            ->paginate(15);
-
-        return view('bookings.index', compact('bookings'));
-    }
-
-    /**
      * Cancel a booking
      */
     public function cancel($id)
@@ -187,92 +224,30 @@ class BookingController extends Controller
     }
 
     /**
- * Complete a booking and refund deposit
- */
-public function complete($id)
-{
-    $booking = Booking::with(['item', 'deposit', 'user'])->findOrFail($id);
+     * Complete a booking and refund deposit
+     */
+    public function complete($id)
+    {
+        $booking = Booking::with(['item', 'deposit', 'user'])->findOrFail($id);
 
-    // Only item owner can complete
-    if ($booking->item->UserID !== auth()->id()) {
-        abort(403, 'Unauthorized action.');
-    }
-
-    // Only confirmed bookings can be completed
-    if ($booking->Status !== 'confirmed') {
-        return back()->with('error', 'Only confirmed bookings can be marked as completed.');
-    }
-
-    // Check if booking period has ended
-    if (now()->lt($booking->EndDate)) {
-        return back()->with('error', 'Cannot complete booking before the rental period ends.');
-    }
-
-    DB::beginTransaction();
-    try {
-        // Mark booking as completed
-        $booking->update(['Status' => 'completed']);
-
-        // Refund deposit
-        if ($booking->deposit) {
-            $booking->deposit->update([
-                'Status' => 'refunded',
-                'DateRefunded' => now(),
-                'RefundMethod' => 'Auto Refund',
-                'RefundReference' => 'REF-' . $booking->BookingID . '-' . time()
-            ]);
+        // Only item owner can complete
+        if ($booking->item->UserID !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
         }
 
-        // Notify renter about completion and refund
-        Notification::create([
-            'UserID' => $booking->UserID,
-            'Type' => 'booking',
-            'Title' => '✅ Booking Completed - Deposit Refunded',
-            'Content' => 'Your booking for ' . $booking->item->ItemName . ' has been completed. Your deposit of RM ' . number_format($booking->DepositAmount, 2) . ' will be refunded to your account within 3-5 business days.',
-            'RelatedID' => $booking->BookingID,
-            'RelatedType' => 'booking',
-            'CreatedAt' => now()
-        ]);
+        // Only confirmed bookings can be completed
+        if ($booking->Status !== 'confirmed') {
+            return back()->with('error', 'Only confirmed bookings can be marked as completed.');
+        }
 
-        // Notify owner
-        Notification::create([
-            'UserID' => $booking->item->UserID,
-            'Type' => 'booking',
-            'Title' => 'Booking Completed',
-            'Content' => 'Booking #' . $booking->BookingID . ' has been marked as completed.',
-            'RelatedID' => $booking->BookingID,
-            'RelatedType' => 'booking',
-            'CreatedAt' => now()
-        ]);
+        // Check if booking period has ended
+        if (now()->lt($booking->EndDate)) {
+            return back()->with('error', 'Cannot complete booking before the rental period ends.');
+        }
 
-        DB::commit();
-
-        return back()->with('success', 'Booking completed successfully. Deposit refund has been processed.');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        \Log::error('Booking completion error: ' . $e->getMessage());
-        return back()->with('error', 'Failed to complete booking. Please try again.');
-    }
-}
-
-/**
- * Auto-complete bookings and refund deposits (run via cron)
- */
-public function autoCompleteBookings()
-{
-    // Get all confirmed bookings where end date has passed
-    $bookings = Booking::with(['item', 'deposit', 'user'])
-        ->where('Status', 'confirmed')
-        ->where('EndDate', '<', now())
-        ->get();
-
-    $completed = 0;
-
-    foreach ($bookings as $booking) {
         DB::beginTransaction();
         try {
-            // Mark as completed
+            // Mark booking as completed
             $booking->update(['Status' => 'completed']);
 
             // Refund deposit
@@ -281,41 +256,93 @@ public function autoCompleteBookings()
                     'Status' => 'refunded',
                     'DateRefunded' => now(),
                     'RefundMethod' => 'Auto Refund',
-                    'RefundReference' => 'AUTO-REF-' . $booking->BookingID . '-' . time()
+                    'RefundReference' => 'REF-' . $booking->BookingID . '-' . time()
                 ]);
             }
 
-            // Notify user
+            // Notify renter about completion and refund
             Notification::create([
                 'UserID' => $booking->UserID,
                 'Type' => 'booking',
-                'Title' => '✅ Booking Auto-Completed - Deposit Refunded',
-                'Content' => 'Your booking for ' . $booking->item->ItemName . ' has been automatically completed. Your deposit of RM ' . number_format($booking->DepositAmount, 2) . ' will be refunded within 3-5 business days.',
+                'Title' => '✅ Booking Completed - Deposit Refunded',
+                'Content' => 'Your booking for ' . $booking->item->ItemName . ' has been completed. Your deposit of RM ' . number_format($booking->DepositAmount, 2) . ' will be refunded to your account within 3-5 business days.',
+                'RelatedID' => $booking->BookingID,
+                'RelatedType' => 'booking',
+                'CreatedAt' => now()
+            ]);
+
+            // Notify owner
+            Notification::create([
+                'UserID' => $booking->item->UserID,
+                'Type' => 'booking',
+                'Title' => 'Booking Completed',
+                'Content' => 'Booking #' . $booking->BookingID . ' has been marked as completed.',
                 'RelatedID' => $booking->BookingID,
                 'RelatedType' => 'booking',
                 'CreatedAt' => now()
             ]);
 
             DB::commit();
-            $completed++;
+
+            return back()->with('success', 'Booking completed successfully. Deposit refund has been processed.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Auto-complete booking error: ' . $e->getMessage());
+            \Log::error('Booking completion error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to complete booking. Please try again.');
         }
     }
 
-    \Log::info("Auto-completed {$completed} bookings");
-    return $completed;
-}
-
     /**
-     * Old create method (keeping for backwards compatibility)
-     * You can remove this if you're only using the store method
+     * Auto-complete bookings and refund deposits (run via cron)
      */
-    public function create(Request $request)
+    public function autoCompleteBookings()
     {
-        // Redirect to store method
-        return $this->store($request);
+        // Get all confirmed bookings where end date has passed
+        $bookings = Booking::with(['item', 'deposit', 'user'])
+            ->where('Status', 'confirmed')
+            ->where('EndDate', '<', now())
+            ->get();
+
+        $completed = 0;
+
+        foreach ($bookings as $booking) {
+            DB::beginTransaction();
+            try {
+                // Mark as completed
+                $booking->update(['Status' => 'completed']);
+
+                // Refund deposit
+                if ($booking->deposit) {
+                    $booking->deposit->update([
+                        'Status' => 'refunded',
+                        'DateRefunded' => now(),
+                        'RefundMethod' => 'Auto Refund',
+                        'RefundReference' => 'AUTO-REF-' . $booking->BookingID . '-' . time()
+                    ]);
+                }
+
+                // Notify user
+                Notification::create([
+                    'UserID' => $booking->UserID,
+                    'Type' => 'booking',
+                    'Title' => '✅ Booking Auto-Completed - Deposit Refunded',
+                    'Content' => 'Your booking for ' . $booking->item->ItemName . ' has been automatically completed. Your deposit of RM ' . number_format($booking->DepositAmount, 2) . ' will be refunded within 3-5 business days.',
+                    'RelatedID' => $booking->BookingID,
+                    'RelatedType' => 'booking',
+                    'CreatedAt' => now()
+                ]);
+
+                DB::commit();
+                $completed++;
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                \Log::error('Auto-complete booking error: ' . $e->getMessage());
+            }
+        }
+
+        \Log::info("Auto-completed {$completed} bookings");
+        return $completed;
     }
 }
