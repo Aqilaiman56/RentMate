@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>RentMate - Rent Anything, Anytime</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
@@ -26,6 +27,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            gap: 30px;
         }
 
         .logo {
@@ -33,11 +35,67 @@
             font-weight: 700;
             color: #4461F2;
             text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .header-search-container {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .header-search-bar {
+            position: relative;
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-search-input {
+            flex: 1;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .header-search-input:focus {
+            outline: none;
+            border-color: #4461F2;
+            box-shadow: 0 0 0 3px rgba(68, 97, 242, 0.1);
+        }
+
+        .header-search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        .header-search-button {
+            padding: 12px 24px;
+            background: #4461F2;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .header-search-button:hover {
+            background: #3651E2;
+            transform: translateY(-1px);
         }
 
         .auth-buttons {
             display: flex;
             gap: 15px;
+            flex-shrink: 0;
         }
 
         .btn {
@@ -232,49 +290,13 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s;
             position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
         }
 
         .item-card:hover {
             transform: translateY(-5px);
-        }
-
-        .item-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(30, 58, 95, 0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .item-card:hover::after {
-            opacity: 1;
-        }
-
-        .item-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .item-card:hover .item-overlay {
-            opacity: 1;
-        }
-
-        .item-overlay-text {
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
         }
 
         .item-image {
@@ -400,7 +422,88 @@
             font-size: 16px;
         }
 
+        .footer {
+            background: white;
+            padding: 60px 40px 30px;
+            margin-top: 60px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1E3A5F;
+            margin-bottom: 20px;
+        }
+
+        .footer-section p {
+            color: #6B7280;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #6B7280;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #4461F2;
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
         @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+            }
+
+            .header-search-container {
+                order: 3;
+                width: 100%;
+                margin-top: 15px;
+                max-width: 100%;
+            }
+
+            .header-search-bar {
+                flex-direction: column;
+            }
+
+            .header-search-button {
+                width: 100%;
+            }
+
+            .auth-buttons {
+                flex-wrap: wrap;
+            }
+
             .hero-title {
                 font-size: 32px;
             }
@@ -422,10 +525,6 @@
                 justify-content: flex-start;
             }
 
-            .header {
-                padding: 15px 20px;
-            }
-
             .container {
                 padding: 20px;
             }
@@ -434,12 +533,39 @@
                 flex-direction: column;
                 gap: 10px;
             }
+
+            .footer {
+                padding: 40px 20px 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
         }
     </style>
 </head>
 <body>
     <header class="header">
         <a href="/" class="logo">RentMate</a>
+        
+        <!-- Search Bar in Header -->
+        <div class="header-search-container">
+            <form action="{{ route('welcome') }}" method="GET" class="header-search-bar">
+                <span class="header-search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="header-search-input" 
+                    placeholder="Search items, categories, or locations..."
+                    value="{{ request('search') }}"
+                >
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
+                <button type="submit" class="header-search-button">Search</button>
+            </form>
+        </div>
         
         @if (Route::has('login'))
             <div class="auth-buttons">
@@ -466,16 +592,16 @@
                 <a href="{{ route('items.create') }}" class="btn-cta btn-secondary">List an Item</a>
             @else
                 <a href="{{ route('register') }}" class="btn-cta btn-primary">Get Started</a>
-                <a href="{{ route('login') }}" class="btn-cta btn-secondary">Browse Items</a>
+                <a href="#items-section" class="btn-cta btn-secondary">Browse Items</a>
             @endauth
         </div>
     </div>
 
-    <div class="container">
+    <div class="container" id="items-section">
         @if($categories->count() > 0)
             <div class="category-header">
-                <h2 class="section-title" style="margin-bottom: 0;">Popular Categories</h2>
-                @if($selectedCategory)
+                <h2 class="section-title" style="margin-bottom: 0;">Categories</h2>
+                @if($selectedCategory || request('search'))
                     <a href="{{ route('welcome') }}" class="clear-filter">✕ Clear Filter</a>
                 @endif
             </div>
@@ -486,7 +612,7 @@
                         'Gaming' => '🎮',
                         'Music' => '🎵',
                         'Computer' => '💻',
-                        'Camera' => '📷',
+                        'Photography' => '📷',
                         'Attire' => '👔',
                         'Books' => '📚',
                         'Event' => '🎁',
@@ -496,7 +622,7 @@
                 @endphp
                 
                 @foreach($categories as $category)
-                    <a href="{{ route('welcome', ['category' => $category->CategoryID]) }}" 
+                    <a href="{{ route('welcome', ['category' => $category->CategoryID] + request()->only('search')) }}" 
                        class="category-card {{ $selectedCategory && $selectedCategory->CategoryID == $category->CategoryID ? 'active' : '' }}">
                         <div class="category-icon">
                             {{ $categoryIcons[$category->CategoryName] ?? '📦' }}
@@ -508,7 +634,9 @@
         @endif
 
         <h2 class="section-title">
-            @if($selectedCategory)
+            @if(request('search'))
+                Search Results for "{{ request('search') }}"
+            @elseif($selectedCategory)
                 {{ $selectedCategory->CategoryName }} Items
             @else
                 Featured Items
@@ -518,7 +646,7 @@
         @if($featuredItems->count() > 0)
             <div class="items-grid">
                 @foreach($featuredItems as $item)
-                    <div class="item-card">
+                    <a href="{{ route('welcome.item.details', $item->ItemID) }}" class="item-card">
                         <span class="item-category-badge">{{ $item->category->CategoryName ?? 'Other' }}</span>
                         
                         @if($item->ImagePath)
@@ -533,28 +661,22 @@
                         <div class="item-details">
                             <div class="item-title">{{ $item->ItemName }}</div>
                             <div class="item-location">
-                                📍 {{ $item->location->City ?? 'Malaysia' }}
+                                📍 {{ $item->location->LocationName ?? 'Malaysia' }}
                             </div>
                             <div class="item-price">RM {{ number_format($item->PricePerDay, 2) }} / day</div>
                         </div>
-                        
-                        @guest
-                            <div class="item-overlay">
-                                <div class="item-overlay-text">Sign up to view details</div>
-                                <a href="{{ route('register') }}" class="btn btn-register" style="pointer-events: all;">Join Now</a>
-                            </div>
-                        @else
-                            <div class="item-overlay">
-                                <div class="item-overlay-text">View Item Details</div>
-                                <a href="{{ route('item.details', $item->ItemID) }}" class="btn btn-register" style="pointer-events: all;">View Now</a>
-                            </div>
-                        @endguest
-                    </div>
+                    </a>
                 @endforeach
             </div>
         @else
             <div class="no-items">
-                <h3 class="no-items-title">No Items Available in This Category</h3>
+                <h3 class="no-items-title">
+                    @if(request('search'))
+                        No items found for "{{ request('search') }}"
+                    @else
+                        No Items Available in This Category
+                    @endif
+                </h3>
                 <p class="no-items-text">Try browsing other categories or check back later!</p>
                 <a href="{{ route('welcome') }}" class="btn-cta btn-primary" style="margin-top: 20px;">View All Items</a>
             </div>
@@ -596,5 +718,52 @@
             @endauth
         </div>
     </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About RentMate</h3>
+                <p>RentMate is your trusted platform for renting and lending items within your community. Join thousands of users who are making the most of the sharing economy.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ route('welcome') }}">Home</a></li>
+                    @auth
+                        <li><a href="{{ route('user.HomePage') }}">Dashboard</a></li>
+                        <li><a href="{{ route('items.create') }}">List an Item</a></li>
+                    @else
+                        <li><a href="{{ route('register') }}">Sign Up</a></li>
+                        <li><a href="{{ route('login') }}">Log In</a></li>
+                    @endauth
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Categories</h3>
+                <ul class="footer-links">
+                    @foreach($categories->take(5) as $category)
+                        <li><a href="{{ route('welcome', ['category' => $category->CategoryID]) }}">{{ $category->CategoryName }}</a></li>
+                    @endforeach
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Safety Tips</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; {{ date('Y') }} RentMate. All rights reserved. Made with ❤️ for the community.</p>
+        </div>
+    </footer>
 </body>
 </html>

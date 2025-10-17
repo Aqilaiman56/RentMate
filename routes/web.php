@@ -8,6 +8,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UsersController as AdminUsersController;
 use App\Http\Controllers\Admin\ListingsController as AdminListingsController;
@@ -21,19 +22,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
 
-// Welcome/Landing Page
-Route::get('/', function () {
-    return view('welcome');
-});
+// Welcome/Landing Page (Public with search and category filter)
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
-Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
+// Public Item Details (No auth required - guests can browse)
+Route::get('/item/{id}', [ItemController::class, 'showPublicDetails'])->name('welcome.item.details');
 
 // User Homepage (Authenticated)
 Route::get('/homepage', [HomeController::class, 'index'])
@@ -46,11 +45,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-// Admin Dashboard (Legacy - might be duplicate)
-Route::get('/AdminDashboard', function () {
-    return view('admin.AdminDashboard');
-})->middleware(['auth', 'verified'])->name('admin.AdminDashboard');
 
 // Custom Registration Route
 Route::post('/register', function (Request $request) {
@@ -70,7 +64,7 @@ Route::post('/register', function (Request $request) {
 
     Auth::login($user);
 
-    return redirect()->route('admin.AdminDashboard');
+    return redirect()->route('user.HomePage');
 });
 
 /*
@@ -84,8 +78,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/items', [ItemController::class, 'index'])->name('items.index');
 });
 
-// Item Details Page (Public but some features require auth)
-Route::get('/item/{id}', [ItemController::class, 'show'])->name('item.details');
+// Authenticated Item Details Page (with booking functionality)
+Route::middleware('auth')->group(function () {
+    Route::get('/items/{id}/details', [ItemController::class, 'show'])->name('item.details');
+});
 
 // User Item Management (List, Create, Edit, Delete)
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -113,34 +109,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/booking/{id}/complete', [BookingController::class, 'complete'])->name('booking.complete');
 });
 
-Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(function () {
-    Route::get('/bookings', [BookingController::class, 'userBookings'])->name('bookings');
-});
-
-
-
-
-/*
-|--------------------------------------------------------------------------
-| Message and Notification Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Notifications
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
-    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
-    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
-    
-    // Messages
-    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-    Route::get('/messages/{userId}', [MessageController::class, 'show'])->name('messages.show');
-    Route::post('/messages/send', [MessageController::class, 'send'])->name('messages.send');
-    Route::get('/messages/new/{userId}', [MessageController::class, 'getNewMessages'])->name('messages.new');
-    Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount'])->name('messages.unreadCount');
-});
 /*
 |--------------------------------------------------------------------------
 | Review Routes
@@ -151,14 +119,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/review/add', [ItemController::class, 'addReview'])->name('review.add');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Payment Routes
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Payment routes
     Route::post('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');
     Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
     Route::get('/payment/status/{bookingId}', [PaymentController::class, 'checkStatus'])->name('payment.status');
@@ -171,14 +138,71 @@ Route::any('/payment/callback', [PaymentController::class, 'paymentCallback'])->
 
 /*
 |--------------------------------------------------------------------------
+| Message Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{userId}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/send', [MessageController::class, 'send'])->name('messages.send');
+    Route::get('/messages/new/{userId}', [MessageController::class, 'getNewMessages'])->name('messages.new');
+    Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount'])->name('messages.unreadCount');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Notification Routes
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
-    Route::get('/notifications', function() {
-        return view('notifications.index'); 
-    })->name('notifications');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
+| User Dashboard Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(function () {
+    
+    // User Profile Settings
+    Route::get('/profile', [ProfileController::class, 'userProfile'])->name('profile');
+    Route::patch('/profile', [ProfileController::class, 'userUpdateProfile'])->name('profile.update');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    
+    // User Listings Management
+    Route::get('/listings', [ItemController::class, 'userListings'])->name('listings');
+    
+    // Add New Listing
+    Route::get('/add-listing', [ItemController::class, 'create'])->name('add-listing');
+    
+    // User Bookings
+    Route::get('/bookings', [BookingController::class, 'userBookings'])->name('bookings');
+    
+    // User Wishlist
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+    
+    // Report Submission
+    Route::post('/report', [ProfileController::class, 'submitReport'])->name('report.submit');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Wishlist Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/wishlist/toggle/{itemId}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::post('/wishlist/add/{itemId}', [WishlistController::class, 'add'])->name('wishlist.add');
+    Route::delete('/wishlist/remove/{itemId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 });
 
 /*
@@ -194,97 +218,109 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\DashboardController::class)->index();
+        return app(AdminDashboardController::class)->index();
     })->name('dashboard');
     
     // Users Management
-    Route::get('/users', function(Illuminate\Http\Request $request) {
+    Route::get('/users', function(Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\UsersController::class)->index($request);
+        return app(AdminUsersController::class)->index($request);
     })->name('users');
     
     Route::get('/users/export', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\UsersController::class)->export();
+        return app(AdminUsersController::class)->export();
     })->name('users.export');
     
     Route::get('/users/{id}', function($id) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\UsersController::class)->show($id);
+        return app(AdminUsersController::class)->show($id);
     })->name('users.show');
     
     Route::delete('/users/{id}', function($id) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\UsersController::class)->destroy($id);
+        return app(AdminUsersController::class)->destroy($id);
     })->name('users.destroy');
     
-    // Listings
-    Route::get('/listings', function() {
+    // Listings Management
+    Route::get('/listings', function(Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\ListingsController::class)->index();
+        return app(AdminListingsController::class)->index($request);
     })->name('listings');
-    
-    // Deposits
-    Route::get('/deposits', function(Illuminate\Http\Request $request) {
+
+    Route::get('/listings/export', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\DepositsController::class)->index($request);
+        return app(AdminListingsController::class)->export();
+    })->name('listings.export');
+
+    Route::delete('/listings/{id}', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminListingsController::class)->destroy($id);
+    })->name('listings.destroy');
+    
+    // Deposits Management
+    Route::get('/deposits', function(Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminDepositsController::class)->index($request);
     })->name('deposits');
 
     Route::get('/deposits/export', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\DepositsController::class)->export();
+        return app(AdminDepositsController::class)->export();
     })->name('deposits.export');
 
     Route::get('/deposits/report', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\DepositsController::class)->generateReport();
+        return app(AdminDepositsController::class)->generateReport();
     })->name('deposits.report');
 
     Route::get('/deposits/{id}', function($id) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\DepositsController::class)->show($id);
+        return app(AdminDepositsController::class)->show($id);
     })->name('deposits.show');
 
-    Route::post('/deposits/{id}/refund', function($id, Illuminate\Http\Request $request) {
+    Route::post('/deposits/{id}/refund', function($id, Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\DepositsController::class)->refund($request, $id);
+        return app(AdminDepositsController::class)->refund($request, $id);
     })->name('deposits.refund');
 
-    Route::post('/deposits/{id}/forfeit', function($id, Illuminate\Http\Request $request) {
+    Route::post('/deposits/{id}/forfeit', function($id, Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        return app(App\Http\Controllers\Admin\DepositsController::class)->forfeit($request, $id);
+        return app(AdminDepositsController::class)->forfeit($request, $id);
     })->name('deposits.forfeit');
-
-
     
     // Reports Management
-    Route::get('/reports', function(Illuminate\Http\Request $request) {
+    Route::get('/reports', function(Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        $controller = new App\Http\Controllers\Admin\ReportsController();
+        $controller = new AdminReportsController();
         return $controller->index($request);
     })->name('reports');
 
@@ -292,23 +328,23 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        $controller = new App\Http\Controllers\Admin\ReportsController();
+        $controller = new AdminReportsController();
         return $controller->show($id);
     })->name('reports.show');
 
-    Route::post('/reports/{id}/resolve', function($id, Illuminate\Http\Request $request) {
+    Route::post('/reports/{id}/resolve', function($id, Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        $controller = new App\Http\Controllers\Admin\ReportsController();
+        $controller = new AdminReportsController();
         return $controller->resolve($request, $id);
     })->name('reports.resolve');
 
-    Route::post('/reports/{id}/dismiss', function($id, Illuminate\Http\Request $request) {
+    Route::post('/reports/{id}/dismiss', function($id, Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        $controller = new App\Http\Controllers\Admin\ReportsController();
+        $controller = new AdminReportsController();
         return $controller->dismiss($request, $id);
     })->name('reports.dismiss');
 
@@ -316,17 +352,16 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');
         }
-        $controller = new App\Http\Controllers\Admin\ReportsController();
+        $controller = new AdminReportsController();
         return $controller->export();
     })->name('reports.export');
         
-
-   // Penalties Management
-    Route::get('/penalties', function(Illuminate\Http\Request $request) {
+    // Penalties Management
+    Route::get('/penalties', function(Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new App\Http\Controllers\Admin\PenaltiesController();
+        $controller = new AdminPenaltiesController();
         return $controller->index($request);
     })->name('penalties');
 
@@ -334,7 +369,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new App\Http\Controllers\Admin\PenaltiesController();
+        $controller = new AdminPenaltiesController();
         return $controller->show($id);
     })->name('penalties.show');
 
@@ -342,7 +377,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new App\Http\Controllers\Admin\PenaltiesController();
+        $controller = new AdminPenaltiesController();
         return $controller->resolve($id);
     })->name('penalties.resolve');
 
@@ -350,120 +385,32 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new App\Http\Controllers\Admin\PenaltiesController();
+        $controller = new AdminPenaltiesController();
         return $controller->export();
     })->name('penalties.export');
-   
 
-        // Listings Management
-        Route::get('/listings', function(Illuminate\Http\Request $request) {
-            if (!auth()->user()->IsAdmin) {
-                abort(403, 'Unauthorized access. Admin only.');
-            }
-            return app(App\Http\Controllers\Admin\ListingsController::class)->index($request);
-        })->name('listings');
+    // Taxes Management
+    Route::get('/taxes', function(Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403);
+        }
+        $controller = new AdminTaxesController();
+        return $controller->index($request);
+    })->name('taxes');
 
-        Route::get('/listings/export', function() {
-            if (!auth()->user()->IsAdmin) {
-                abort(403, 'Unauthorized access. Admin only.');
-            }
-            return app(App\Http\Controllers\Admin\ListingsController::class)->export();
-        })->name('listings.export');
+    Route::get('/taxes-export', function(Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403);
+        }
+        $controller = new AdminTaxesController();
+        return $controller->export($request);
+    })->name('taxes.export');
+});
 
-        Route::delete('/listings/{id}', function($id) {
-            if (!auth()->user()->IsAdmin) {
-                abort(403, 'Unauthorized access. Admin only.');
-            }
-            return app(App\Http\Controllers\Admin\ListingsController::class)->destroy($id);
-        })->name('listings.destroy');
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
 
-        // Taxes Management
-        Route::get('/taxes', function(Illuminate\Http\Request $request) {
-            if (!auth()->user()->IsAdmin) {
-                abort(403);
-            }
-            $controller = new App\Http\Controllers\Admin\TaxesController();
-            return $controller->index($request);
-        })->name('taxes');
-
-        Route::get('/taxes-export', function(Illuminate\Http\Request $request) {
-            if (!auth()->user()->IsAdmin) {
-                abort(403);
-            }
-            $controller = new App\Http\Controllers\Admin\TaxesController();
-            return $controller->export($request);
-        })->name('taxes.export');
- });
-
-            /*
-    |--------------------------------------------------------------------------
-    | Message Routes
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-        Route::get('/messages/{userId}', [MessageController::class, 'show'])->name('messages.show');
-        Route::post('/messages/send', [MessageController::class, 'send'])->name('messages.send');
-        Route::get('/messages/new/{userId}', [MessageController::class, 'getNewMessages'])->name('messages.new');
-        Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount'])->name('messages.unreadCount');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Notification Routes
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
-        Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
-        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | User Dashboard Routes
-    |--------------------------------------------------------------------------
-    */
-
-    Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(function () {
-        
-        // User Profile Settings (Different from Admin Profile)
-        Route::get('/profile', [ProfileController::class, 'userProfile'])->name('profile');
-        Route::patch('/profile', [ProfileController::class, 'userUpdateProfile'])->name('profile.update');
-        Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-        
-        // User Listings Management
-        Route::get('/listings', [ItemController::class, 'userListings'])->name('listings');
-        
-        // Add New Listing
-        Route::get('/add-listing', [ItemController::class, 'create'])->name('add-listing');
-        
-        // User Bookings
-        Route::get('/user/bookings', [BookingController::class, 'userBookings'])->name('user.bookings');
-        
-        // User Wishlist
-        Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
-        
-    });
-
-        // Wishlist Actions (AJAX routes - don't need user prefix)
-        Route::middleware(['auth', 'verified'])->group(function () {
-            Route::post('/wishlist/toggle/{itemId}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-            Route::post('/wishlist/add/{itemId}', [WishlistController::class, 'add'])->name('wishlist.add');
-            Route::delete('/wishlist/remove/{itemId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
-        });
-
-    // Inside the user middleware group
-    Route::post('/report', [ProfileController::class, 'submitReport'])->name('report.submit');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Authentication Routes
-    |--------------------------------------------------------------------------
-    */
-
-    require __DIR__.'/auth.php';
+require __DIR__.'/auth.php';

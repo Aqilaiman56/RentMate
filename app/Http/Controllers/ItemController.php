@@ -230,6 +230,24 @@ class ItemController extends Controller
         
         return view('user.listings', compact('items'));
     }
+
+    //for welcome page
+        public function showPublicDetails($id)
+    {
+        $item = Item::with(['category', 'location', 'user', 'reviews.user'])
+            ->findOrFail($id);
+        
+        $averageRating = $item->reviews()->avg('Rating') ?? 0;
+        $totalReviews = $item->reviews()->count();
+        
+        $ratingDistribution = [];
+        for ($i = 5; $i >= 1; $i--) {
+            $ratingDistribution[$i] = $item->reviews()->where('Rating', $i)->count();
+        }
+        
+        // Return a public view (create this blade file)
+        return view('public-item-details', compact('item', 'averageRating', 'totalReviews', 'ratingDistribution'));
+    }
     
     /**
      * Add review to item

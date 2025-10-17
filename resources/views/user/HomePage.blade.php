@@ -5,6 +5,60 @@
 
 @push('styles')
 <style>
+    /* Search Bar Styles */
+    .search-container {
+        max-width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .search-bar {
+        position: relative;
+        display: flex;
+        gap: 10px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 16px 20px 16px 50px;
+        border: 2px solid #e5e7eb;
+        border-radius: 50px;
+        font-size: 15px;
+        transition: all 0.3s;
+        background: white;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #4461F2;
+        box-shadow: 0 0 0 3px rgba(68, 97, 242, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 18px;
+    }
+
+    .search-button {
+        padding: 16px 32px;
+        background: #4461F2;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .search-button:hover {
+        background: #3651E2;
+        transform: translateY(-2px);
+    }
+
     .categories {
         display: flex;
         gap: 15px;
@@ -18,7 +72,7 @@
         border: 3px solid #4461F2;
         border-radius: 15px;
         padding: 20px;
-        width: 120px;
+        min-width: 120px;
         height: 120px;
         display: flex;
         flex-direction: column;
@@ -93,6 +147,11 @@
     .item-title {
         font-size: 16px;
         font-weight: 600;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-right: 10px;
     }
 
     .heart-btn {
@@ -102,6 +161,7 @@
         font-size: 20px;
         cursor: pointer;
         transition: color 0.3s;
+        flex-shrink: 0;
     }
 
     .heart-btn:hover {
@@ -124,24 +184,6 @@
     .item-price {
         font-size: 18px;
         font-weight: 700;
-        margin-bottom: 15px;
-    }
-
-    .view-detail-btn {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .view-detail-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
     }
 
     .no-items {
@@ -155,22 +197,71 @@
         margin-top: 50px;
     }
 
+    .clear-filter {
+        display: inline-block;
+        background: #ef4444;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        margin-bottom: 20px;
+    }
+
+    .clear-filter:hover {
+        background: #dc2626;
+    }
+
     @media (max-width: 768px) {
         .categories {
             overflow-x: scroll;
+        }
+
+        .search-bar {
+            flex-direction: column;
+        }
+
+        .search-button {
+            width: 100%;
         }
     }
 </style>
 @endpush
 
 @section('content')
+<!-- Search Bar -->
+<div class="search-container">
+    <form action="{{ route('user.HomePage') }}" method="GET" class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input 
+            type="text" 
+            name="search" 
+            class="search-input" 
+            placeholder="Search for items, categories, or locations..."
+            value="{{ request('search') }}"
+        >
+        @if(request('category'))
+            <input type="hidden" name="category" value="{{ request('category') }}">
+        @endif
+        <button type="submit" class="search-button">Search</button>
+    </form>
+</div>
+
+<!-- Clear Filter Button -->
+@if(request('category') || request('search'))
+    <a href="{{ route('user.HomePage') }}" class="clear-filter">✕ Clear Filters</a>
+@endif
+
+<!-- Categories -->
 <div class="categories">
     <a href="{{ route('user.HomePage') }}" class="category-card {{ !request('category') ? 'active' : '' }}">
         <div class="category-icon">🏠</div>
         <div class="category-name">All</div>
     </a>
     @foreach($categories as $category)
-        <a href="{{ route('user.HomePage', ['category' => $category->CategoryID]) }}" 
+        <a href="{{ route('user.HomePage', ['category' => $category->CategoryID] + request()->only('search')) }}" 
            class="category-card {{ request('category') == $category->CategoryID ? 'active' : '' }}">
             <div class="category-icon">
                 @switch($category->CategoryName)
@@ -178,10 +269,13 @@
                     @case('Music') 🎵 @break
                     @case('Computer') 💻 @break
                     @case('Photography') 📷 @break
+                    @case('Camera') 📷 @break
                     @case('Attire') 👔 @break
                     @case('Books') 📚 @break
                     @case('Events') 🎁 @break
+                    @case('Event') 🎁 @break
                     @case('Sport') ⚽ @break
+                    @case('Sports') ⚽ @break
                     @case('Electric') ⚡ @break
                     @default 📦
                 @endswitch
@@ -191,6 +285,7 @@
     @endforeach
 </div>
 
+<!-- Items Grid -->
 <div class="items-grid">
     @forelse($items as $item)
         <a href="{{ route('item.details', $item->ItemID) }}" class="item-card">
@@ -221,13 +316,17 @@
                         Price on request
                     @endif
                 </div>
-                <button class="view-detail-btn">View Detail</button>
             </div>
         </a>
     @empty
         <div class="no-items" style="grid-column: 1/-1;">
-            <p>No items available at the moment.</p>
-            <p style="margin-top: 10px; font-size: 14px;">Be the first to list an item!</p>
+            @if(request('search'))
+                <p>No items found for "{{ request('search') }}"</p>
+                <p style="margin-top: 10px; font-size: 14px;">Try a different search term or browse all items.</p>
+            @else
+                <p>No items available at the moment.</p>
+                <p style="margin-top: 10px; font-size: 14px;">Be the first to list an item!</p>
+            @endif
         </div>
     @endforelse
 </div>
