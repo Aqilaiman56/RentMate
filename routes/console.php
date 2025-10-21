@@ -18,3 +18,28 @@ Schedule::call(function () {
 
 // Alternative: using the command
 Schedule::command('bookings:auto-complete')->daily()->at('00:00');
+
+/*
+|--------------------------------------------------------------------------
+| Console Routes
+|--------------------------------------------------------------------------
+*/
+
+Artisan::command('inspire', function () {
+    $this->comment(Inspiring::quote());
+})->purpose('Display an inspiring quote');
+
+/*
+|--------------------------------------------------------------------------
+| Scheduled Tasks (Laravel 11)
+|--------------------------------------------------------------------------
+*/
+
+// Auto-complete expired bookings daily at midnight
+Schedule::command('bookings:complete-expired')
+    ->daily()
+    ->at('00:00');
+
+// Update item availability every hour
+Schedule::command('items:update-availability')
+    ->hourly();

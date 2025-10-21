@@ -504,6 +504,31 @@
                 <h2 class="section-title">Availability</h2>
                 
                 <div class="form-group">
+                    <label class="form-label" for="Quantity">
+                        Total Quantity <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        id="Quantity" 
+                        name="Quantity" 
+                        class="form-input" 
+                        placeholder="1"
+                        min="1"
+                        value="{{ old('Quantity', $item->Quantity) }}"
+                        required
+                    >
+                    <div class="form-help">
+                        Total units available. Currently {{ $item->AvailableQuantity }} out of {{ $item->Quantity }} are available.
+                        @if($item->Quantity - $item->AvailableQuantity > 0)
+                            <br><strong>{{ $item->Quantity - $item->AvailableQuantity }} unit(s) currently booked.</strong>
+                        @endif
+                    </div>
+                    @error('Quantity')
+                        <div class="error-message">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group">
                     <div class="checkbox-group">
                         <input 
                             type="checkbox" 
@@ -517,7 +542,7 @@
                             Item is available for rent
                         </label>
                     </div>
-                    <div class="form-help">Uncheck to temporarily make this item unavailable</div>
+                    <div class="form-help">Uncheck to temporarily disable rentals for this item</div>
                 </div>
             </div>
 

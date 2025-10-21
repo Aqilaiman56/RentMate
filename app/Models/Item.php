@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Item extends Model
 {
@@ -23,6 +24,8 @@ class Item extends Model
         'PricePerDay',
         'ImagePath',
         'Availability',
+        'Quantity',
+        'AvailableQuantity',
         'DateAdded'
     ];
 
@@ -30,7 +33,9 @@ class Item extends Model
         'DateAdded' => 'datetime',
         'Availability' => 'boolean',
         'PricePerDay' => 'decimal:2',
-        'DepositAmount' => 'decimal:2'
+        'DepositAmount' => 'decimal:2',
+        'Quantity' => 'integer',
+        'AvailableQuantity' => 'integer',
     ];
 
     /**
@@ -98,11 +103,117 @@ class Item extends Model
     }
 
     /**
-     * Scope for available items
+     * Check if item has available quantity
+     */
+    public function hasAvailableQuantity()
+    {
+        return $this->AvailableQuantity > 0;
+    }
+
+    /**
+     * Get number of items currently booked (ACTIVE BOOKINGS NOW)
+     */
+    public function getBookedQuantity()
+    {
+        return $this->bookings()
+            ->whereIn('Status', ['confirmed', 'Confirmed', 'ongoing', 'Ongoing'])
+            ->where('StartDate', '<=', now())
+            ->where('EndDate', '>=', now())
+            ->count();
+    }
+
+    /**
+     * Update available quantity based on active bookings
+     */
+    public function updateAvailableQuantity()
+    {
+        $bookedQuantity = $this->getBookedQuantity();
+        $availableQuantity = max(0, $this->Quantity - $bookedQuantity);
+        
+        $this->update([
+            'AvailableQuantity' => $availableQuantity,
+            'Availability' => $availableQuantity > 0
+        ]);
+
+        return $availableQuantity;
+    }
+
+    /**
+     * Check if item is currently available (not booked)
+     */
+    public function isCurrentlyAvailable()
+    {
+        return $this->hasAvailableQuantity();
+    }
+
+    /**
+     * Check if item is available for a specific date range
+     */
+    public function isAvailableForDates($startDate, $endDate)
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        // Count overlapping bookings
+        $overlappingBookings = $this->bookings()
+            ->whereIn('Status', ['confirmed', 'Confirmed', 'ongoing', 'Ongoing'])
+            ->where(function($query) use ($start, $end) {
+                $query->where(function($q) use ($start, $end) {
+                    // New booking starts during existing booking
+                    $q->where('StartDate', '<=', $start)
+                      ->where('EndDate', '>=', $start);
+                })
+                ->orWhere(function($q) use ($start, $end) {
+                    // New booking ends during existing booking
+                    $q->where('StartDate', '<=', $end)
+                      ->where('EndDate', '>=', $end);
+                })
+                ->orWhere(function($q) use ($start, $end) {
+                    // New booking completely encompasses existing booking
+                    $q->where('StartDate', '>=', $start)
+                      ->where('EndDate', '<=', $end);
+                });
+            })
+            ->count();
+
+        // Check if we have enough quantity available
+        $availableForPeriod = $this->Quantity - $overlappingBookings;
+        
+        return $availableForPeriod > 0;
+    }
+
+    /**
+     * Get all booked date ranges for this item
+     */
+    public function getBookedDatesAttribute()
+    {
+        return $this->bookings()
+            ->whereIn('Status', ['confirmed', 'Confirmed', 'ongoing', 'Ongoing'])
+            ->where('EndDate', '>=', now())
+            ->get(['StartDate', 'EndDate'])
+            ->map(function($booking) {
+                return [
+                    'start' => $booking->StartDate->format('Y-m-d'),
+                    'end' => $booking->EndDate->format('Y-m-d')
+                ];
+            });
+    }
+
+    /**
+     * Auto-update availability based on bookings
+     */
+    public function updateAvailabilityStatus()
+    {
+        return $this->updateAvailableQuantity();
+    }
+
+    /**
+     * Scope for available items (considering active bookings)
      */
     public function scopeAvailable($query)
     {
-        return $query->where('Availability', true);
+        return $query->where('Availability', true)
+            ->where('AvailableQuantity', '>', 0);
     }
 
     /**
@@ -150,6 +261,12 @@ class Item extends Model
             }
             if (!isset($item->Availability)) {
                 $item->Availability = true;
+            }
+            if (!isset($item->Quantity)) {
+                $item->Quantity = 1;
+            }
+            if (!isset($item->AvailableQuantity)) {
+                $item->AvailableQuantity = $item->Quantity;
             }
         });
     }

@@ -1,4 +1,3 @@
-{{-- resources/views/user/HomePage.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'RentMate - Home')
@@ -231,23 +230,6 @@
 @endpush
 
 @section('content')
-<!-- Search Bar -->
-<div class="search-container">
-    <form action="{{ route('user.HomePage') }}" method="GET" class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input 
-            type="text" 
-            name="search" 
-            class="search-input" 
-            placeholder="Search for items, categories, or locations..."
-            value="{{ request('search') }}"
-        >
-        @if(request('category'))
-            <input type="hidden" name="category" value="{{ request('category') }}">
-        @endif
-        <button type="submit" class="search-button">Search</button>
-    </form>
-</div>
 
 <!-- Clear Filter Button -->
 @if(request('category') || request('search'))

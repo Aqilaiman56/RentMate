@@ -38,6 +38,11 @@ class BookingController extends Controller
             return back()->with('error', 'You cannot book your own item.');
         }
 
+        // Check if item is available for the selected dates
+        if (!$item->isAvailableForDates($validated['start_date'], $validated['end_date'])) {
+            return back()->with('error', 'This item is already booked for the selected dates. Please choose different dates.');
+        }
+
         // Calculate rental period
         $startDate = Carbon::parse($validated['start_date']);
         $endDate = Carbon::parse($validated['end_date']);
@@ -91,6 +96,11 @@ class BookingController extends Controller
             return back()->with('error', 'You cannot book your own item.');
         }
 
+        // Check date availability
+        if (!$item->isAvailableForDates($validated['start_date'], $validated['end_date'])) {
+            return back()->with('error', 'This item is already booked for the selected dates.');
+        }
+
         // Calculate rental period
         $startDate = Carbon::parse($validated['start_date']);
         $endDate = Carbon::parse($validated['end_date']);
@@ -114,7 +124,7 @@ class BookingController extends Controller
                 'EndDate' => $endDate,
                 'TotalAmount' => $totalAmount,
                 'DepositAmount' => $item->DepositAmount,
-                'Status' => 'pending',
+                'Status' => 'confirmed', // Changed to confirmed
                 'BookingDate' => now()
             ]);
 
@@ -134,12 +144,15 @@ class BookingController extends Controller
                 'DateCollected' => now()
             ]);
 
+            // Update item availability automatically
+            $item->updateAvailabilityStatus();
+
             // Create notification for item owner
             Notification::create([
                 'UserID' => $item->UserID,
                 'Type' => 'booking',
                 'Title' => 'New Booking Request',
-                'Content' => auth()->user()->UserName . ' requested to book your item: ' . $item->ItemName,
+                'Content' => auth()->user()->UserName . ' booked your item: ' . $item->ItemName,
                 'RelatedID' => $booking->BookingID,
                 'RelatedType' => 'booking',
                 'CreatedAt' => now()
@@ -148,7 +161,7 @@ class BookingController extends Controller
             DB::commit();
 
             return redirect()->route('booking.show', $booking->BookingID)
-                ->with('success', 'Booking created successfully! Please proceed with payment.');
+                ->with('success', 'Booking created successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -198,31 +211,43 @@ class BookingController extends Controller
             abort(403, 'You are not authorized to cancel this booking.');
         }
 
-        // Only allow cancellation if payment hasn't been made
-        if ($booking->Status !== 'pending') {
-            return back()->with('error', 'Cannot cancel a confirmed booking. Please contact support.');
+        // Only allow cancellation if not completed
+        if ($booking->Status === 'completed') {
+            return back()->with('error', 'Cannot cancel a completed booking.');
         }
 
-        $booking->update(['Status' => 'cancelled']);
+        DB::beginTransaction();
+        try {
+            $booking->update(['Status' => 'cancelled']);
 
-        // Update deposit status
-        if ($booking->deposit) {
-            $booking->deposit->update(['Status' => 'cancelled']);
+            // Update deposit status
+            if ($booking->deposit) {
+                $booking->deposit->update(['Status' => 'refunded']);
+            }
+
+            // Update item availability
+            $booking->item->updateAvailabilityStatus();
+
+            // Notify item owner
+            Notification::create([
+                'UserID' => $booking->item->UserID,
+                'Type' => 'booking',
+                'Title' => 'Booking Cancelled',
+                'Content' => auth()->user()->UserName . ' cancelled their booking for ' . $booking->item->ItemName,
+                'RelatedID' => $booking->BookingID,
+                'RelatedType' => 'booking',
+                'CreatedAt' => now()
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('user.bookings')
+                ->with('success', 'Booking cancelled successfully. Your deposit will be refunded.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to cancel booking.');
         }
-
-        // Notify item owner
-        Notification::create([
-            'UserID' => $booking->item->UserID,
-            'Type' => 'booking',
-            'Title' => 'Booking Cancelled',
-            'Content' => auth()->user()->UserName . ' cancelled their booking for ' . $booking->item->ItemName,
-            'RelatedID' => $booking->BookingID,
-            'RelatedType' => 'booking',
-            'CreatedAt' => now()
-        ]);
-
-        return redirect()->route('user.bookings')
-            ->with('success', 'Booking cancelled successfully.');
     }
 
     /**
@@ -238,7 +263,7 @@ class BookingController extends Controller
         }
 
         // Only confirmed bookings can be completed
-        if ($booking->Status !== 'confirmed') {
+        if (!in_array($booking->Status, ['confirmed', 'Confirmed', 'ongoing', 'Ongoing'])) {
             return back()->with('error', 'Only confirmed bookings can be marked as completed.');
         }
 
@@ -261,6 +286,9 @@ class BookingController extends Controller
                     'RefundReference' => 'REF-' . $booking->BookingID . '-' . time()
                 ]);
             }
+
+            // Update item availability
+            $booking->item->updateAvailabilityStatus();
 
             // Notify renter about completion and refund
             Notification::create([
@@ -286,7 +314,7 @@ class BookingController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'Booking completed successfully. Deposit refund has been processed.');
+            return back()->with('success', 'Booking completed successfully. Item is now available again. Deposit refund has been processed.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -302,7 +330,7 @@ class BookingController extends Controller
     {
         // Get all confirmed bookings where end date has passed
         $bookings = Booking::with(['item', 'deposit', 'user'])
-            ->where('Status', 'confirmed')
+            ->whereIn('Status', ['confirmed', 'Confirmed', 'ongoing', 'Ongoing'])
             ->where('EndDate', '<', now())
             ->get();
 
@@ -324,6 +352,9 @@ class BookingController extends Controller
                     ]);
                 }
 
+                // Update item availability
+                $booking->item->updateAvailabilityStatus();
+
                 // Notify user
                 Notification::create([
                     'UserID' => $booking->UserID,
@@ -344,7 +375,7 @@ class BookingController extends Controller
             }
         }
 
-        \Log::info("Auto-completed {$completed} bookings");
+        \Log::info("Auto-completed {$completed} bookings and updated item availability");
         return $completed;
     }
 }

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class ItemController extends Controller
 {
     /**
-     * Display item details page
+     * Display item details page (AUTHENTICATED USERS)
      */
     public function show($id)
     {
@@ -24,7 +24,7 @@ class ItemController extends Controller
             'category',
             'reviews.user',
             'bookings' => function($query) {
-                $query->where('Status', 'Approved');
+                $query->whereIn('Status', ['Confirmed', 'confirmed', 'Ongoing', 'ongoing']);
             }
         ])->findOrFail($id);
         
@@ -42,7 +42,7 @@ class ItemController extends Controller
         
         // Get booked dates for calendar
         $bookedDates = $item->bookings()
-            ->where('Status', 'Approved')
+            ->whereIn('Status', ['Confirmed', 'confirmed', 'Ongoing', 'ongoing'])
             ->where('EndDate', '>=', now())
             ->get(['StartDate', 'EndDate'])
             ->map(function($booking) {
@@ -62,6 +62,25 @@ class ItemController extends Controller
             'ratingDistribution',
             'bookedDates'
         ));
+    }
+
+    /**
+     * Show public item details (FOR GUESTS - NO AUTH REQUIRED)
+     */
+    public function showPublicDetails($id)
+    {
+        $item = Item::with(['category', 'location', 'user', 'reviews.user'])
+            ->findOrFail($id);
+        
+        $averageRating = $item->reviews()->avg('Rating') ?? 0;
+        $totalReviews = $item->reviews()->count();
+        
+        $ratingDistribution = [];
+        for ($i = 5; $i >= 1; $i--) {
+            $ratingDistribution[$i] = $item->reviews()->where('Rating', $i)->count();
+        }
+        
+        return view('public-item-details', compact('item', 'averageRating', 'totalReviews', 'ratingDistribution'));
     }
     
     /**
@@ -101,6 +120,7 @@ class ItemController extends Controller
             'DepositAmount' => 'required|numeric|min:0',
             'PricePerDay' => 'required|numeric|min:0',
             'ImagePath' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'Quantity' => 'required|integer|min:1',
             'Availability' => 'nullable|boolean'
         ]);
         
@@ -112,7 +132,8 @@ class ItemController extends Controller
         
         $validated['UserID'] = auth()->id();
         $validated['DateAdded'] = now();
-        $validated['Availability'] = $request->has('Availability') ? 1 : 1; // Default to available
+        $validated['Availability'] = $request->has('Availability') ? 1 : 1;
+        $validated['AvailableQuantity'] = $validated['Quantity'];
         
         $item = Item::create($validated);
         
@@ -151,12 +172,12 @@ class ItemController extends Controller
             'DepositAmount' => 'required|numeric|min:0',
             'PricePerDay' => 'required|numeric|min:0',
             'ImagePath' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'Quantity' => 'required|integer|min:1',
             'Availability' => 'nullable|boolean'
         ]);
         
         // Handle image upload if new image provided
         if ($request->hasFile('ImagePath')) {
-            // Delete old image
             if ($item->ImagePath) {
                 Storage::disk('public')->delete($item->ImagePath);
             }
@@ -166,6 +187,12 @@ class ItemController extends Controller
         }
         
         $validated['Availability'] = $request->has('Availability') ? 1 : 0;
+        
+        // Update available quantity if total quantity changed
+        if ($validated['Quantity'] != $item->Quantity) {
+            $bookedQuantity = $item->getBookedQuantity();
+            $validated['AvailableQuantity'] = max(0, $validated['Quantity'] - $bookedQuantity);
+        }
         
         $item->update($validated);
         
@@ -183,7 +210,7 @@ class ItemController extends Controller
         
         // Check if item has active bookings
         $hasActiveBookings = $item->bookings()
-            ->where('Status', 'Approved')
+            ->whereIn('Status', ['Confirmed', 'confirmed', 'Ongoing', 'ongoing'])
             ->where('EndDate', '>=', now())
             ->exists();
         
@@ -192,27 +219,16 @@ class ItemController extends Controller
                 ->with('error', 'Cannot delete item with active bookings');
         }
         
-        // Delete related records first to avoid foreign key constraint errors
-        
-        // 1. Delete wishlist entries
+        // Delete related records
         $item->wishlists()->delete();
-        
-        // 2. Delete reviews
         $item->reviews()->delete();
-        
-        // 3. Delete bookings (only past/cancelled ones since we checked for active ones above)
         $item->bookings()->delete();
         
-        // 4. Delete messages related to this item (if you have a messages table with ItemID)
-        // Uncomment the line below if you have messages relationship
-        // $item->messages()->delete();
-        
-        // 5. Delete image from storage
+        // Delete image
         if ($item->ImagePath) {
             Storage::disk('public')->delete($item->ImagePath);
         }
         
-        // 6. Finally delete the item itself
         $item->delete();
         
         return redirect()->route('items.my')->with('success', 'Item deleted successfully!');
@@ -230,24 +246,6 @@ class ItemController extends Controller
         
         return view('user.listings', compact('items'));
     }
-
-    //for welcome page
-        public function showPublicDetails($id)
-    {
-        $item = Item::with(['category', 'location', 'user', 'reviews.user'])
-            ->findOrFail($id);
-        
-        $averageRating = $item->reviews()->avg('Rating') ?? 0;
-        $totalReviews = $item->reviews()->count();
-        
-        $ratingDistribution = [];
-        for ($i = 5; $i >= 1; $i--) {
-            $ratingDistribution[$i] = $item->reviews()->where('Rating', $i)->count();
-        }
-        
-        // Return a public view (create this blade file)
-        return view('public-item-details', compact('item', 'averageRating', 'totalReviews', 'ratingDistribution'));
-    }
     
     /**
      * Add review to item
@@ -260,17 +258,17 @@ class ItemController extends Controller
             'Comment' => 'required|string|max:1000'
         ]);
         
-        // Check if user has booked this item before
+        // Check if user has booked this item
         $hasBooked = Booking::where('UserID', auth()->id())
             ->where('ItemID', $validated['ItemID'])
-            ->where('Status', 'Approved')
+            ->whereIn('Status', ['Confirmed', 'confirmed', 'completed', 'Completed'])
             ->exists();
         
         if (!$hasBooked) {
             return back()->with('error', 'You can only review items you have rented');
         }
         
-        // Check if user already reviewed this item
+        // Check if already reviewed
         $existingReview = Review::where('UserID', auth()->id())
             ->where('ItemID', $validated['ItemID'])
             ->exists();
@@ -290,4 +288,6 @@ class ItemController extends Controller
         
         return back()->with('success', 'Review added successfully!');
     }
+
+    
 }

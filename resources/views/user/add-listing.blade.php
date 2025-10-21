@@ -461,9 +461,29 @@
             </div>
 
             <!-- Availability -->
-            <div class="form-section">
+             <div class="form-section">
                 <h2 class="section-title">Availability</h2>
                 
+                <div class="form-group">
+                    <label class="form-label" for="Quantity">
+                        Quantity Available <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        id="Quantity" 
+                        name="Quantity" 
+                        class="form-input" 
+                        placeholder="1"
+                        min="1"
+                        value="{{ old('Quantity', 1) }}"
+                        required
+                    >
+                    <div class="form-help">How many units of this item do you have available for rent?</div>
+                    @error('Quantity')
+                        <div class="error-message">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="form-group">
                     <div class="checkbox-group">
                         <input 
@@ -475,12 +495,13 @@
                             {{ old('Availability', true) ? 'checked' : '' }}
                         >
                         <label class="form-label" for="Availability" style="margin-bottom: 0;">
-                            Item is available for rent
+                            Make item immediately available for rent
                         </label>
                     </div>
                     <div class="form-help">Uncheck if you want to list the item but not make it available yet</div>
                 </div>
             </div>
+            
 
             <!-- Form Actions -->
             <div class="form-actions">

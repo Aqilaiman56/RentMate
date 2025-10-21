@@ -545,20 +545,28 @@
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Location</span>
-                        <span class="detail-value">📍 {{ $item->location->City ?? 'N/A' }}</span>
+                        <span class="detail-value">📍 {{ $item->location->LocationName ?? 'N/A' }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Deposit Amount</span>
                         <span class="detail-value">RM {{ number_format($item->DepositAmount, 2) }}</span>
                     </div>
+
                     <div class="detail-row">
                         <span class="detail-label">Availability</span>
                         <span class="detail-value">
-                            <span class="availability-badge {{ $item->Availability ? 'badge-available' : 'badge-unavailable' }}">
-                                {{ $item->Availability ? '✓ Available' : '✗ Unavailable' }}
-                            </span>
+                            @if($item->Availability && $item->AvailableQuantity > 0)
+                                <span class="availability-badge badge-available">
+                                    ✓ {{ $item->AvailableQuantity }} {{ $item->AvailableQuantity > 1 ? 'units' : 'unit' }} available
+                                </span>
+                            @else
+                                <span class="availability-badge badge-unavailable">
+                                    ✗ Currently unavailable
+                                </span>
+                            @endif
                         </span>
-                    </div>
+                      </div>
+
                     <div class="detail-row">
                         <span class="detail-label">Listed</span>
                         <span class="detail-value">{{ $item->DateAdded ? $item->DateAdded->format('M d, Y') : 'N/A' }}</span>
