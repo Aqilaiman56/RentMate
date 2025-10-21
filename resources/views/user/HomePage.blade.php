@@ -59,45 +59,45 @@
     }
 
     .categories {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         gap: 15px;
-        overflow-x: auto;
-        padding: 20px 0;
-        margin-bottom: 30px;
+        justify-items: center;
+        margin-bottom: 40px;
     }
 
     .category-card {
         background: white;
-        border: 3px solid #4461F2;
+        border: 1px solid #e5e7eb;
         border-radius: 15px;
-        padding: 20px;
-        min-width: 120px;
-        height: 120px;
+        padding: 18px 10px;
+        width: 100%;
+        max-width: 110px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
         text-align: center;
-        cursor: pointer;
-        transition: all 0.3s;
         text-decoration: none;
-        flex-shrink: 0;
+        color: #1f2937;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    .category-card:hover,
+    .category-card:hover, 
     .category-card.active {
         background: #4461F2;
         color: white;
-        transform: translateY(-2px);
+        transform: translateY(-3px);
     }
 
     .category-icon {
-        font-size: 32px;
-        margin-bottom: 8px;
+        font-size: 26px;
+        margin-bottom: 6px;
+        color: inherit;
     }
 
     .category-name {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
         color: inherit;
     }
@@ -231,6 +231,7 @@
 
 @section('content')
 
+
 <!-- Clear Filter Button -->
 @if(request('category') || request('search'))
     <a href="{{ route('user.HomePage') }}" class="clear-filter">✕ Clear Filters</a>
@@ -239,7 +240,7 @@
 <!-- Categories -->
 <div class="categories">
     <a href="{{ route('user.HomePage') }}" class="category-card {{ !request('category') ? 'active' : '' }}">
-        <div class="category-icon">🏠</div>
+        <div class="category-icon">🏠︎</div>
         <div class="category-name">All</div>
     </a>
     @foreach($categories as $category)
@@ -247,21 +248,20 @@
            class="category-card {{ request('category') == $category->CategoryID ? 'active' : '' }}">
             <div class="category-icon">
                 @switch($category->CategoryName)
-                    @case('Gaming') 🎮 @break
-                    @case('Music') 🎵 @break
-                    @case('Computer') 💻 @break
-                    @case('Photography') 📷 @break
-                    @case('Camera') 📷 @break
-                    @case('Attire') 👔 @break
-                    @case('Books') 📚 @break
-                    @case('Events') 🎁 @break
-                    @case('Event') 🎁 @break
-                    @case('Sport') ⚽ @break
-                    @case('Sports') ⚽ @break
-                    @case('Electric') ⚡ @break
-                    @default 📦
+                    @case('Gaming') <i class="fa-solid fa-gamepad"></i> @break
+                    @case('Music') <i class="fa-solid fa-music"></i> @break
+                    @case('Computer') <i class="fa-solid fa-laptop"></i> @break
+                    @case('Photography') <i class="fa-solid fa-camera"></i> @break
+                    @case('Camera') <i class="fa-solid fa-camera-retro"></i> @break
+                    @case('Attire') <i class="fa-solid fa-shirt"></i> @break
+                    @case('Books') <i class="fa-solid fa-book"></i> @break
+                    @case('Event') <i class="fa-solid fa-calendar-days"></i> @break
+                    @case('Sports') <i class="fa-solid fa-futbol"></i> @break
+                    @case('Electric') <i class="fa-solid fa-bolt"></i> @break
+                    @default <i class="fa-solid fa-box"></i>
                 @endswitch
             </div>
+
             <div class="category-name">{{ $category->CategoryName }}</div>
         </a>
     @endforeach

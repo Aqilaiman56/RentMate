@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>RentMate - Rent Anything, Anytime</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -228,54 +228,49 @@
             background: #dc2626;
         }
 
-        .categories {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 20px 0;
-            margin-bottom: 30px;
+       .categories {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 15px;
+        justify-items: center;
+        margin-bottom: 40px;
         }
 
         .category-card {
             background: white;
-            border: 3px solid #4461F2;
+            border: 1px solid #e5e7eb;
             border-radius: 15px;
-            padding: 20px;
-            min-width: 120px;
-            height: 120px;
+            padding: 18px 10px;
+            width: 100%;
+            max-width: 110px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
             text-decoration: none;
-            color: inherit;
+            color: #1f2937;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        .category-card:hover {
-            background: #4461F2;
-            color: white;
-            transform: translateY(-2px);
-        }
-
+        .category-card:hover, 
         .category-card.active {
             background: #4461F2;
             color: white;
+            transform: translateY(-3px);
         }
 
         .category-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
+            font-size: 26px;
+            margin-bottom: 6px;
+            color: inherit;
         }
 
         .category-name {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
+            color: inherit;
         }
-
         .items-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -607,26 +602,25 @@
             </div>
             
             <div class="categories">
-                @php
-                    $categoryIcons = [
-                        'Gaming' => '🎮',
-                        'Music' => '🎵',
-                        'Computer' => '💻',
-                        'Photography' => '📷',
-                        'Attire' => '👔',
-                        'Books' => '📚',
-                        'Event' => '🎁',
-                        'Sports' => '⚽',
-                        'Electric' => '⚡',
-                    ];
-                @endphp
-                
                 @foreach($categories as $category)
                     <a href="{{ route('welcome', ['category' => $category->CategoryID] + request()->only('search')) }}" 
                        class="category-card {{ $selectedCategory && $selectedCategory->CategoryID == $category->CategoryID ? 'active' : '' }}">
                         <div class="category-icon">
-                            {{ $categoryIcons[$category->CategoryName] ?? '📦' }}
+                           @switch($category->CategoryName)
+                                @case('Gaming') <i class="fa-solid fa-gamepad"></i> @break
+                                @case('Music') <i class="fa-solid fa-music"></i> @break
+                                @case('Computer') <i class="fa-solid fa-laptop"></i> @break
+                                @case('Photography') <i class="fa-solid fa-camera"></i> @break
+                                @case('Camera') <i class="fa-solid fa-camera-retro"></i> @break
+                                @case('Attire') <i class="fa-solid fa-shirt"></i> @break
+                                @case('Books') <i class="fa-solid fa-book"></i> @break
+                                @case('Event') <i class="fa-solid fa-calendar-days"></i> @break
+                                @case('Sports') <i class="fa-solid fa-futbol"></i> @break
+                                @case('Electric') <i class="fa-solid fa-bolt"></i> @break
+                                @default <i class="fa-solid fa-box"></i>
+                             @endswitch
                         </div>
+
                         <div class="category-name">{{ $category->CategoryName }}</div>
                     </a>
                 @endforeach
