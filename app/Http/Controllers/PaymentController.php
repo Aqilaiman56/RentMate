@@ -124,6 +124,9 @@ class PaymentController extends Controller
                     'Status' => 'confirmed'
                 ]);
 
+                // Update item availability automatically
+                $booking->item->updateAvailabilityStatus();
+
                 // Calculate rental amount to remind user
                 $rentalAmount = $booking->TotalAmount;
 

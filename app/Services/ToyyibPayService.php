@@ -35,8 +35,8 @@ class ToyyibPayService
                     'billPriceSetting' => 1, // 1 = Fixed price
                     'billPayorInfo' => 1, // 1 = Required
                     'billAmount' => $bookingData['amount'] * 100, // Amount in cents
-                    'billReturnUrl' => route('payment.callback'),
-                    'billCallbackUrl' => route('payment.callback'),
+                    'billReturnUrl' => config('toyyibpay.callback_url'),
+                    'billCallbackUrl' => config('toyyibpay.callback_url'),
                     'billExternalReferenceNo' => $bookingData['booking_id'],
                     'billTo' => $bookingData['payer_name'],
                     'billEmail' => $bookingData['payer_email'],

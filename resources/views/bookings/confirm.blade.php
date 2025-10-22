@@ -431,7 +431,7 @@
                     <span class="detail-value">{{ $days }} day(s)</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Total Rental Cost</span>
+                    <span class="detail-label">Total Booking Cost</span>
                     <span class="detail-value">RM {{ number_format($rental_amount, 2) }}</span>
                 </div>
 
@@ -500,7 +500,7 @@
                     <p>⚠️ <strong>Important:</strong> The rental fee (RM {{ number_format($rental_amount, 2) }}) must be paid separately to the owner. Contact them to arrange payment method.</p>
                 </div>
 
-                <form action="{{ route('bookings.store') }}" method="POST" id="bookingForm">
+                <form action="{{ route('bookings.create_and_pay') }}" method="POST" id="bookingForm">
                     @csrf
                     <input type="hidden" name="item_id" value="{{ $item->ItemID }}">
                     <input type="hidden" name="start_date" value="{{ $start_date->format('Y-m-d') }}">

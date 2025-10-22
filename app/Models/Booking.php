@@ -30,6 +30,7 @@ class Booking extends Model
     protected $casts = [
         'StartDate' => 'date',
         'EndDate' => 'date',
+        'BookingDate' => 'datetime',
         'TaxAmount' => 'decimal:2',
         'TotalPaid' => 'decimal:2',
         'ReturnConfirmed' => 'boolean'

@@ -124,7 +124,7 @@ class BookingController extends Controller
                 'EndDate' => $endDate,
                 'TotalAmount' => $totalAmount,
                 'DepositAmount' => $item->DepositAmount,
-                'Status' => 'confirmed', // Changed to confirmed
+                'Status' => 'pending', // Changed to pending for payment flow
                 'BookingDate' => now()
             ]);
 
@@ -132,7 +132,7 @@ class BookingController extends Controller
             Deposit::create([
                 'BookingID' => $booking->BookingID,
                 'Amount' => $item->DepositAmount,
-                'Status' => 'held',
+                'Status' => 'pending',
                 'DateCollected' => now()
             ]);
 
@@ -162,6 +162,103 @@ class BookingController extends Controller
 
             return redirect()->route('booking.show', $booking->BookingID)
                 ->with('success', 'Booking created successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Booking creation error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to create booking. Please try again.');
+        }
+    }
+
+    /**
+     * Create booking and redirect to payment
+     */
+    public function createAndPay(Request $request)
+    {
+        $validated = $request->validate([
+            'item_id' => 'required|exists:items,ItemID',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after:start_date'
+        ]);
+
+        $item = Item::findOrFail($validated['item_id']);
+
+        // Check if item is available
+        if (!$item->Availability) {
+            return back()->with('error', 'This item is not available for booking.');
+        }
+
+        // Check if user is trying to book their own item
+        if ($item->UserID == auth()->id()) {
+            return back()->with('error', 'You cannot book your own item.');
+        }
+
+        // Check date availability
+        if (!$item->isAvailableForDates($validated['start_date'], $validated['end_date'])) {
+            return back()->with('error', 'This item is already booked for the selected dates.');
+        }
+
+        // Calculate rental period
+        $startDate = Carbon::parse($validated['start_date']);
+        $endDate = Carbon::parse($validated['end_date']);
+        $days = $startDate->diffInDays($endDate);
+
+        if ($days < 1) {
+            $days = 1;
+        }
+
+        // Calculate total amount
+        $totalAmount = $item->PricePerDay * $days;
+
+        try {
+            DB::beginTransaction();
+
+            // Create booking
+            $booking = Booking::create([
+                'UserID' => auth()->id(),
+                'ItemID' => $item->ItemID,
+                'StartDate' => $startDate,
+                'EndDate' => $endDate,
+                'TotalAmount' => $totalAmount,
+                'DepositAmount' => $item->DepositAmount,
+                'Status' => 'pending',
+                'BookingDate' => now()
+            ]);
+
+            // Create deposit record
+            Deposit::create([
+                'BookingID' => $booking->BookingID,
+                'Amount' => $item->DepositAmount,
+                'Status' => 'pending',
+                'DateCollected' => now()
+            ]);
+
+            // Create tax record
+            Tax::create([
+                'UserID' => auth()->id(),
+                'BookingID' => $booking->BookingID,
+                'TaxAmount' => 1.00,
+                'DateCollected' => now()
+            ]);
+
+            // Update item availability automatically
+            $item->updateAvailabilityStatus();
+
+            // Create notification for item owner
+            Notification::create([
+                'UserID' => $item->UserID,
+                'Type' => 'booking',
+                'Title' => 'New Booking Request',
+                'Content' => auth()->user()->UserName . ' booked your item: ' . $item->ItemName,
+                'RelatedID' => $booking->BookingID,
+                'RelatedType' => 'booking',
+                'CreatedAt' => now()
+            ]);
+
+            DB::commit();
+
+            // Redirect to payment creation
+            return redirect()->route('payment.create', ['booking_id' => $booking->BookingID]);
 
         } catch (\Exception $e) {
             DB::rollBack();

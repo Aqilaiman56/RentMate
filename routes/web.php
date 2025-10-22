@@ -102,6 +102,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/booking/confirm', [BookingController::class, 'confirm'])->name('booking.confirm');
     Route::post('/bookings/store', [BookingController::class, 'store'])->name('bookings.store');
+    Route::post('/bookings/create-and-pay', [BookingController::class, 'createAndPay'])->name('bookings.create_and_pay');
     Route::post('/booking/create', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('/booking/{id}', [BookingController::class, 'show'])->name('booking.show');

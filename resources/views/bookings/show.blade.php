@@ -440,7 +440,7 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Booking Date</span>
-                    <span class="detail-value">{{ $booking->BookingDate->format('d M Y, g:i A') }}</span>
+                    <span class="detail-value">{{ $booking->BookingDate ? $booking->BookingDate->format('d M Y, g:i A') : 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Status</span>

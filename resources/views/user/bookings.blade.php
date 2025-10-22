@@ -305,7 +305,7 @@
                             </div>
                             <div class="meta-item">
                                 <span>📆</span>
-                                <span>Booked {{ $booking->BookingDate->diffForHumans() }}</span>
+                                <span>Booked {{ $booking->BookingDate ? $booking->BookingDate->diffForHumans() : 'N/A' }}</span>
                             </div>
                             @if($booking->payment)
                                 <div class="meta-item">
