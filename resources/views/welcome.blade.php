@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>RentMate - Rent Anything, Anytime</title>
+    <title>GoRentUMS - Rent Anything, Anytime</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -542,7 +542,7 @@
 </head>
 <body>
     <header class="header">
-        <a href="/" class="logo">RentMate</a>
+        <a href="/" class="logo">GoRentUMS</a>
         
         <!-- Search Bar in Header -->
         <div class="header-search-container">

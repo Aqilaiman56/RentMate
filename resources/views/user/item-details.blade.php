@@ -1,7 +1,7 @@
 {{-- resources/views/users/item-details.blade.php --}}
 @extends('layouts.app')
 
-@section('title', $item->ItemName . ' - RentMate')
+@section('title', $item->ItemName . ' - GoRentUMS')
 
 @push('styles')
 <style>
@@ -490,7 +490,7 @@
 @section('content')
 <div class="item-details-container">
     <a href="{{ route('user.HomePage') }}" class="back-button">
-        ← Back to Listings
+        <i class="fa-solid fa-arrow-left"></i> Back to Listings
     </a>
 
     <div class="item-content">
@@ -504,7 +504,7 @@
                 @endif
                 
                 <button class="wishlist-btn" onclick="toggleWishlist({{ $item->ItemID }})">
-                    ♡
+                    <i class="fa-regular fa-heart"></i>
                 </button>
             </div>
 
@@ -521,7 +521,7 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Location</span>
-                    <span class="detail-value">📍 {{ $item->location->LocationName ?? 'N/A' }}</span>
+                    <span class="detail-value"><i class="fa-solid fa-location-dot"></i> {{ $item->location->LocationName ?? 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Deposit Amount</span>
@@ -532,11 +532,11 @@
                     <span class="detail-value">
                         @if($item->Availability && $item->AvailableQuantity > 0)
                             <span class="availability-badge badge-available">
-                                ✓ {{ $item->AvailableQuantity }} {{ $item->AvailableQuantity > 1 ? 'units' : 'unit' }} available
+                                <i class="fa-solid fa-check"></i> {{ $item->AvailableQuantity }} {{ $item->AvailableQuantity > 1 ? 'units' : 'unit' }} available
                             </span>
                         @else
                             <span class="availability-badge badge-unavailable">
-                                ✗ Currently unavailable
+                                <i class="fa-solid fa-xmark"></i> Currently unavailable
                             </span>
                         @endif
                     </span>
@@ -562,11 +562,11 @@
                         <div class="rating-stars">
                             @for($i = 1; $i <= 5; $i++)
                                 @if($i <= floor($averageRating))
-                                    ★
+                                    <i class="fa-solid fa-star"></i>
                                 @elseif($i - 0.5 <= $averageRating)
-                                    ★
+                                    <i class="fa-solid fa-star-half-stroke"></i>
                                 @else
-                                    ☆
+                                    <i class="fa-regular fa-star"></i>
                                 @endif
                             @endfor
                         </div>
@@ -589,11 +589,11 @@
                 </div>
                     @if(auth()->id() !== $item->UserID)
                         <button class="contact-owner-btn" onclick="window.location.href='{{ route('messages.show', ['userId' => $item->user->UserID, 'item_id' => $item->ItemID]) }}'">
-                            💬 Contact Owner
+                            <i class="fa-solid fa-message"></i> Contact Owner
                         </button>
                     @else
                         <button class="contact-owner-btn" disabled style="background: #e5e7eb; color: #9ca3af; cursor: not-allowed;">
-                            💬 This is Your Item
+                            <i class="fa-solid fa-message"></i> This is Your Item
                         </button>
                     @endif
             </div>
@@ -605,7 +605,7 @@
                 </div>
                 
                 <div class="deposit-info">
-                    💰 Refundable deposit: RM {{ number_format($item->DepositAmount, 2) }}
+                    <i class="fa-solid fa-money-bill-wave"></i> Refundable deposit: RM {{ number_format($item->DepositAmount, 2) }}
                     <br>
                     <small style="color: #9ca3af; font-size: 12px;">Pay deposit online • Rental fee to owner</small>
                 </div>
@@ -642,7 +642,7 @@
                                 <span id="rentalTotal">RM 0.00</span>
                             </div>
                             <div class="calc-row" style="color: #f59e0b; font-weight: 600;">
-                                <span>💵 Pay to Owner</span>
+                                <span><i class="fa-solid fa-money-bill"></i> Pay to Owner</span>
                                 <span id="payToOwner">RM 0.00</span>
                             </div>
                             <div class="calc-row" style="border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
@@ -707,7 +707,11 @@
                     </div>
                     <div class="review-rating">
                         @for($i = 1; $i <= 5; $i++)
-                            {{ $i <= $review->Rating ? '★' : '☆' }}
+                            @if($i <= $review->Rating)
+                                <i class="fa-solid fa-star"></i>
+                            @else
+                                <i class="fa-regular fa-star"></i>
+                            @endif
                         @endfor
                     </div>
                     <p class="review-text">{{ $review->Comment }}</p>
@@ -763,10 +767,10 @@
         .then(data => {
             const heartBtn = document.querySelector('.wishlist-btn');
             if(data.added) {
-                heartBtn.textContent = '♥';
+                heartBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
                 heartBtn.style.color = '#FF6B6B';
             } else {
-                heartBtn.textContent = '♡';
+                heartBtn.innerHTML = '<i class="fa-regular fa-heart"></i>';
                 heartBtn.style.color = '#000';
             }
         })

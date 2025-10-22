@@ -6,7 +6,7 @@
             <!-- Brand Section -->
             <div class="footer-column">
                 <div class="footer-brand">
-                    <h3 class="brand-name">RentMate</h3>
+                    <h3 class="brand-name">GoRentUMS</h3>
                     <p class="brand-tagline">Your trusted peer-to-peer rental marketplace</p>
                 </div>
                 <p class="footer-description">

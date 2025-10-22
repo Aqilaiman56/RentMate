@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'RentMate')</title>
+    <title>@yield('title', 'GoRentUMS')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
@@ -225,7 +225,7 @@
 </head>
 <body>
     <header class="header">
-        <a href="{{ route('user.HomePage') }}" class="logo">RentMate</a>
+        <a href="{{ route('user.HomePage') }}" class="logo">GoRentUMS</a>
         
         <form action="{{ route('user.HomePage') }}" method="GET" class="search-bar">
             <input type="date" name="availability" class="search-input" placeholder="Availability" value="{{ request('availability') }}">
