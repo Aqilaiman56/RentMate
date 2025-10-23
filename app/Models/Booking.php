@@ -21,10 +21,13 @@ class Booking extends Model
         'ItemID',
         'StartDate',
         'EndDate',
+        'TotalAmount',
+        'DepositAmount',
         'TaxAmount',
         'TotalPaid',
         'Status',
-        'ReturnConfirmed'
+        'ReturnConfirmed',
+        'BookingDate'
     ];
 
     protected $casts = [

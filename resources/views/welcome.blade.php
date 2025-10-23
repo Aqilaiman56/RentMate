@@ -33,9 +33,22 @@
         .logo {
             font-size: 24px;
             font-weight: 700;
-            color: #4461F2;
             text-decoration: none;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-go {
+            color: #1e3a8a;
+        }
+
+        .logo-rent {
+            color: #60a5fa;
+        }
+
+        .logo-ums {
+            color: #1e3a8a;
         }
 
         .header-search-container {
@@ -365,6 +378,7 @@
         .feature-icon {
             font-size: 48px;
             margin-bottom: 15px;
+            color: #4461F2;
         }
 
         .feature-title {
@@ -542,12 +556,14 @@
 </head>
 <body>
     <header class="header">
-        <a href="/" class="logo">GoRentUMS</a>
+        <a href="/" class="logo">
+            <span class="logo-go">Go</span><span class="logo-rent">Rent</span><span class="logo-ums">UMS</span>
+        </a>
         
         <!-- Search Bar in Header -->
         <div class="header-search-container">
             <form action="{{ route('welcome') }}" method="GET" class="header-search-bar">
-                <span class="header-search-icon">🔍</span>
+                <span class="header-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
                 <input 
                     type="text" 
                     name="search" 
@@ -597,7 +613,7 @@
             <div class="category-header">
                 <h2 class="section-title" style="margin-bottom: 0;">Categories</h2>
                 @if($selectedCategory || request('search'))
-                    <a href="{{ route('welcome') }}" class="clear-filter">✕ Clear Filter</a>
+                    <a href="{{ route('welcome') }}" class="clear-filter"><i class="fa-solid fa-xmark"></i> Clear Filter</a>
                 @endif
             </div>
             
@@ -655,7 +671,7 @@
                         <div class="item-details">
                             <div class="item-title">{{ $item->ItemName }}</div>
                             <div class="item-location">
-                                📍 {{ $item->location->LocationName ?? 'Malaysia' }}
+                                <i class="fa-solid fa-location-dot"></i> {{ $item->location->LocationName ?? 'Malaysia' }}
                             </div>
                             <div class="item-price">RM {{ number_format($item->PricePerDay, 2) }} / day</div>
                         </div>
@@ -677,25 +693,25 @@
         @endif
 
         <div class="features">
-            <h2 class="section-title">Why Choose RentMate?</h2>
+            <h2 class="section-title">Why Choose GoRentUMS?</h2>
             <div class="features-grid">
                 <div class="feature-item">
-                    <div class="feature-icon">🔒</div>
+                    <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
                     <h3 class="feature-title">Safe & Secure</h3>
                     <p class="feature-desc">All transactions are protected with secure payment processing and verified users.</p>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon">💰</div>
+                    <div class="feature-icon"><i class="fa-solid fa-sack-dollar"></i></div>
                     <h3 class="feature-title">Earn Extra Income</h3>
                     <p class="feature-desc">List your unused items and start earning money from things you already own.</p>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon">🌍</div>
+                    <div class="feature-icon"><i class="fa-solid fa-earth-asia"></i></div>
                     <h3 class="feature-title">Local Community</h3>
                     <p class="feature-desc">Connect with people in your area and support the sharing economy.</p>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon">⚡</div>
+                    <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
                     <h3 class="feature-title">Quick & Easy</h3>
                     <p class="feature-desc">Simple booking process with instant confirmation and flexible rental periods.</p>
                 </div>
@@ -704,7 +720,7 @@
 
         <div class="cta-section">
             <h2 class="cta-section-title">Ready to Get Started?</h2>
-            <p class="cta-section-text">Join thousands of users who are already renting and lending on RentMate</p>
+            <p class="cta-section-text">Join thousands of users who are already renting and lending on GoRentUMS</p>
             @auth
                 <a href="{{ route('items.index') }}" class="btn-cta btn-secondary">Browse All Items</a>
             @else
@@ -716,8 +732,8 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>About RentMate</h3>
-                <p>RentMate is your trusted platform for renting and lending items within your community. Join thousands of users who are making the most of the sharing economy.</p>
+                <h3>About GoRentUMS</h3>
+                <p>GoRentUMS is your trusted platform for renting and lending items within your community. Join thousands of users who are making the most of the sharing economy.</p>
             </div>
             
             <div class="footer-section">
@@ -756,7 +772,7 @@
         </div>
         
         <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} RentMate. All rights reserved. Made with ❤️ for the community.</p>
+            <p>&copy; {{ date('Y') }} GoRentUMS. All rights reserved. Made with <i class="fa-solid fa-heart" style="color: #ef4444;"></i> for the community.</p>
         </div>
     </footer>
 </body>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'RentMate - Home')
+@section('title', 'GoRentUMS - Home')
 
 @push('styles')
 <style>
@@ -234,13 +234,13 @@
 
 <!-- Clear Filter Button -->
 @if(request('category') || request('search'))
-    <a href="{{ route('user.HomePage') }}" class="clear-filter">✕ Clear Filters</a>
+    <a href="{{ route('user.HomePage') }}" class="clear-filter"><i class="fa-solid fa-xmark"></i> Clear Filters</a>
 @endif
 
 <!-- Categories -->
 <div class="categories">
     <a href="{{ route('user.HomePage') }}" class="category-card {{ !request('category') ? 'active' : '' }}">
-        <div class="category-icon">🏠︎</div>
+        <div class="category-icon"><i class="fa-solid fa-house"></i></div>
         <div class="category-name">All</div>
     </a>
     @foreach($categories as $category)
@@ -282,14 +282,14 @@
                     <div class="item-title">{{ $item->ItemName }}</div>
                     <button class="heart-btn {{ $item->isInWishlist ? 'active' : '' }}" onclick="toggleWishlist(event, {{ $item->ItemID }})">
                         @if($item->isInWishlist)
-                            ♥
+                            <i class="fa-solid fa-heart"></i>
                         @else
-                            ♡
+                            <i class="fa-regular fa-heart"></i>
                         @endif
                     </button>
                 </div>
                 <div class="item-location">
-                    📍 {{ $item->location->LocationName ?? 'Location not set' }}
+                    <i class="fa-solid fa-location-dot"></i> {{ $item->location->LocationName ?? 'Location not set' }}
                 </div>
                 <div class="item-price">
                     @if(isset($item->PricePerDay))
@@ -335,12 +335,12 @@
         })
         .then(response => response.json())
         .then(data => {
-            const heartBtn = event.target;
+            const heartBtn = event.target.closest('.heart-btn');
             if(data.added) {
-                heartBtn.textContent = '♥';
+                heartBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
                 heartBtn.classList.add('active');
             } else {
-                heartBtn.textContent = '♡';
+                heartBtn.innerHTML = '<i class="fa-regular fa-heart"></i>';
                 heartBtn.classList.remove('active');
             }
         })

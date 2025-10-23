@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $item->ItemName }} - RentMate</title>
+    <title>{{ $item->ItemName }} - GoRentUMS</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -32,8 +33,21 @@
         .logo {
             font-size: 24px;
             font-weight: 700;
-            color: #4461F2;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-go {
+            color: #1e3a8a;
+        }
+
+        .logo-rent {
+            color: #60a5fa;
+        }
+
+        .logo-ums {
+            color: #1e3a8a;
         }
 
         .auth-buttons {
@@ -112,11 +126,6 @@
             object-fit: cover;
             border-radius: 20px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-
-        .item-info-section {
-            display: flex;
-            flex-direction: column;
         }
 
         .item-header {
@@ -508,7 +517,9 @@
 </head>
 <body>
     <header class="header">
-        <a href="/" class="logo">RentMate</a>
+        <a href="/" class="logo">
+            <span class="logo-go">Go</span><span class="logo-rent">Rent</span><span class="logo-ums">UMS</span>
+        </a>
         
         <div class="auth-buttons">
             <a href="{{ route('login') }}" class="btn btn-login">Log in</a>
@@ -518,11 +529,11 @@
 
     <div class="item-details-container">
         <a href="{{ route('welcome') }}" class="back-button">
-            ← Back to Listings
+            <i class="fa-solid fa-arrow-left"></i> Back to Listings
         </a>
 
         <div class="item-content">
-            <!-- Left Column - Images & Info -->
+            <!-- Left Column - Images & Details -->
             <div>
                 <div class="item-image-section">
                     @if($item->ImagePath)
@@ -530,71 +541,6 @@
                     @else
                         <img src="https://via.placeholder.com/600x500/4461F2/fff?text={{ urlencode($item->ItemName) }}" alt="{{ $item->ItemName }}" class="item-main-image">
                     @endif
-                </div>
-
-                <div class="item-description">
-                    <h2 class="section-title">Description</h2>
-                    <p class="description-text">{{ $item->Description }}</p>
-                </div>
-
-                <div class="item-details-list">
-                    <h2 class="section-title">Item Details</h2>
-                    <div class="detail-row">
-                        <span class="detail-label">Category</span>
-                        <span class="detail-value">{{ $item->category->CategoryName ?? 'N/A' }}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Location</span>
-                        <span class="detail-value">📍 {{ $item->location->LocationName ?? 'N/A' }}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Deposit Amount</span>
-                        <span class="detail-value">RM {{ number_format($item->DepositAmount, 2) }}</span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Availability</span>
-                        <span class="detail-value">
-                            @if($item->Availability && $item->AvailableQuantity > 0)
-                                <span class="availability-badge badge-available">
-                                    ✓ {{ $item->AvailableQuantity }} {{ $item->AvailableQuantity > 1 ? 'units' : 'unit' }} available
-                                </span>
-                            @else
-                                <span class="availability-badge badge-unavailable">
-                                    ✗ Currently unavailable
-                                </span>
-                            @endif
-                        </span>
-                      </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Listed</span>
-                        <span class="detail-value">{{ $item->DateAdded ? $item->DateAdded->format('M d, Y') : 'N/A' }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column - Booking -->
-            <div>
-                <div class="item-header">
-                    <span class="item-category">{{ $item->category->CategoryName ?? 'Item' }}</span>
-                    <h1 class="item-title">{{ $item->ItemName }}</h1>
-                    <div class="item-meta">
-                        <div class="meta-item">
-                            <div class="rating-stars">
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= floor($averageRating))
-                                        ★
-                                    @elseif($i - 0.5 <= $averageRating)
-                                        ★
-                                    @else
-                                        ☆
-                                    @endif
-                                @endfor
-                            </div>
-                            <span>{{ number_format($averageRating, 1) }} ({{ $totalReviews }} reviews)</span>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="item-owner">
@@ -611,6 +557,71 @@
                     </div>
                 </div>
 
+                <div class="item-description">
+                    <h2 class="section-title">Description</h2>
+                    <p class="description-text">{{ $item->Description }}</p>
+                </div>
+            </div>
+
+            <!-- Right Column - Booking Info -->
+            <div>
+                <div class="item-header">
+                    <span class="item-category">{{ $item->category->CategoryName ?? 'Item' }}</span>
+                    <h1 class="item-title">{{ $item->ItemName }}</h1>
+                    <div class="item-meta">
+                        <div class="meta-item">
+                            <div class="rating-stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= floor($averageRating))
+                                        <i class="fa-solid fa-star"></i>
+                                    @elseif($i - 0.5 <= $averageRating)
+                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                    @else
+                                        <i class="fa-regular fa-star"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <span>{{ number_format($averageRating, 1) }} ({{ $totalReviews }} reviews)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item-details-list">
+                    <h2 class="section-title">Item Details</h2>
+                    <div class="detail-row">
+                        <span class="detail-label">Category</span>
+                        <span class="detail-value">{{ $item->category->CategoryName ?? 'N/A' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Location</span>
+                        <span class="detail-value"><i class="fa-solid fa-location-dot"></i> {{ $item->location->LocationName ?? 'N/A' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Deposit Amount</span>
+                        <span class="detail-value">RM {{ number_format($item->DepositAmount, 2) }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Availability</span>
+                        <span class="detail-value">
+                            @if($item->Availability && $item->AvailableQuantity > 0)
+                                <span class="availability-badge badge-available">
+                                    <i class="fa-solid fa-check"></i> {{ $item->AvailableQuantity }} {{ $item->AvailableQuantity > 1 ? 'units' : 'unit' }} available
+                                </span>
+                            @else
+                                <span class="availability-badge badge-unavailable">
+                                    <i class="fa-solid fa-xmark"></i> Currently unavailable
+                                </span>
+                            @endif
+                        </span>
+                      </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Listed</span>
+                        <span class="detail-value">{{ $item->DateAdded ? $item->DateAdded->format('M d, Y') : 'N/A' }}</span>
+                    </div>
+                </div>
+
                 <div class="booking-card">
                     <div class="price-display">
                         RM {{ number_format($item->PricePerDay, 2) }}
@@ -618,11 +629,11 @@
                     </div>
                     
                     <div class="deposit-info">
-                        💰 Refundable deposit: RM {{ number_format($item->DepositAmount, 2) }}
+                        <i class="fa-solid fa-money-bill-wave"></i> Refundable deposit: RM {{ number_format($item->DepositAmount, 2) }}
                     </div>
 
                     <div class="auth-required-box">
-                        <h3>🔒 Sign in to Book</h3>
+                        <h3><i class="fa-solid fa-lock"></i> Sign in to Book</h3>
                         <p>Create an account or log in to rent this item and connect with the owner</p>
                         <div class="auth-buttons-vertical">
                             <a href="{{ route('register') }}" class="btn-auth btn-white">Create Account</a>
@@ -670,7 +681,11 @@
                         </div>
                         <div class="review-rating">
                             @for($i = 1; $i <= 5; $i++)
-                                {{ $i <= $review->Rating ? '★' : '☆' }}
+                                @if($i <= $review->Rating)
+                                    <i class="fa-solid fa-star"></i>
+                                @else
+                                    <i class="fa-regular fa-star"></i>
+                                @endif
                             @endfor
                         </div>
                         <p class="review-text">{{ $review->Comment }}</p>

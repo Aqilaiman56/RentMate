@@ -66,11 +66,6 @@
         transform: scale(1.1);
     }
 
-    .item-info-section {
-        display: flex;
-        flex-direction: column;
-    }
-
     .item-header {
         margin-bottom: 20px;
     }
@@ -494,7 +489,7 @@
     </a>
 
     <div class="item-content">
-        <!-- Left Column - Images & Info -->
+        <!-- Left Column - Images & Reviews -->
         <div>
             <div class="item-image-section">
                 @if($item->ImagePath)
@@ -508,12 +503,61 @@
                 </button>
             </div>
 
+            <div class="item-owner">
+                <div class="owner-header">
+                    @if($item->user->ProfileImage)
+                        <img src="{{ asset('storage/' . $item->user->ProfileImage) }}" alt="{{ $item->user->UserName }}" class="owner-avatar">
+                    @else
+                        <img src="https://via.placeholder.com/50" alt="{{ $item->user->UserName }}" class="owner-avatar">
+                    @endif
+                    <div class="owner-info">
+                        <h3>{{ $item->user->UserName ?? 'Unknown' }}</h3>
+                        <p>Owner • Member since {{ $item->user && $item->user->created_at ? $item->user->created_at->format('Y') : 'N/A' }}</p>
+                    </div>
+                </div>
+                    @if(auth()->id() !== $item->UserID)
+                        <button class="contact-owner-btn" onclick="window.location.href='{{ route('messages.show', ['userId' => $item->user->UserID, 'item_id' => $item->ItemID]) }}'">
+                            <i class="fa-solid fa-message"></i> Contact Owner
+                        </button>
+                    @else
+                        <button class="contact-owner-btn" disabled style="background: #e5e7eb; color: #9ca3af; cursor: not-allowed;">
+                            <i class="fa-solid fa-message"></i> This is Your Item
+                        </button>
+                    @endif
+            </div>
+
             <div class="item-description">
                 <h2 class="section-title">Description</h2>
                 <p class="description-text">{{ $item->Description }}</p>
             </div>
 
-            <div class="item-details-list">
+     
+        </div>
+
+        <!-- Right Column - Booking & Item Info -->
+        <div>
+            <div class="item-header">
+                <span class="item-category">{{ $item->category->CategoryName ?? 'Item' }}</span>
+                <h1 class="item-title">{{ $item->ItemName }}</h1>
+                <div class="item-meta">
+                    <div class="meta-item">
+                        <div class="rating-stars">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <= floor($averageRating))
+                                    <i class="fa-solid fa-star"></i>
+                                @elseif($i - 0.5 <= $averageRating)
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                @else
+                                    <i class="fa-regular fa-star"></i>
+                                @endif
+                            @endfor
+                        </div>
+                        <span>{{ number_format($averageRating, 1) }} ({{ $totalReviews }} reviews)</span>
+                    </div>
+                </div>
+            </div>
+
+                   <div class="item-details-list">
                 <h2 class="section-title">Item Details</h2>
                 <div class="detail-row">
                     <span class="detail-label">Category</span>
@@ -550,54 +594,7 @@
                     <span class="detail-value">{{ $item->DateAdded ? $item->DateAdded->format('M d, Y') : 'N/A' }}</span>
                 </div>
             </div>
-        </div>
-
-        <!-- Right Column - Booking -->
-        <div>
-            <div class="item-header">
-                <span class="item-category">{{ $item->category->CategoryName ?? 'Item' }}</span>
-                <h1 class="item-title">{{ $item->ItemName }}</h1>
-                <div class="item-meta">
-                    <div class="meta-item">
-                        <div class="rating-stars">
-                            @for($i = 1; $i <= 5; $i++)
-                                @if($i <= floor($averageRating))
-                                    <i class="fa-solid fa-star"></i>
-                                @elseif($i - 0.5 <= $averageRating)
-                                    <i class="fa-solid fa-star-half-stroke"></i>
-                                @else
-                                    <i class="fa-regular fa-star"></i>
-                                @endif
-                            @endfor
-                        </div>
-                        <span>{{ number_format($averageRating, 1) }} ({{ $totalReviews }} reviews)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="item-owner">
-                <div class="owner-header">
-                    @if($item->user->ProfileImage)
-                        <img src="{{ asset('storage/' . $item->user->ProfileImage) }}" alt="{{ $item->user->UserName }}" class="owner-avatar">
-                    @else
-                        <img src="https://via.placeholder.com/50" alt="{{ $item->user->UserName }}" class="owner-avatar">
-                    @endif
-                    <div class="owner-info">
-                        <h3>{{ $item->user->UserName ?? 'Unknown' }}</h3>
-                        <p>Owner • Member since {{ $item->user && $item->user->created_at ? $item->user->created_at->format('Y') : 'N/A' }}</p>
-                    </div>
-                </div>
-                    @if(auth()->id() !== $item->UserID)
-                        <button class="contact-owner-btn" onclick="window.location.href='{{ route('messages.show', ['userId' => $item->user->UserID, 'item_id' => $item->ItemID]) }}'">
-                            <i class="fa-solid fa-message"></i> Contact Owner
-                        </button>
-                    @else
-                        <button class="contact-owner-btn" disabled style="background: #e5e7eb; color: #9ca3af; cursor: not-allowed;">
-                            <i class="fa-solid fa-message"></i> This is Your Item
-                        </button>
-                    @endif
-            </div>
-
+            
             <div class="booking-card">
                 <div class="price-display">
                     RM {{ number_format($item->PricePerDay, 2) }}
