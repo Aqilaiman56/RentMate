@@ -285,7 +285,6 @@
                     <div class="booking-content">
                         <div class="booking-header">
                             <div>
-                                <div class="booking-id">#{{ $booking->BookingID }}</div>
                                 <h3 class="booking-title">{{ $booking->item->ItemName }}</h3>
                             </div>
                             <span class="status-badge status-{{ strtolower($booking->Status) }}">
