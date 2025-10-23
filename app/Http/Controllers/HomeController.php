@@ -65,7 +65,29 @@ class HomeController extends Controller
         }
         
         // Get items with pagination
-        $items = $query->orderBy('DateAdded', 'desc')->paginate(12);
+        if (!$request->has('category') || $request->category == '') {
+            // For "All" items, order by top rented (bookings count) and user preferences (wishlist)
+            if (auth()->check()) {
+                // For logged-in users: prioritize wishlist items, then by bookings count
+                $items = $query->leftJoin('wishlist', function($join) {
+                    $join->on('items.ItemID', '=', 'wishlist.ItemID')
+                         ->where('wishlist.UserID', '=', auth()->id());
+                })
+                ->select('items.*', \DB::raw('wishlist.ItemID IS NOT NULL as is_wishlist'))
+                ->withCount('bookings')
+                ->orderBy('is_wishlist', 'desc')
+                ->orderBy('bookings_count', 'desc')
+                ->paginate(12);
+            } else {
+                // For non-logged-in users: order by bookings count
+                $items = $query->withCount('bookings')
+                    ->orderBy('bookings_count', 'desc')
+                    ->paginate(12);
+            }
+        } else {
+            // For specific categories, keep the current ordering by date added
+            $items = $query->orderBy('DateAdded', 'desc')->paginate(12);
+        }
         
         // Check if items are in user's wishlist (if user is logged in)
         if (auth()->check()) {
