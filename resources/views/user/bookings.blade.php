@@ -2,7 +2,9 @@
 
 @section('title', 'My Bookings - RentMate')
 
-@php($hideSearch = true)
+@php
+    $hideSearch = true;
+@endphp
 
 @push('styles')
 <style>
