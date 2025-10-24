@@ -19,10 +19,11 @@ class ItemController extends Controller
     {
         // Get item with all relationships
         $item = Item::with([
-            'user', 
-            'location', 
+            'user',
+            'location',
             'category',
             'reviews.user',
+            'images',
             'bookings' => function($query) {
                 $query->whereIn('Status', ['Confirmed', 'confirmed', 'Ongoing', 'ongoing']);
             }
@@ -69,7 +70,7 @@ class ItemController extends Controller
      */
     public function showPublicDetails($id)
     {
-        $item = Item::with(['category', 'location', 'user', 'reviews.user'])
+        $item = Item::with(['category', 'location', 'user', 'reviews.user', 'images'])
             ->findOrFail($id);
         
         $averageRating = $item->reviews()->avg('Rating') ?? 0;
@@ -89,10 +90,10 @@ class ItemController extends Controller
     public function myItems()
     {
         $items = Item::where('UserID', auth()->id())
-            ->with(['location', 'category', 'bookings', 'reviews'])
+            ->with(['location', 'category', 'bookings', 'reviews', 'images'])
             ->orderBy('DateAdded', 'desc')
             ->paginate(12);
-        
+
         return view('user.listings', compact('items'));
     }
     
@@ -119,24 +120,31 @@ class ItemController extends Controller
             'LocationID' => 'required|exists:location,LocationID',
             'DepositAmount' => 'required|numeric|min:0',
             'PricePerDay' => 'required|numeric|min:0',
-            'ImagePath' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'required|array|min:1|max:4',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'Quantity' => 'required|integer|min:1',
             'Availability' => 'nullable|boolean'
         ]);
-        
-        // Handle image upload
-        if ($request->hasFile('ImagePath')) {
-            $imagePath = $request->file('ImagePath')->store('items', 'public');
-            $validated['ImagePath'] = $imagePath;
-        }
-        
+
         $validated['UserID'] = auth()->id();
         $validated['DateAdded'] = now();
         $validated['Availability'] = $request->has('Availability') ? 1 : 1;
         $validated['AvailableQuantity'] = $validated['Quantity'];
-        
+
+        // Create the item
         $item = Item::create($validated);
-        
+
+        // Store all images in item_images table
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $imagePath = $image->store('items', 'public');
+                $item->images()->create([
+                    'ImagePath' => $imagePath,
+                    'DisplayOrder' => $index
+                ]);
+            }
+        }
+
         return redirect()->route('items.my')->with('success', 'Item listed successfully!');
     }
     
@@ -145,13 +153,14 @@ class ItemController extends Controller
      */
     public function edit($id)
     {
-        $item = Item::where('ItemID', $id)
+        $item = Item::with('images')
+            ->where('ItemID', $id)
             ->where('UserID', auth()->id())
             ->firstOrFail();
-        
+
         $categories = Category::all();
         $locations = Location::all();
-        
+
         return view('user.edit-listing', compact('item', 'categories', 'locations'));
     }
     
@@ -163,7 +172,7 @@ class ItemController extends Controller
         $item = Item::where('ItemID', $id)
             ->where('UserID', auth()->id())
             ->firstOrFail();
-        
+
         $validated = $request->validate([
             'ItemName' => 'required|string|max:255',
             'Description' => 'required|string',
@@ -171,31 +180,42 @@ class ItemController extends Controller
             'LocationID' => 'required|exists:location,LocationID',
             'DepositAmount' => 'required|numeric|min:0',
             'PricePerDay' => 'required|numeric|min:0',
-            'ImagePath' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'nullable|array|min:1|max:4',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'Quantity' => 'required|integer|min:1',
             'Availability' => 'nullable|boolean'
         ]);
-        
-        // Handle image upload if new image provided
-        if ($request->hasFile('ImagePath')) {
-            if ($item->ImagePath) {
-                Storage::disk('public')->delete($item->ImagePath);
+
+        // Handle image upload if new images provided
+        if ($request->hasFile('images')) {
+            // Delete old images from storage
+            foreach ($item->images as $oldImage) {
+                Storage::disk('public')->delete($oldImage->ImagePath);
             }
-            
-            $imagePath = $request->file('ImagePath')->store('items', 'public');
-            $validated['ImagePath'] = $imagePath;
+
+            // Delete old image records
+            $item->images()->delete();
+
+            // Store all new images
+            foreach ($request->file('images') as $index => $image) {
+                $imagePath = $image->store('items', 'public');
+                $item->images()->create([
+                    'ImagePath' => $imagePath,
+                    'DisplayOrder' => $index
+                ]);
+            }
         }
-        
+
         $validated['Availability'] = $request->has('Availability') ? 1 : 0;
-        
+
         // Update available quantity if total quantity changed
         if ($validated['Quantity'] != $item->Quantity) {
             $bookedQuantity = $item->getBookedQuantity();
             $validated['AvailableQuantity'] = max(0, $validated['Quantity'] - $bookedQuantity);
         }
-        
+
         $item->update($validated);
-        
+
         return redirect()->route('items.my')->with('success', 'Item updated successfully!');
     }
     
@@ -207,30 +227,31 @@ class ItemController extends Controller
         $item = Item::where('ItemID', $id)
             ->where('UserID', auth()->id())
             ->firstOrFail();
-        
+
         // Check if item has active bookings
         $hasActiveBookings = $item->bookings()
             ->whereIn('Status', ['Confirmed', 'confirmed', 'Ongoing', 'ongoing'])
             ->where('EndDate', '>=', now())
             ->exists();
-        
+
         if ($hasActiveBookings) {
             return redirect()->route('items.my')
                 ->with('error', 'Cannot delete item with active bookings');
         }
-        
+
         // Delete related records
         $item->wishlists()->delete();
         $item->reviews()->delete();
         $item->bookings()->delete();
-        
-        // Delete image
-        if ($item->ImagePath) {
-            Storage::disk('public')->delete($item->ImagePath);
+
+        // Delete all images from storage and records
+        foreach ($item->images as $image) {
+            Storage::disk('public')->delete($image->ImagePath);
         }
-        
+        $item->images()->delete();
+
         $item->delete();
-        
+
         return redirect()->route('items.my')->with('success', 'Item deleted successfully!');
     }
 

@@ -315,14 +315,17 @@
         <div class="wishlist-grid">
             @foreach($wishlistItems as $wishlist)
                 <div class="wishlist-card" id="wishlist-item-{{ $wishlist->item->ItemID }}">
-                    @if($wishlist->item->ImagePath)
-                        <img src="{{ asset('storage/' . $wishlist->item->ImagePath) }}" 
-                             alt="{{ $wishlist->item->ItemName }}" 
+                    @php
+                        $firstImage = $wishlist->item->images->first();
+                    @endphp
+                    @if($firstImage)
+                        <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
+                             alt="{{ $wishlist->item->ItemName }}"
                              class="item-image"
                              onerror="this.src='https://via.placeholder.com/300x220/4461F2/fff?text={{ urlencode($wishlist->item->ItemName) }}'">
                     @else
-                        <img src="https://via.placeholder.com/300x220/4461F2/fff?text={{ urlencode($wishlist->item->ItemName) }}" 
-                             alt="{{ $wishlist->item->ItemName }}" 
+                        <img src="https://via.placeholder.com/300x220/4461F2/fff?text={{ urlencode($wishlist->item->ItemName) }}"
+                             alt="{{ $wishlist->item->ItemName }}"
                              class="item-image">
                     @endif
                     

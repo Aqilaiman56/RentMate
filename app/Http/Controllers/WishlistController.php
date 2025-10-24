@@ -120,7 +120,7 @@ class WishlistController extends Controller
         $userId = auth()->id();
         
         $wishlistItems = Wishlist::where('UserID', $userId)
-            ->with('item.location', 'item.category')
+            ->with('item.location', 'item.category', 'item.images')
             ->orderBy('DateAdded', 'desc')
             ->get();
         

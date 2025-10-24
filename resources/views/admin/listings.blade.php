@@ -115,8 +115,11 @@
         @forelse($items as $item)
             <div class="listing-card">
                 <div class="listing-image">
-                    @if($item->ImagePath)
-                        <img src="{{ asset('storage/' . $item->ImagePath) }}" alt="{{ $item->ItemName }}">
+                    @php
+                        $firstImage = $item->images->first();
+                    @endphp
+                    @if($firstImage)
+                        <img src="{{ asset('storage/' . $firstImage->ImagePath) }}" alt="{{ $item->ItemName }}">
                     @else
                         <img src="https://via.placeholder.com/300x200/3b82f6/ffffff?text={{ urlencode($item->ItemName) }}" alt="{{ $item->ItemName }}">
                     @endif

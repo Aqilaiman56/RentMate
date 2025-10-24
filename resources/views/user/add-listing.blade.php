@@ -126,43 +126,63 @@
         color: #9ca3af;
     }
 
-    .image-preview {
-        display: none;
+    .images-preview-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
         margin-top: 20px;
-        position: relative;
     }
 
-    .image-preview.show {
-        display: block;
+    .images-preview-container.hidden {
+        display: none;
+    }
+
+    .image-preview-item {
+        position: relative;
+        aspect-ratio: 4/3;
+        border-radius: 10px;
+        overflow: hidden;
     }
 
     .preview-image {
         width: 100%;
-        max-height: 300px;
+        height: 100%;
         object-fit: cover;
-        border-radius: 10px;
     }
 
     .remove-image {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 8px;
+        right: 8px;
         background: #dc3545;
         color: white;
         border: none;
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         cursor: pointer;
-        font-size: 18px;
+        font-size: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: background 0.3s;
+        z-index: 10;
     }
 
     .remove-image:hover {
         background: #c82333;
+    }
+
+    .image-number {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
     }
 
     .price-input-group {
@@ -429,32 +449,33 @@
                 </div>
             </div>
 
-            <!-- Item Image -->
+            <!-- Item Images -->
             <div class="form-section">
-                <h2 class="section-title">Item Image</h2>
-                
+                <h2 class="section-title">Item Images</h2>
+
                 <div class="form-group">
                     <label class="form-label">
-                        Upload Image <span class="required">*</span>
+                        Upload Images (1-4 images) <span class="required">*</span>
                     </label>
                     <div class="image-upload-area" id="imageUploadArea">
                         <div class="upload-icon">📸</div>
                         <div class="upload-text">Click to upload or drag and drop</div>
-                        <div class="upload-hint">PNG, JPG or JPEG (MAX. 2MB)</div>
-                        <input 
-                            type="file" 
-                            id="ImagePath" 
-                            name="ImagePath" 
+                        <div class="upload-hint">PNG, JPG or JPEG (MAX. 2MB each) - Maximum 4 images</div>
+                        <input
+                            type="file"
+                            id="images"
+                            name="images[]"
                             accept="image/png,image/jpeg,image/jpg,image/gif"
                             style="display: none;"
+                            multiple
                             required
                         >
                     </div>
-                    <div class="image-preview" id="imagePreview">
-                        <img src="" alt="Preview" class="preview-image" id="previewImg">
-                        <button type="button" class="remove-image" id="removeImage">×</button>
-                    </div>
-                    @error('ImagePath')
+                    <div class="images-preview-container hidden" id="imagesPreview"></div>
+                    @error('images')
+                        <div class="error-message">{{ $message }}</div>
+                    @enderror
+                    @error('images.*')
                         <div class="error-message">{{ $message }}</div>
                     @enderror
                 </div>
@@ -521,10 +542,11 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const imageUploadArea = document.getElementById('imageUploadArea');
-        const imageInput = document.getElementById('ImagePath');
-        const imagePreview = document.getElementById('imagePreview');
-        const previewImg = document.getElementById('previewImg');
-        const removeImageBtn = document.getElementById('removeImage');
+        const imageInput = document.getElementById('images');
+        const imagesPreview = document.getElementById('imagesPreview');
+        const MAX_IMAGES = 4;
+        const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+        let selectedFiles = [];
 
         // Click to upload
         imageUploadArea.addEventListener('click', function() {
@@ -533,7 +555,7 @@
 
         // Handle file selection
         imageInput.addEventListener('change', function(e) {
-            handleFile(e.target.files[0]);
+            handleFiles(Array.from(e.target.files));
         });
 
         // Drag and drop
@@ -549,42 +571,82 @@
         imageUploadArea.addEventListener('drop', function(e) {
             e.preventDefault();
             imageUploadArea.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.match('image.*')) {
-                imageInput.files = e.dataTransfer.files;
-                handleFile(file);
-            }
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.match('image.*'));
+            handleFiles(files);
         });
 
-        // Remove image
-        removeImageBtn.addEventListener('click', function() {
-            imageInput.value = '';
-            imagePreview.classList.remove('show');
-            previewImg.src = '';
-        });
+        function handleFiles(files) {
+            // Filter valid images
+            const validFiles = files.filter(file => {
+                if (!file.type.match('image/(png|jpeg|jpg|gif)')) {
+                    return false;
+                }
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`${file.name} is too large. Maximum size is 2MB.`);
+                    return false;
+                }
+                return true;
+            });
 
-        function handleFile(file) {
-            if (!file) return;
-
-            // Validate file type
-            if (!file.type.match('image/(png|jpeg|jpg|gif)')) {
-                alert('Please upload a PNG, JPG, JPEG, or GIF image');
+            // Check total count
+            const totalFiles = selectedFiles.length + validFiles.length;
+            if (totalFiles > MAX_IMAGES) {
+                alert(`You can only upload a maximum of ${MAX_IMAGES} images. Currently you have ${selectedFiles.length} image(s).`);
                 return;
             }
 
-            // Validate file size (2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                alert('File size must be less than 2MB');
+            // Add valid files
+            validFiles.forEach(file => {
+                selectedFiles.push(file);
+            });
+
+            updatePreview();
+            updateFileInput();
+        }
+
+        function updatePreview() {
+            imagesPreview.innerHTML = '';
+
+            if (selectedFiles.length === 0) {
+                imagesPreview.classList.add('hidden');
                 return;
             }
 
-            // Show preview
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImg.src = e.target.result;
-                imagePreview.classList.add('show');
-            };
-            reader.readAsDataURL(file);
+            imagesPreview.classList.remove('hidden');
+
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'image-preview-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview ${index + 1}" class="preview-image">
+                        <button type="button" class="remove-image" data-index="${index}">×</button>
+                        <div class="image-number">Image ${index + 1}</div>
+                    `;
+                    imagesPreview.appendChild(div);
+
+                    // Add remove functionality
+                    div.querySelector('.remove-image').addEventListener('click', function() {
+                        removeImage(parseInt(this.getAttribute('data-index')));
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeImage(index) {
+            selectedFiles.splice(index, 1);
+            updatePreview();
+            updateFileInput();
+        }
+
+        function updateFileInput() {
+            const dataTransfer = new DataTransfer();
+            selectedFiles.forEach(file => {
+                dataTransfer.items.add(file);
+            });
+            imageInput.files = dataTransfer.files;
         }
 
         // Form validation
@@ -596,11 +658,11 @@
             const price = document.getElementById('PricePerDay').value;
             const deposit = document.getElementById('DepositAmount').value;
             const location = document.getElementById('LocationID').value;
-            const image = document.getElementById('ImagePath').files.length;
+            const images = selectedFiles.length;
 
-            if (!itemName || !category || !description || !price || !deposit || !location || !image) {
+            if (!itemName || !category || !description || !price || !deposit || !location || images === 0) {
                 e.preventDefault();
-                alert('Please fill in all required fields');
+                alert('Please fill in all required fields and upload at least 1 image');
                 return false;
             }
 

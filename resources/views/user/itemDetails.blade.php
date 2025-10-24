@@ -581,11 +581,22 @@
             <div class="left-column">
                 <!-- Image Gallery -->
                 <div class="image-gallery">
-                    <img src="{{ asset('storage/' . $item->ImagePath) }}" alt="{{ $item->ItemName }}" class="main-image" id="mainImage">
-                    <div class="thumbnail-grid">
-                        <img src="{{ asset('storage/' . $item->ImagePath) }}" alt="View 1" class="thumbnail" onclick="changeImage(this.src)">
-                        <img src="{{ asset('storage/' . $item->ImagePath) }}" alt="View 2" class="thumbnail" onclick="changeImage(this.src)">
-                    </div>
+                    @if($item->images->count() > 0)
+                        <img src="{{ asset('storage/' . $item->images->first()->ImagePath) }}" alt="{{ $item->ItemName }}" class="main-image" id="mainImage">
+                        <div class="thumbnail-grid">
+                            @foreach($item->images as $image)
+                                <img src="{{ asset('storage/' . $image->ImagePath) }}"
+                                     alt="View {{ $loop->iteration }}"
+                                     class="thumbnail"
+                                     onclick="changeImage(this.src)">
+                            @endforeach
+                        </div>
+                    @else
+                        <img src="https://via.placeholder.com/600x400/4461F2/fff?text={{ urlencode($item->ItemName) }}"
+                             alt="{{ $item->ItemName }}"
+                             class="main-image"
+                             id="mainImage">
+                    @endif
                 </div>
 
                 <!-- About Section -->
@@ -753,11 +764,22 @@
                         <span class="price-label">Deposit</span>
                         <span class="deposit-value">RM{{ $item->DepositAmount }}</span>
                     </div>
-                    <form action="{{ route('booking.create') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="item_id" value="{{ $item->ItemID }}">
-                        <button type="submit" class="book-now-btn">Book Now!</button>
-                    </form>
+                    @php
+                        $isOwner = auth()->id() == $item->UserID;
+                    @endphp
+
+                    @if($isOwner)
+                        <div style="text-align: center; padding: 15px; background: #f3f4f6; border-radius: 10px;">
+                            <p style="color: #6b7280; font-weight: 500; margin: 0;">This is your listing</p>
+                            <p style="color: #9ca3af; font-size: 14px; margin: 5px 0 0 0;">You cannot book your own item</p>
+                        </div>
+                    @else
+                        <form action="{{ route('booking.create') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="item_id" value="{{ $item->ItemID }}">
+                            <button type="submit" class="book-now-btn">Book Now!</button>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

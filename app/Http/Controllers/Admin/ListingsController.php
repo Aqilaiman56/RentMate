@@ -16,7 +16,7 @@ class ListingsController extends Controller
     public function index(Request $request)
     {
         // Start query
-        $query = Item::with(['user', 'category', 'location', 'bookings']);
+        $query = Item::with(['user', 'category', 'location', 'bookings', 'images']);
 
         // Search filter
         if ($request->has('search') && $request->search != '') {

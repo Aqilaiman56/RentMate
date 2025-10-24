@@ -271,14 +271,17 @@
         <div class="bookings-grid">
             @foreach($bookings as $booking)
                 <div class="booking-card">
-                    @if($booking->item->ImagePath)
-                        <img src="{{ asset('storage/' . $booking->item->ImagePath) }}" 
-                             alt="{{ $booking->item->ItemName }}" 
+                    @php
+                        $firstImage = $booking->item->images->first();
+                    @endphp
+                    @if($firstImage)
+                        <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
+                             alt="{{ $booking->item->ItemName }}"
                              class="booking-image"
                              onerror="this.src='https://via.placeholder.com/150'">
                     @else
-                        <img src="https://via.placeholder.com/150" 
-                             alt="{{ $booking->item->ItemName }}" 
+                        <img src="https://via.placeholder.com/150"
+                             alt="{{ $booking->item->ItemName }}"
                              class="booking-image">
                     @endif
 

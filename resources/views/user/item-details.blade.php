@@ -44,6 +44,78 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     }
 
+    /* Image Grid Layouts */
+    .images-grid {
+        display: grid;
+        gap: 10px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        position: relative;
+    }
+
+    .images-grid.count-1 {
+        grid-template-columns: 1fr;
+    }
+
+    .images-grid.count-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .images-grid.count-3 {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+
+    .images-grid.count-3 .grid-image:first-child {
+        grid-row: 1 / 3;
+    }
+
+    .images-grid.count-4 {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: repeat(3, 1fr);
+    }
+
+    .images-grid.count-4 .grid-image:first-child {
+        grid-row: 1 / 4;
+    }
+
+    .grid-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+    .grid-image:hover {
+        transform: scale(1.02);
+    }
+
+    .images-grid.count-1 .grid-image {
+        height: 500px;
+    }
+
+    .images-grid.count-2 .grid-image {
+        height: 500px;
+    }
+
+    .images-grid.count-3 .grid-image {
+        height: 245px;
+    }
+
+    .images-grid.count-3 .grid-image:first-child {
+        height: 500px;
+    }
+
+    .images-grid.count-4 .grid-image {
+        height: 160px;
+    }
+
+    .images-grid.count-4 .grid-image:first-child {
+        height: 500px;
+    }
+
     .wishlist-btn {
         position: absolute;
         top: 20px;
@@ -492,12 +564,21 @@
         <!-- Left Column - Images & Reviews -->
         <div>
             <div class="item-image-section">
-                @if($item->ImagePath)
-                    <img src="{{ asset('storage/' . $item->ImagePath) }}" alt="{{ $item->ItemName }}" class="item-main-image" onerror="this.src='https://via.placeholder.com/600x500/4461F2/fff?text={{ urlencode($item->ItemName) }}'">
+                @if($item->images->count() > 0)
+                    <div class="images-grid count-{{ $item->images->count() }}">
+                        @foreach($item->images as $image)
+                            <img src="{{ asset('storage/' . $image->ImagePath) }}"
+                                 alt="{{ $item->ItemName }}"
+                                 class="grid-image"
+                                 onerror="this.src='https://via.placeholder.com/600x500/4461F2/fff?text={{ urlencode($item->ItemName) }}'">
+                        @endforeach
+                    </div>
                 @else
-                    <img src="https://via.placeholder.com/600x500/4461F2/fff?text={{ urlencode($item->ItemName) }}" alt="{{ $item->ItemName }}" class="item-main-image">
+                    <img src="https://via.placeholder.com/600x500/4461F2/fff?text={{ urlencode($item->ItemName) }}"
+                         alt="{{ $item->ItemName }}"
+                         class="item-main-image">
                 @endif
-                
+
                 <button class="wishlist-btn" onclick="toggleWishlist({{ $item->ItemID }})">
                     <i class="fa-regular fa-heart"></i>
                 </button>
@@ -607,7 +688,17 @@
                     <small style="color: #9ca3af; font-size: 12px;">Pay deposit online • Rental fee to owner</small>
                 </div>
 
-                @if($item->Availability)
+                @php
+                    $isOwner = auth()->id() == $item->UserID;
+                @endphp
+
+                @if($isOwner)
+                    <div style="text-align: center; padding: 20px; background: #f3f4f6; border-radius: 10px;">
+                        <i class="fa-solid fa-info-circle" style="font-size: 24px; color: #6b7280; margin-bottom: 10px;"></i>
+                        <p style="color: #6b7280; font-weight: 500;">This is your listing</p>
+                        <p style="color: #9ca3af; font-size: 14px; margin-top: 5px;">You cannot book your own item</p>
+                    </div>
+                @elseif($item->Availability)
                     <form action="{{ route('booking.confirm') }}" method="POST" class="booking-form" id="bookingForm">
                         @csrf
 
@@ -622,7 +713,7 @@
                         @endif
 
                         <input type="hidden" name="item_id" value="{{ $item->ItemID }}">
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="start_date">Start Date</label>
                             <input type="date" id="start_date" name="start_date" class="form-input" min="{{ date('Y-m-d') }}" required>

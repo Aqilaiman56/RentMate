@@ -68,7 +68,7 @@ class MessageController extends Controller
         // Get item if provided in request
         $item = null;
         if ($request->has('item_id')) {
-            $item = \App\Models\Item::find($request->item_id);
+            $item = \App\Models\Item::with('images')->find($request->item_id);
         }
         
         return view('messages.show', compact('messages', 'otherUser', 'item'));

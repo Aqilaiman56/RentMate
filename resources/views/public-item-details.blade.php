@@ -128,6 +128,81 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         }
 
+        /* Image Grid Layouts */
+        .images-grid {
+            display: grid;
+            gap: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Single image */
+        .images-grid.count-1 {
+            grid-template-columns: 1fr;
+        }
+
+        /* Two images side by side */
+        .images-grid.count-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* Three images: 1 large + 2 small on right */
+        .images-grid.count-3 {
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+
+        .images-grid.count-3 .grid-image:first-child {
+            grid-row: 1 / 3;
+        }
+
+        /* Four images: 1 large + 3 small on right */
+        .images-grid.count-4 {
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: repeat(3, 1fr);
+        }
+
+        .images-grid.count-4 .grid-image:first-child {
+            grid-row: 1 / 4;
+        }
+
+        .grid-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .grid-image:hover {
+            transform: scale(1.02);
+        }
+
+        .images-grid.count-1 .grid-image {
+            height: 500px;
+        }
+
+        .images-grid.count-2 .grid-image {
+            height: 500px;
+        }
+
+        .images-grid.count-3 .grid-image {
+            height: 245px;
+        }
+
+        .images-grid.count-3 .grid-image:first-child {
+            height: 500px;
+        }
+
+        .images-grid.count-4 .grid-image {
+            height: 160px;
+        }
+
+        .images-grid.count-4 .grid-image:first-child {
+            height: 500px;
+        }
+
         .item-header {
             margin-bottom: 20px;
         }
@@ -285,63 +360,77 @@
             color: #6b7280;
         }
 
-        .auth-required-box {
-            background: linear-gradient(135deg, #4461F2 0%, #3651E2 100%);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            color: white;
+        .booking-form {
             margin-top: 20px;
         }
 
-        .auth-required-box h3 {
-            font-size: 20px;
-            margin-bottom: 12px;
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        .auth-required-box p {
-            font-size: 14px;
-            margin-bottom: 20px;
-            opacity: 0.9;
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
         }
 
-        .auth-buttons-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn-auth {
-            padding: 14px 28px;
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
             border-radius: 10px;
-            font-size: 15px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4461F2;
+        }
+
+        .total-calculation {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .calc-row.total {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            padding-top: 8px;
+            border-top: 2px solid #e5e7eb;
+            margin-top: 8px;
+        }
+
+        .book-now-btn {
+            width: 100%;
+            background: #4461F2;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            text-decoration: none;
             transition: all 0.3s;
-            display: inline-block;
-            text-align: center;
         }
 
-        .btn-white {
-            background: white;
-            color: #4461F2;
-            border: none;
-        }
-
-        .btn-white:hover {
-            background: #f0f4ff;
+        .book-now-btn:hover {
+            background: #3651E2;
             transform: translateY(-2px);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(68, 97, 242, 0.3);
         }
 
         .availability-badge {
@@ -362,6 +451,117 @@
         .badge-unavailable {
             background: #fee2e2;
             color: #991b1b;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            color: #4461F2;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .modal-btn-primary {
+            background: #4461F2;
+            color: white;
+            border: none;
+        }
+
+        .modal-btn-primary:hover {
+            background: #3651E2;
+            transform: translateY(-2px);
+        }
+
+        .modal-btn-secondary {
+            background: transparent;
+            color: #4461F2;
+            border: 2px solid #4461F2;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #f8f9ff;
+        }
+
+        .modal-close {
+            background: transparent;
+            color: #9ca3af;
+            border: none;
+            margin-top: 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-close:hover {
+            color: #6b7280;
         }
 
         .reviews-section {
@@ -512,6 +712,10 @@
             .item-details-container {
                 padding: 20px;
             }
+
+            .modal-content {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
@@ -536,10 +740,19 @@
             <!-- Left Column - Images & Details -->
             <div>
                 <div class="item-image-section">
-                    @if($item->ImagePath)
-                        <img src="{{ asset('storage/' . $item->ImagePath) }}" alt="{{ $item->ItemName }}" class="item-main-image" onerror="this.src='https://via.placeholder.com/600x500/4461F2/fff?text={{ urlencode($item->ItemName) }}'">
+                    @if($item->images->count() > 0)
+                        <div class="images-grid count-{{ $item->images->count() }}">
+                            @foreach($item->images as $image)
+                                <img src="{{ asset('storage/' . $image->ImagePath) }}"
+                                     alt="{{ $item->ItemName }}"
+                                     class="grid-image"
+                                     onerror="this.src='https://via.placeholder.com/600x500/4461F2/fff?text={{ urlencode($item->ItemName) }}'">
+                            @endforeach
+                        </div>
                     @else
-                        <img src="https://via.placeholder.com/600x500/4461F2/fff?text={{ urlencode($item->ItemName) }}" alt="{{ $item->ItemName }}" class="item-main-image">
+                        <img src="https://via.placeholder.com/600x500/4461F2/fff?text={{ urlencode($item->ItemName) }}"
+                             alt="{{ $item->ItemName }}"
+                             class="item-main-image">
                     @endif
                 </div>
 
@@ -600,7 +813,6 @@
                         <span class="detail-label">Deposit Amount</span>
                         <span class="detail-value">RM {{ number_format($item->DepositAmount, 2) }}</span>
                     </div>
-
                     <div class="detail-row">
                         <span class="detail-label">Availability</span>
                         <span class="detail-value">
@@ -614,8 +826,7 @@
                                 </span>
                             @endif
                         </span>
-                      </div>
-
+                    </div>
                     <div class="detail-row">
                         <span class="detail-label">Listed</span>
                         <span class="detail-value">{{ $item->DateAdded ? $item->DateAdded->format('M d, Y') : 'N/A' }}</span>
@@ -630,16 +841,62 @@
                     
                     <div class="deposit-info">
                         <i class="fa-solid fa-money-bill-wave"></i> Refundable deposit: RM {{ number_format($item->DepositAmount, 2) }}
+                        <br>
+                        <small style="color: #9ca3af; font-size: 12px;">Pay deposit online • Rental fee to owner</small>
                     </div>
 
-                    <div class="auth-required-box">
-                        <h3><i class="fa-solid fa-lock"></i> Sign in to Book</h3>
-                        <p>Create an account or log in to rent this item and connect with the owner</p>
-                        <div class="auth-buttons-vertical">
-                            <a href="{{ route('register') }}" class="btn-auth btn-white">Create Account</a>
-                            <a href="{{ route('login') }}" class="btn-auth btn-outline">Log In</a>
+                    @php
+                        $isOwner = auth()->check() && auth()->id() == $item->UserID;
+                    @endphp
+
+                    @if($isOwner)
+                        <div style="text-align: center; padding: 20px; background: #f3f4f6; border-radius: 10px;">
+                            <i class="fa-solid fa-info-circle" style="font-size: 24px; color: #6b7280; margin-bottom: 10px;"></i>
+                            <p style="color: #6b7280; font-weight: 500;">This is your listing</p>
+                            <p style="color: #9ca3af; font-size: 14px; margin-top: 5px;">You cannot book your own item</p>
                         </div>
-                    </div>
+                    @elseif($item->Availability)
+                        <form id="bookingForm" class="booking-form">
+                            <div class="form-group">
+                                <label class="form-label" for="start_date">Start Date</label>
+                                <input type="date" id="start_date" name="start_date" class="form-input" min="{{ date('Y-m-d') }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="end_date">End Date</label>
+                                <input type="date" id="end_date" name="end_date" class="form-input" min="{{ date('Y-m-d') }}" required>
+                            </div>
+
+                            <div class="total-calculation" id="totalCalculation" style="display: none;">
+                                <div class="calc-row">
+                                    <span>Rental (RM {{ number_format($item->PricePerDay, 2) }} × <span id="numDays">0</span> days)</span>
+                                    <span id="rentalTotal">RM 0.00</span>
+                                </div>
+                                <div class="calc-row" style="color: #f59e0b; font-weight: 600;">
+                                    <span><i class="fa-solid fa-money-bill"></i> Pay to Owner</span>
+                                    <span id="payToOwner">RM 0.00</span>
+                                </div>
+                                <div class="calc-row" style="border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
+                                    <span>Deposit (Online)</span>
+                                    <span>RM {{ number_format($item->DepositAmount, 2) }}</span>
+                                </div>
+                                <div class="calc-row">
+                                    <span>Tax (Online)</span>
+                                    <span>RM 1.00</span>
+                                </div>
+                                <div class="calc-row total" style="background: #eff6ff; padding: 8px; border-radius: 6px; margin-top: 8px;">
+                                    <span>Pay Online Now</span>
+                                    <span id="payOnline">RM {{ number_format($item->DepositAmount + 1.00, 2) }}</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="book-now-btn">Review Booking</button>
+                        </form>
+                    @else
+                        <div style="text-align: center; padding: 20px; color: #9ca3af;">
+                            <p>This item is currently unavailable</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -698,5 +955,70 @@
             @endif
         </div>
     </div>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 class="modal-title">Sign in Required</h2>
+            <p class="modal-text">To complete your booking and reserve this item, please create an account or log in to your existing account.</p>
+            <div class="modal-buttons">
+                <a href="{{ route('register') }}" class="modal-btn modal-btn-primary">Create Account</a>
+                <a href="{{ route('login') }}" class="modal-btn modal-btn-secondary">Log In</a>
+                <button class="modal-close" onclick="closeModal()">Continue Browsing</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pricePerDay = {{ $item->PricePerDay }};
+        const depositAmount = {{ $item->DepositAmount }};
+        const taxAmount = 1.00;
+
+        document.getElementById('start_date').addEventListener('change', calculateTotal);
+        document.getElementById('end_date').addEventListener('change', calculateTotal);
+
+        function calculateTotal() {
+            const startDate = new Date(document.getElementById('start_date').value);
+            const endDate = new Date(document.getElementById('end_date').value);
+
+            if (startDate && endDate && endDate > startDate) {
+                const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                const rentalTotal = pricePerDay * days;
+                const payOnline = depositAmount + taxAmount;
+
+                document.getElementById('numDays').textContent = days;
+                document.getElementById('rentalTotal').textContent = 'RM ' + rentalTotal.toFixed(2);
+                document.getElementById('payToOwner').textContent = 'RM ' + rentalTotal.toFixed(2);
+                document.getElementById('payOnline').textContent = 'RM ' + payOnline.toFixed(2);
+                document.getElementById('totalCalculation').style.display = 'block';
+            } else {
+                document.getElementById('totalCalculation').style.display = 'none';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showModal();
+        });
+
+        function showModal() {
+            document.getElementById('authModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('authModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>

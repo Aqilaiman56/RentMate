@@ -407,13 +407,16 @@
                 <h2 class="section-title">📦 Item Details</h2>
                 
                 <div class="item-preview">
-                    @if($booking->item->ImagePath)
-                        <img src="{{ asset('storage/' . $booking->item->ImagePath) }}" 
-                             alt="{{ $booking->item->ItemName }}" 
+                    @php
+                        $firstImage = $booking->item->images->first();
+                    @endphp
+                    @if($firstImage)
+                        <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
+                             alt="{{ $booking->item->ItemName }}"
                              class="item-image">
                     @else
-                        <img src="https://via.placeholder.com/100" 
-                             alt="{{ $booking->item->ItemName }}" 
+                        <img src="https://via.placeholder.com/100"
+                             alt="{{ $booking->item->ItemName }}"
                              class="item-image">
                     @endif
                     

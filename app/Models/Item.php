@@ -22,7 +22,6 @@ class Item extends Model
         'LocationID',
         'DepositAmount',
         'PricePerDay',
-        'ImagePath',
         'Availability',
         'Quantity',
         'AvailableQuantity',
@@ -92,6 +91,14 @@ class Item extends Model
     public function messages()
     {
         return $this->hasMany(Message::class, 'ItemID', 'ItemID');
+    }
+
+    /**
+     * Relationship to ItemImages (multiple images)
+     */
+    public function images()
+    {
+        return $this->hasMany(ItemImage::class, 'ItemID', 'ItemID')->orderBy('DisplayOrder');
     }
 
     /**

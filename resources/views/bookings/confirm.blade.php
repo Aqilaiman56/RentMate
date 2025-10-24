@@ -397,14 +397,17 @@
                 <h2 class="section-title">📦 Item Details</h2>
                 
                 <div class="item-preview">
-                    @if($item->ImagePath)
-                        <img src="{{ asset('storage/' . $item->ImagePath) }}" 
-                             alt="{{ $item->ItemName }}" 
+                    @php
+                        $firstImage = $item->images->first();
+                    @endphp
+                    @if($firstImage)
+                        <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
+                             alt="{{ $item->ItemName }}"
                              class="item-image"
                              onerror="this.src='https://via.placeholder.com/120'">
                     @else
-                        <img src="https://via.placeholder.com/120" 
-                             alt="{{ $item->ItemName }}" 
+                        <img src="https://via.placeholder.com/120"
+                             alt="{{ $item->ItemName }}"
                              class="item-image">
                     @endif
                     

@@ -26,7 +26,7 @@ class BookingController extends Controller
             'end_date' => 'required|date|after:start_date'
         ]);
 
-        $item = Item::with(['user', 'location', 'category'])->findOrFail($validated['item_id']);
+        $item = Item::with(['user', 'location', 'category', 'images'])->findOrFail($validated['item_id']);
 
         // Check if item is available
         if (!$item->Availability) {
@@ -272,7 +272,7 @@ class BookingController extends Controller
      */
     public function show($id)
     {
-        $booking = Booking::with(['item.user', 'item.location', 'user', 'deposit', 'payment'])
+        $booking = Booking::with(['item.user', 'item.location', 'item.images', 'user', 'deposit', 'payment'])
             ->findOrFail($id);
 
         // Check if user owns this booking or owns the item
@@ -288,7 +288,7 @@ class BookingController extends Controller
      */
     public function userBookings()
     {
-        $bookings = Booking::with(['item', 'item.location', 'payment'])
+        $bookings = Booking::with(['item', 'item.location', 'item.images', 'payment'])
             ->where('UserID', auth()->id())
             ->orderBy('BookingDate', 'desc')
             ->paginate(10);

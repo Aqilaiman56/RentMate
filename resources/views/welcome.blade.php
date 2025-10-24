@@ -658,13 +658,16 @@
                 @foreach($featuredItems as $item)
                     <a href="{{ route('welcome.item.details', $item->ItemID) }}" class="item-card">
                         <span class="item-category-badge">{{ $item->category->CategoryName ?? 'Other' }}</span>
-                        
-                        @if($item->ImagePath)
-                            <img src="{{ asset('storage/' . $item->ImagePath) }}" 
-                                 alt="{{ $item->ItemName }}" 
+
+                        @php
+                            $firstImage = $item->images->first();
+                        @endphp
+                        @if($firstImage)
+                            <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
+                                 alt="{{ $item->ItemName }}"
                                  class="item-image">
                         @else
-                            <img src="https://via.placeholder.com/300x200/4461F2/fff?text={{ urlencode($item->ItemName) }}" 
+                            <img src="https://via.placeholder.com/300x200/4461F2/fff?text={{ urlencode($item->ItemName) }}"
                                  class="item-image">
                         @endif
                         

@@ -3,7 +3,9 @@
 
 @section('title', 'My Listings - RentMate')
 
-@php($hideSearch = true)
+@php
+    $hideSearch = true;
+@endphp
 
 @push('styles')
 <style>
@@ -325,8 +327,11 @@
         <div class="listings-grid">
             @foreach($items as $item)
                 <div class="listing-card">
-                    @if($item->ImagePath)
-                        <img src="{{ asset('storage/' . $item->ImagePath) }}" alt="{{ $item->ItemName }}" class="listing-image" onerror="this.src='https://via.placeholder.com/300x200/4461F2/fff?text={{ urlencode($item->ItemName) }}'">
+                    @php
+                        $firstImage = $item->images->first();
+                    @endphp
+                    @if($firstImage)
+                        <img src="{{ asset('storage/' . $firstImage->ImagePath) }}" alt="{{ $item->ItemName }}" class="listing-image" onerror="this.src='https://via.placeholder.com/300x200/4461F2/fff?text={{ urlencode($item->ItemName) }}'">
                     @else
                         <img src="https://via.placeholder.com/300x200/4461F2/fff?text={{ urlencode($item->ItemName) }}" alt="{{ $item->ItemName }}" class="listing-image">
                     @endif

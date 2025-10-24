@@ -18,7 +18,7 @@ class WelcomeController extends Controller
         $selectedCategory = null;
         
         // Start building the query
-        $query = Item::with(['category', 'location'])
+        $query = Item::with(['category', 'location', 'images'])
             ->where('Availability', true);
         
         // Handle category filter

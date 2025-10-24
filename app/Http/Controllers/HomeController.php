@@ -30,7 +30,7 @@ class HomeController extends Controller
         // dd($categories, $locations); // Uncomment this line to debug
         
         // Start building the query
-        $query = Item::with(['location', 'category', 'user'])
+        $query = Item::with(['location', 'category', 'user', 'images'])
             ->where('Availability', '!=', 0); // Only show available items
         
         // Filter by category if selected

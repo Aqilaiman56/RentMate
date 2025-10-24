@@ -271,8 +271,11 @@
 <div class="items-grid">
     @forelse($items as $item)
         <a href="{{ route('item.details', $item->ItemID) }}" class="item-card">
-            @if($item->ImagePath)
-                <img src="{{ asset('storage/' . $item->ImagePath) }}" alt="{{ $item->ItemName }}" class="item-image">
+            @php
+                $firstImage = $item->images->first();
+            @endphp
+            @if($firstImage)
+                <img src="{{ asset('storage/' . $firstImage->ImagePath) }}" alt="{{ $item->ItemName }}" class="item-image">
             @else
                 <img src="https://via.placeholder.com/300x200/4461F2/fff?text={{ urlencode($item->ItemName) }}" alt="{{ $item->ItemName }}" class="item-image">
             @endif

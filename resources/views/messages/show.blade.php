@@ -331,14 +331,17 @@
 
     @if($item)
         <div class="item-reference">
-            @if($item->ImagePath)
-                <img src="{{ asset('storage/' . $item->ImagePath) }}" 
-                     alt="{{ $item->ItemName }}" 
+            @php
+                $firstImage = $item->images->first();
+            @endphp
+            @if($firstImage)
+                <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
+                     alt="{{ $item->ItemName }}"
                      class="item-reference-image"
                      onerror="this.src='https://via.placeholder.com/80'">
             @else
-                <img src="https://via.placeholder.com/80" 
-                     alt="{{ $item->ItemName }}" 
+                <img src="https://via.placeholder.com/80"
+                     alt="{{ $item->ItemName }}"
                      class="item-reference-image">
             @endif
             
