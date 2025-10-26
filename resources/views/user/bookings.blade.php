@@ -274,7 +274,7 @@
             @foreach($bookings as $booking)
                 <div class="booking-card">
                     @php
-                        $firstImage = $booking->item->images->first();
+                        $firstImage = $booking->item->images ? $booking->item->images->first() : null;
                     @endphp
                     @if($firstImage)
                         <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"

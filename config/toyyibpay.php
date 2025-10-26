@@ -4,6 +4,7 @@ return [
     'secret_key' => env('TOYYIBPAY_SECRET_KEY', ''),
     'category_code' => env('TOYYIBPAY_CATEGORY_CODE', ''),
     'sandbox_mode' => env('TOYYIBPAY_SANDBOX', true),
+    'test_mode' => env('TOYYIBPAY_TEST_MODE', false),
 
     // API URLs
     'api_url' => env('TOYYIBPAY_SANDBOX', true)

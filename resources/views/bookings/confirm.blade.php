@@ -397,11 +397,8 @@
                 <h2 class="section-title">📦 Item Details</h2>
                 
                 <div class="item-preview">
-                    @php
-                        $firstImage = $item->images->first();
-                    @endphp
-                    @if($firstImage)
-                        <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
+                    @if($item->images?->first())
+                        <img src="{{ asset('storage/' . $item->images->first()->ImagePath) }}"
                              alt="{{ $item->ItemName }}"
                              class="item-image"
                              onerror="this.src='https://via.placeholder.com/120'">

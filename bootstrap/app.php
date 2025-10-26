@@ -11,7 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->trustProxies(at: '*');
+        $middleware->trustHosts(at: [
+            'localhost',
+            'irrevocable-tinkly-clemmie.ngrok-free.dev',
+            fn ($host) => str_ends_with($host, '.ngrok-free.dev'),
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

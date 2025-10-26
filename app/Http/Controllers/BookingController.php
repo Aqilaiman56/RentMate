@@ -8,6 +8,8 @@ use App\Models\Item;
 use App\Models\Deposit;
 use App\Models\Tax;
 use App\Models\Notification;
+use App\Models\Payment;
+use App\Services\ToyyibPayService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -18,8 +20,6 @@ class BookingController extends Controller
      */
     public function confirm(Request $request)
     {
-        \Log::info('Confirm method called', $request->all());
-        
         $validated = $request->validate([
             'item_id' => 'required|exists:items,ItemID',
             'start_date' => 'required|date|after_or_equal:today',
@@ -131,8 +131,8 @@ class BookingController extends Controller
             // Create deposit record
             Deposit::create([
                 'BookingID' => $booking->BookingID,
-                'Amount' => $item->DepositAmount,
-                'Status' => 'pending',
+                'DepositAmount' => $item->DepositAmount,
+                'Status' => 'held',
                 'DateCollected' => now()
             ]);
 
@@ -219,8 +219,8 @@ class BookingController extends Controller
                 'ItemID' => $item->ItemID,
                 'StartDate' => $startDate,
                 'EndDate' => $endDate,
-                'TotalAmount' => $totalAmount,
-                'DepositAmount' => $item->DepositAmount,
+                'TotalPaid' => 0, // Will be updated after payment
+                'TaxAmount' => 1.00,
                 'Status' => 'pending',
                 'BookingDate' => now()
             ]);
@@ -228,8 +228,8 @@ class BookingController extends Controller
             // Create deposit record
             Deposit::create([
                 'BookingID' => $booking->BookingID,
-                'Amount' => $item->DepositAmount,
-                'Status' => 'pending',
+                'DepositAmount' => $item->DepositAmount,
+                'Status' => 'held',
                 'DateCollected' => now()
             ]);
 
@@ -257,8 +257,55 @@ class BookingController extends Controller
 
             DB::commit();
 
-            // Redirect to payment creation
-            return redirect()->route('payment.create', ['booking_id' => $booking->BookingID]);
+            // Create payment and redirect to ToyyibPay
+            $toyyibpay = app(ToyyibPayService::class);
+
+            // Calculate payment amount (Deposit + Tax)
+            $depositAmount = $item->DepositAmount;
+            $taxAmount = 1.00;
+            $totalAmount = $depositAmount + $taxAmount;
+
+            // Create payment record
+            $payment = Payment::create([
+                'BookingID' => $booking->BookingID,
+                'Amount' => $totalAmount,
+                'Status' => 'pending',
+                'CreatedAt' => now()
+            ]);
+
+            // Prepare data for ToyyibPay
+            $dateRange = '';
+            if ($booking->StartDate && $booking->EndDate) {
+                $dateRange = ' (Rental: ' . $booking->StartDate->format('d M') . ' - ' . $booking->EndDate->format('d M Y') . ')';
+            }
+
+            $billData = [
+                'booking_id' => $booking->BookingID,
+                'bill_name' => 'Security Deposit - Booking #' . $booking->BookingID,
+                'bill_description' => 'Security deposit for ' . $item->ItemName . $dateRange . '. Rental fee to be paid directly to owner.',
+                'amount' => $totalAmount,
+                'payer_name' => auth()->user()->UserName,
+                'payer_email' => auth()->user()->Email,
+                'payer_phone' => auth()->user()->PhoneNumber ?? '',
+            ];
+
+            // Create bill in ToyyibPay
+            $result = $toyyibpay->createBill($billData);
+
+            if ($result['success']) {
+                // Update payment with bill code
+                $payment->update([
+                    'BillCode' => $result['bill_code']
+                ]);
+
+                // Redirect to ToyyibPay payment page
+                return redirect($result['payment_url']);
+            } else {
+                $payment->update(['Status' => 'failed']);
+
+                return redirect()->route('booking.show', $booking->BookingID)
+                    ->with('error', 'Failed to create payment. Please try again.');
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();

@@ -332,7 +332,7 @@
     @if($item)
         <div class="item-reference">
             @php
-                $firstImage = $item->images->first();
+                $firstImage = $item->images ? $item->images->first() : null;
             @endphp
             @if($firstImage)
                 <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
@@ -441,13 +441,20 @@
             },
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Server error');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 // Add message to chat
                 const message = data.message;
                 let itemRefHTML = '';
-                
+
                 if (message.item) {
                     itemRefHTML = `
                         <div class="message-item-ref">
@@ -456,7 +463,7 @@
                         </div>
                     `;
                 }
-                
+
                 const messageHTML = `
                     <div class="message sent">
                         <div>
@@ -475,11 +482,13 @@
 
                 // Clear input
                 messageInput.value = '';
+            } else {
+                alert(data.message || 'Failed to send message');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to send message. Please try again.');
+            alert('Failed to send message: ' + error.message);
         })
         .finally(() => {
             sendBtn.disabled = false;

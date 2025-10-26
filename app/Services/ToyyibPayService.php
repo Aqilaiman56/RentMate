@@ -25,6 +25,21 @@ class ToyyibPayService
      */
     public function createBill($bookingData)
     {
+        // Test mode - bypass actual API call during account verification
+        if (config('toyyibpay.test_mode', false)) {
+            $testBillCode = 'TEST-' . time() . '-' . rand(1000, 9999);
+            Log::info('ToyyibPay Test Mode - Simulated Bill Created', [
+                'bill_code' => $testBillCode,
+                'booking_id' => $bookingData['booking_id']
+            ]);
+
+            return [
+                'success' => true,
+                'bill_code' => $testBillCode,
+                'payment_url' => route('payment.test', ['bill_code' => $testBillCode])
+            ];
+        }
+
         try {
             $response = $this->client->post($this->apiUrl . 'index.php/api/createBill', [
                 'form_params' => [
@@ -49,9 +64,14 @@ class ToyyibPayService
                 ]
             ]);
 
-            $result = json_decode($response->getBody()->getContents(), true);
+            $responseBody = $response->getBody()->getContents();
+            $result = json_decode($responseBody, true);
 
-            Log::info('ToyyibPay Create Bill Response:', $result);
+            Log::info('ToyyibPay Create Bill Response', [
+                'status_code' => $response->getStatusCode(),
+                'raw_response' => $responseBody,
+                'result' => $result
+            ]);
 
             if (isset($result[0]['BillCode'])) {
                 return [

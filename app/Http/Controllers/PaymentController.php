@@ -88,7 +88,7 @@ class PaymentController extends Controller
      */
     public function paymentCallback(Request $request)
     {
-        Log::info('ToyyibPay Callback:', $request->all());
+        Log::info('ToyyibPay Callback', ['data' => $request->all()]);
 
         $billCode = $request->input('billcode');
         $statusId = $request->input('status_id');
@@ -300,6 +300,23 @@ class PaymentController extends Controller
             Log::error('Refund error: ' . $e->getMessage());
             return back()->with('error', 'Failed to process refund. Please try again.');
         }
+    }
+
+    /**
+     * Test payment page (simulates ToyyibPay during verification)
+     */
+    public function testPayment($billCode)
+    {
+        $payment = Payment::where('BillCode', $billCode)->first();
+
+        if (!$payment) {
+            return redirect()->route('user.HomePage')
+                ->with('error', 'Payment not found');
+        }
+
+        $booking = Booking::with(['item', 'user'])->findOrFail($payment->BookingID);
+
+        return view('payments.test', compact('payment', 'booking', 'billCode'));
     }
 
     /**

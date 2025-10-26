@@ -410,7 +410,7 @@
                 
                 <div class="item-preview">
                     @php
-                        $firstImage = $booking->item->images->first();
+                        $firstImage = $booking->item->images ? $booking->item->images->first() : null;
                     @endphp
                     @if($firstImage)
                         <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
@@ -433,15 +433,15 @@
                 
                 <div class="detail-row">
                     <span class="detail-label">Start Date</span>
-                    <span class="detail-value">{{ $booking->StartDate->format('d M Y') }}</span>
+                    <span class="detail-value">{{ $booking->StartDate ? $booking->StartDate->format('d M Y') : 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">End Date</span>
-                    <span class="detail-value">{{ $booking->EndDate->format('d M Y') }}</span>
+                    <span class="detail-value">{{ $booking->EndDate ? $booking->EndDate->format('d M Y') : 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Duration</span>
-                    <span class="detail-value">{{ $booking->StartDate->diffInDays($booking->EndDate) }} days</span>
+                    <span class="detail-value">{{ ($booking->StartDate && $booking->EndDate) ? $booking->StartDate->diffInDays($booking->EndDate) . ' days' : 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Booking Date</span>
@@ -551,7 +551,7 @@
                             </div>
                             <div class="payment-info-row">
                                 <span>Payment Date:</span>
-                                <span>{{ $booking->payment->PaymentDate->format('d M Y, g:i A') }}</span>
+                                <span>{{ $booking->payment->PaymentDate ? $booking->payment->PaymentDate->format('d M Y, g:i A') : 'N/A' }}</span>
                             </div>
                             <div class="payment-info-row">
                                 <span>Payment Method:</span>

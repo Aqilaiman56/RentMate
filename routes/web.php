@@ -137,6 +137,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Payment callback (no auth required)
 Route::any('/payment/callback', [PaymentController::class, 'paymentCallback'])->name('payment.callback');
 
+// Test payment page (for testing during ToyyibPay verification)
+Route::get('/payment/test/{bill_code}', [PaymentController::class, 'testPayment'])->name('payment.test');
+
 /*
 |--------------------------------------------------------------------------
 | Message Routes
