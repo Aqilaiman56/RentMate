@@ -94,10 +94,33 @@
             padding: 8px;
             border-radius: 8px;
             transition: background-color 0.2s;
+            position: relative;
         }
 
         .icon-btn:hover {
             background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 0 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .notification-badge.hidden {
+            display: none;
         }
 
         /* Profile Section with Dropdown */
@@ -245,8 +268,14 @@
         </form>
 
         <div class="header-icons">
-            <a href="{{ route('notifications.index') }}" class="icon-btn">🔔</a>
-            <a href="{{ route('messages.index') }}" class="icon-btn">✉️</a>
+            <a href="{{ route('notifications.index') }}" class="icon-btn" id="notificationIcon">
+                🔔
+                <span class="notification-badge hidden" id="notificationBadge">0</span>
+            </a>
+            <a href="{{ route('messages.index') }}" class="icon-btn" id="messageIcon">
+                ✉️
+                <span class="notification-badge hidden" id="messageBadge">0</span>
+            </a>
             
             <div class="profile-section" id="profileSection">
                 @if(auth()->user()->ProfileImage)
@@ -334,6 +363,57 @@
             
             return false;
         }
+    </script>
+
+    <script>
+        // Notification and message count updater
+        function updateNotificationCounts() {
+            // Fetch notification count
+            fetch('{{ route("notifications.unreadCount") }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.getElementById('notificationBadge');
+                if (data.count > 0) {
+                    badge.textContent = data.count > 99 ? '99+' : data.count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            })
+            .catch(error => console.error('Error fetching notification count:', error));
+
+            // Fetch message count
+            fetch('{{ route("messages.unreadCount") }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.getElementById('messageBadge');
+                if (data.count > 0) {
+                    badge.textContent = data.count > 99 ? '99+' : data.count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            })
+            .catch(error => console.error('Error fetching message count:', error));
+        }
+
+        // Update counts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationCounts();
+
+            // Update every 30 seconds
+            setInterval(updateNotificationCounts, 30000);
+        });
     </script>
 
     @stack('scripts')

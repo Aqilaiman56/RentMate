@@ -115,6 +115,7 @@ class MessageController extends Controller
         return redirect()->route('messages.show', $validated['receiver_id'])
             ->with('success', 'Message sent successfully');
     }
+
     /**
      * Get new messages (for AJAX polling)
      */
