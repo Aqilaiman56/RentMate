@@ -6,6 +6,7 @@
     <title>RentMate - My Profile</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -426,8 +427,8 @@
         <a href="{{ route('user.HomePage') }}" class="logo">RentMate</a>
 
         <div class="header-icons">
-            <a href="{{ route('notifications.index') }}" class="icon-btn">🔔</a>
-            <a href="{{ route('messages.index') }}" class="icon-btn">✉️</a>
+            <a href="{{ route('notifications.index') }}" class="icon-btn"><i class="fas fa-bell"></i></a>
+            <a href="{{ route('messages.index') }}" class="icon-btn"><i class="fas fa-envelope"></i></a>
 
             <div class="profile-section" id="profileSection">
                 @if(auth()->user()->ProfileImage)
@@ -439,29 +440,29 @@
 
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="{{ route('user.profile') }}" class="dropdown-item">
-                        <span class="dropdown-icon">👤</span>
+                        <span class="dropdown-icon"><i class="fas fa-user"></i></span>
                         <span>Profile Settings</span>
                     </a>
                     <a href="{{ route('user.listings') }}" class="dropdown-item">
-                        <span class="dropdown-icon">📦</span>
+                        <span class="dropdown-icon"><i class="fas fa-box"></i></span>
                         <span>My Listings</span>
                     </a>
                     <a href="{{ route('user.add-listing') }}" class="dropdown-item">
-                        <span class="dropdown-icon">➕</span>
+                        <span class="dropdown-icon"><i class="fas fa-plus"></i></span>
                         <span>Add Listing</span>
                     </a>
                     <a href="{{ route('user.bookings') }}" class="dropdown-item">
-                        <span class="dropdown-icon">📅</span>
+                        <span class="dropdown-icon"><i class="fas fa-calendar"></i></span>
                         <span>My Bookings</span>
                     </a>
                     <a href="{{ route('user.wishlist') }}" class="dropdown-item">
-                        <span class="dropdown-icon">❤️</span>
+                        <span class="dropdown-icon"><i class="fas fa-heart"></i></span>
                         <span>Wishlist</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="logout-form">
                         @csrf
                         <button type="submit" class="dropdown-item logout" onclick="confirmLogout(event)">
-                            <span class="dropdown-icon">🚪</span>
+                            <span class="dropdown-icon"><i class="fas fa-sign-out-alt"></i></span>
                             <span>Logout</span>
                         </button>
                     </form>
@@ -480,14 +481,14 @@
 
             <div class="profile-info">
                 <h1>{{ $user->UserName }}</h1>
-                <p>📧 {{ $user->Email }}</p>
+                <p><i class="fas fa-envelope"></i> {{ $user->Email }}</p>
                 @if($user->PhoneNumber)
-                    <p>📞 {{ $user->PhoneNumber }}</p>
+                    <p><i class="fas fa-phone"></i> {{ $user->PhoneNumber }}</p>
                 @endif
                 @if($user->Location)
-                    <p>📍 {{ $user->Location }}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> {{ $user->Location }}</p>
                 @endif
-                <p>🗓️ Member since {{ $user->CreatedAt->format('M Y') }}</p>
+                <p><i class="fas fa-calendar"></i> Member since {{ $user->CreatedAt->format('M Y') }}</p>
             </div>
         </div>
 
@@ -514,7 +515,7 @@
 
             @if(session('success'))
                 <div class="success-message">
-                    ✓ {{ session('success') }}
+                    <i class="fas fa-check"></i> {{ session('success') }}
                 </div>
             @endif
 

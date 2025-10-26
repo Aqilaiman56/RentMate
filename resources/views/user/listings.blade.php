@@ -291,7 +291,7 @@
     <div class="page-header">
         <h1 class="page-title">My Listings</h1>
         <a href="{{ route('user.add-listing') }}" class="add-listing-btn">
-            <span>➕</span>
+            <span><i class="fas fa-plus"></i></span>
             Add New Listing
         </a>
     </div>
@@ -345,15 +345,15 @@
                         
                         <div class="listing-details">
                             <div class="listing-detail">
-                                <span>📍</span>
+                                <span><i class="fas fa-map-marker-alt"></i></span>
                                 <span>{{ $item->location->LocationName ?? 'N/A' }}</span>
                             </div>
                             <div class="listing-detail">
-                                <span>🏷️</span>
+                                <span><i class="fas fa-tag"></i></span>
                                 <span>{{ $item->category->CategoryName ?? 'N/A' }}</span>
                             </div>
                             <div class="listing-detail">
-                                <span>📅</span>
+                                <span><i class="fas fa-calendar"></i></span>
                                 <span>Listed {{ $item->DateAdded->diffForHumans() }}</span>
                             </div>
                         </div>
@@ -364,27 +364,27 @@
 
                         <div class="listing-stats">
                             <div class="stat-item">
-                                <span>📅</span>
+                                <span><i class="fas fa-calendar-check"></i></span>
                                 <span>{{ $item->bookings->count() }} bookings</span>
                             </div>
                             <div class="stat-item">
-                                <span>⭐</span>
+                                <span><i class="fas fa-star"></i></span>
                                 <span>{{ number_format($item->reviews->avg('Rating') ?? 0, 1) }} ({{ $item->reviews->count() }})</span>
                             </div>
                         </div>
 
                         <div class="listing-actions">
                             <a href="{{ route('item.details', $item->ItemID) }}" class="action-btn btn-view">
-                                👁️ View
+                                <i class="fas fa-eye"></i> View
                             </a>
                             <a href="{{ route('items.edit', $item->ItemID) }}" class="action-btn btn-edit">
-                                ✏️ Edit
+                                <i class="fas fa-edit"></i> Edit
                             </a>
                             <form action="{{ route('items.destroy', $item->ItemID) }}" method="POST" style="flex: 1;" onsubmit="return confirmDelete(event, '{{ $item->ItemName }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="action-btn btn-delete" style="width: 100%;">
-                                    🗑️ Delete
+                                    <i class="fas fa-trash"></i> Delete
                                 </button>
                             </form>
                         </div>
@@ -400,11 +400,11 @@
         @endif
     @else
         <div class="alert alert-info">
-            <div class="empty-icon">📦</div>
+            <div class="empty-icon"><i class="fas fa-box"></i></div>
             <div class="empty-title">No Listings Yet</div>
             <p class="empty-text">You haven't created any listings yet. Start earning by listing your first item!</p>
             <a href="{{ route('user.add-listing') }}" class="add-listing-btn">
-                <span>➕</span>
+                <span><i class="fas fa-plus"></i></span>
                 Add Your First Listing
             </a>
         </div>

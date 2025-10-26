@@ -88,6 +88,43 @@ class ListingsController extends Controller
     }
 
     /**
+     * Show detailed item view for admin
+     */
+    public function show($id)
+    {
+        $item = Item::with([
+            'user',
+            'category',
+            'location',
+            'images',
+            'bookings.user',
+            'reviews.user',
+            'deposits'
+        ])->findOrFail($id);
+
+        // Get statistics
+        $totalBookings = $item->bookings()->count();
+        $activeBookings = $item->bookings()
+            ->whereIn('Status', ['Approved', 'Pending'])
+            ->where('EndDate', '>=', now())
+            ->count();
+        $completedBookings = $item->bookings()->where('Status', 'Completed')->count();
+        $totalRevenue = $item->bookings()->where('Status', 'Completed')->sum('TotalAmount');
+        $averageRating = $item->reviews()->avg('Rating') ?? 0;
+        $totalReviews = $item->reviews()->count();
+
+        return view('admin.listings.show', compact(
+            'item',
+            'totalBookings',
+            'activeBookings',
+            'completedBookings',
+            'totalRevenue',
+            'averageRating',
+            'totalReviews'
+        ));
+    }
+
+    /**
      * Delete a listing
      */
     public function destroy($id)

@@ -269,11 +269,11 @@
 
         <div class="header-icons">
             <a href="{{ route('notifications.index') }}" class="icon-btn" id="notificationIcon">
-                🔔
+                <i class="fas fa-bell"></i>
                 <span class="notification-badge hidden" id="notificationBadge">0</span>
             </a>
             <a href="{{ route('messages.index') }}" class="icon-btn" id="messageIcon">
-                ✉️
+                <i class="fas fa-envelope"></i>
                 <span class="notification-badge hidden" id="messageBadge">0</span>
             </a>
             
@@ -288,29 +288,29 @@
                 <!-- Dropdown Menu -->
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="{{ route('user.profile') }}" class="dropdown-item">
-                        <span class="dropdown-icon">👤</span>
+                        <span class="dropdown-icon"><i class="fas fa-user"></i></span>
                         <span>Profile Settings</span>
                     </a>
                     <a href="{{ route('user.listings') }}" class="dropdown-item">
-                        <span class="dropdown-icon">📦</span>
+                        <span class="dropdown-icon"><i class="fas fa-box"></i></span>
                         <span>My Listings</span>
                     </a>
                     <a href="{{ route('user.add-listing') }}" class="dropdown-item">
-                        <span class="dropdown-icon">➕</span>
+                        <span class="dropdown-icon"><i class="fas fa-plus"></i></span>
                         <span>Add Listing</span>
                     </a>
                     <a href="{{ route('user.bookings') }}" class="dropdown-item">
-                        <span class="dropdown-icon">📅</span>
+                        <span class="dropdown-icon"><i class="fas fa-calendar"></i></span>
                         <span>My Bookings</span>
                     </a>
                     <a href="{{ route('user.wishlist') }}" class="dropdown-item">
-                        <span class="dropdown-icon">❤️</span>
+                        <span class="dropdown-icon"><i class="fas fa-heart"></i></span>
                         <span>Wishlist</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="logout-form">
                         @csrf
                         <button type="submit" class="dropdown-item logout" onclick="return confirmLogout(event)">
-                            <span class="dropdown-icon">🚪</span>
+                            <span class="dropdown-icon"><i class="fas fa-sign-out-alt"></i></span>
                             <span>Logout</span>
                         </button>
                     </form>

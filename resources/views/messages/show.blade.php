@@ -4,156 +4,251 @@
 
 @php
     $hideSearch = true;
+    $hideFooter = true;
 @endphp
 
 @push('styles')
 <style>
+    body {
+        overflow: hidden;
+    }
+
     .chat-container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
+        position: fixed;
+        top: 95px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+        padding: 0;
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 120px);
+        height: calc(100vh - 95px);
+        max-width: 100%;
     }
 
     .chat-header {
-        background: white;
-        border-radius: 15px 15px 0 0;
-        padding: 20px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        background: linear-gradient(135deg, #4461F2 0%, #3651E2 100%);
+        border-radius: 0;
+        padding: 20px 30px;
+        box-shadow: 0 4px 20px rgba(68, 97, 242, 0.2);
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 20px;
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .chat-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+        pointer-events: none;
     }
 
     .chat-avatar {
-        width: 50px;
-        height: 50px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
         object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        position: relative;
+        z-index: 1;
     }
 
     .avatar-placeholder {
-        width: 50px;
-        height: 50px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
-        background: #4461F2;
+        background: rgba(255, 255, 255, 0.25);
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
-        font-weight: 600;
+        font-size: 24px;
+        font-weight: 700;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        position: relative;
+        z-index: 1;
+    }
+
+    .chat-user-info {
+        position: relative;
+        z-index: 1;
     }
 
     .chat-user-info h2 {
-        font-size: 18px;
-        font-weight: 600;
-        color: #1f2937;
+        font-size: 20px;
+        font-weight: 700;
+        color: white;
         margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .chat-user-info p {
-        font-size: 13px;
-        color: #6b7280;
-        margin: 2px 0 0 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.85);
+        margin: 4px 0 0 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .chat-user-info p i {
+        font-size: 12px;
     }
 
     .back-btn {
         margin-left: auto;
-        background: #f3f4f6;
-        color: #374151;
-        padding: 8px 16px;
-        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
         text-decoration: none;
         font-size: 14px;
         font-weight: 600;
-        transition: background-color 0.2s;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        z-index: 1;
     }
 
     .back-btn:hover {
-        background: #e5e7eb;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .item-reference {
-        background: white;
-        border-radius: 12px;
-        padding: 15px;
-        margin: 15px 20px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+        border-radius: 0;
+        padding: 20px 30px;
+        margin: 0;
         display: flex;
-        gap: 15px;
+        gap: 20px;
         align-items: center;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        border-left: 4px solid #4461F2;
+        border-bottom: 1px solid rgba(68, 97, 242, 0.1);
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .item-reference::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, #4461F2 0%, #3651E2 100%);
     }
 
     .item-reference-image {
-        width: 80px;
-        height: 80px;
-        border-radius: 8px;
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
         object-fit: cover;
         flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .item-reference-info {
         flex: 1;
     }
 
-    .item-reference-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 5px;
-    }
-
-    .item-reference-price {
-        font-size: 14px;
-        color: #4461F2;
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-
     .item-reference-label {
         font-size: 12px;
         color: #6b7280;
-        background: #f3f4f6;
-        padding: 4px 8px;
-        border-radius: 4px;
-        display: inline-block;
+        background: rgba(68, 97, 242, 0.1);
+        padding: 6px 12px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .item-reference-label i {
+        color: #4461F2;
+    }
+
+    .item-reference-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 6px;
+    }
+
+    .item-reference-price {
+        font-size: 16px;
+        color: #4461F2;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .item-reference-link {
-        background: #4461F2;
+        background: linear-gradient(135deg, #4461F2 0%, #3651E2 100%);
         color: white;
-        padding: 8px 16px;
-        border-radius: 8px;
+        padding: 12px 24px;
+        border-radius: 10px;
         text-decoration: none;
-        font-size: 13px;
+        font-size: 14px;
         font-weight: 600;
         white-space: nowrap;
-        transition: background-color 0.2s;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(68, 97, 242, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .item-reference-link:hover {
-        background: #3651E2;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(68, 97, 242, 0.4);
     }
 
     .chat-messages {
         flex: 1;
-        background: #f9fafb;
-        padding: 20px;
+        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        padding: 30px 25px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 16px;
     }
 
     .message {
         display: flex;
         align-items: flex-end;
-        gap: 10px;
-        max-width: 70%;
+        gap: 12px;
+        max-width: 65%;
+        animation: messageSlide 0.3s ease-out;
+    }
+
+    @keyframes messageSlide {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .message.sent {
@@ -166,129 +261,244 @@
     }
 
     .message-bubble {
-        padding: 12px 16px;
-        border-radius: 18px;
+        padding: 14px 18px;
+        border-radius: 20px;
         word-wrap: break-word;
+        line-height: 1.5;
+        font-size: 14px;
     }
 
     .message.sent .message-bubble {
-        background: #4461F2;
+        background: linear-gradient(135deg, #4461F2 0%, #3651E2 100%);
         color: white;
-        border-bottom-right-radius: 4px;
+        border-bottom-right-radius: 6px;
+        box-shadow: 0 4px 12px rgba(68, 97, 242, 0.3);
     }
 
     .message.received .message-bubble {
         background: white;
         color: #1f2937;
-        border-bottom-left-radius: 4px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-bottom-left-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
     .message-time {
         font-size: 11px;
         color: #9ca3af;
-        margin-top: 4px;
+        margin-top: 6px;
+        font-weight: 500;
     }
 
     .message.sent .message-time {
         text-align: right;
+        color: #d1d5db;
     }
 
     .message-item-ref {
-        background: rgba(68, 97, 242, 0.1);
-        border-left: 3px solid #4461F2;
-        padding: 10px;
-        border-radius: 8px;
-        margin-top: 8px;
-        font-size: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        border-left: 3px solid rgba(255, 255, 255, 0.5);
+        padding: 12px;
+        border-radius: 10px;
+        margin-top: 10px;
+        font-size: 13px;
+        backdrop-filter: blur(10px);
     }
 
     .message.sent .message-item-ref {
         background: rgba(255, 255, 255, 0.2);
-        border-left-color: white;
+        border-left-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .message.received .message-item-ref {
+        background: rgba(68, 97, 242, 0.08);
+        border-left-color: #4461F2;
     }
 
     .message-item-name {
-        font-weight: 600;
-        margin-bottom: 3px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .message-item-price {
-        opacity: 0.8;
+        opacity: 0.9;
+        font-weight: 600;
     }
 
     .chat-input-container {
         background: white;
-        border-radius: 0 0 15px 15px;
-        padding: 20px;
-        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 0;
+        padding: 20px 30px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        flex-shrink: 0;
+        border-top: 1px solid #e5e7eb;
     }
 
     .chat-input-form {
         display: flex;
-        gap: 12px;
+        gap: 14px;
+        align-items: center;
     }
 
     .chat-input {
         flex: 1;
-        padding: 12px 16px;
+        padding: 14px 20px;
         border: 2px solid #e5e7eb;
-        border-radius: 25px;
-        font-size: 14px;
+        border-radius: 30px;
+        font-size: 15px;
         outline: none;
-        transition: border-color 0.2s;
+        transition: all 0.3s;
+        background: #f9fafb;
     }
 
     .chat-input:focus {
         border-color: #4461F2;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(68, 97, 242, 0.1);
     }
 
     .send-btn {
-        background: #4461F2;
+        background: linear-gradient(135deg, #4461F2 0%, #3651E2 100%);
         color: white;
-        padding: 12px 24px;
-        border-radius: 25px;
+        padding: 14px 32px;
+        border-radius: 30px;
         border: none;
-        font-weight: 600;
+        font-weight: 700;
         cursor: pointer;
-        transition: background-color 0.2s;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(68, 97, 242, 0.3);
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .send-btn:hover {
-        background: #3651E2;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(68, 97, 242, 0.4);
     }
 
     .send-btn:disabled {
         background: #9ca3af;
         cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
     }
 
     .date-divider {
         text-align: center;
-        margin: 20px 0;
+        margin: 24px 0;
+        position: relative;
+    }
+
+    .date-divider::before,
+    .date-divider::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 40%;
+        height: 1px;
+        background: linear-gradient(to right, transparent, #d1d5db, transparent);
+    }
+
+    .date-divider::before {
+        left: 0;
+    }
+
+    .date-divider::after {
+        right: 0;
     }
 
     .date-divider span {
-        background: #e5e7eb;
+        background: white;
         color: #6b7280;
-        padding: 4px 12px;
-        border-radius: 12px;
+        padding: 6px 16px;
+        border-radius: 20px;
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Custom Scrollbar */
+    .chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: #a0aec0;
+    }
+
+    @media (max-width: 968px) {
+        .chat-container {
+            top: 85px;
+            height: calc(100vh - 85px);
+        }
+
+        .chat-header {
+            padding: 16px 20px;
+        }
     }
 
     @media (max-width: 768px) {
         .chat-container {
-            padding: 0;
-            height: calc(100vh - 80px);
+            top: 75px;
+            height: calc(100vh - 75px);
         }
 
         .chat-header {
-            border-radius: 0;
+            padding: 14px 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .chat-container {
+            top: 70px;
+            height: calc(100vh - 70px);
+        }
+
+        .chat-header {
+            padding: 12px 14px;
+        }
+
+        .chat-avatar,
+        .avatar-placeholder {
+            width: 48px;
+            height: 48px;
+            font-size: 20px;
+        }
+
+        .chat-user-info h2 {
+            font-size: 18px;
+        }
+
+        .chat-user-info p {
+            font-size: 13px;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            font-size: 13px;
         }
 
         .chat-input-container {
-            border-radius: 0;
+            padding: 16px;
+        }
+
+        .chat-messages {
+            padding: 16px 12px;
         }
 
         .message {
@@ -297,12 +507,16 @@
 
         .item-reference {
             flex-direction: column;
-            margin: 15px 10px;
+            padding: 16px;
         }
 
         .item-reference-image {
             width: 100%;
-            height: 150px;
+            height: 180px;
+        }
+
+        .send-btn {
+            padding: 12px 24px;
         }
     }
 </style>
@@ -312,8 +526,8 @@
 <div class="chat-container">
     <div class="chat-header">
         @if($otherUser->ProfileImage)
-            <img src="{{ asset('storage/' . $otherUser->ProfileImage) }}" 
-                 alt="{{ $otherUser->UserName }}" 
+            <img src="{{ asset('storage/' . $otherUser->ProfileImage) }}"
+                 alt="{{ $otherUser->UserName }}"
                  class="chat-avatar">
         @else
             <div class="avatar-placeholder">
@@ -323,10 +537,12 @@
 
         <div class="chat-user-info">
             <h2>{{ $otherUser->UserName }}</h2>
-            <p>{{ $otherUser->Email }}</p>
+            <p><i class="fas fa-envelope"></i> {{ $otherUser->Email }}</p>
         </div>
 
-        <a href="{{ route('messages.index') }}" class="back-btn">← Back</a>
+        <a href="{{ route('messages.index') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
     </div>
 
     @if($item)
@@ -338,21 +554,25 @@
                 <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
                      alt="{{ $item->ItemName }}"
                      class="item-reference-image"
-                     onerror="this.src='https://via.placeholder.com/80'">
+                     onerror="this.src='https://via.placeholder.com/100'">
             @else
-                <img src="https://via.placeholder.com/80"
+                <img src="https://via.placeholder.com/100"
                      alt="{{ $item->ItemName }}"
                      class="item-reference-image">
             @endif
-            
+
             <div class="item-reference-info">
-                <div class="item-reference-label">💬 Discussing about:</div>
+                <div class="item-reference-label">
+                    <i class="fas fa-comments"></i> Discussing about:
+                </div>
                 <div class="item-reference-title">{{ $item->ItemName }}</div>
-                <div class="item-reference-price">RM {{ number_format($item->PricePerDay, 2) }} / day</div>
+                <div class="item-reference-price">
+                    <i class="fas fa-tag"></i> RM {{ number_format($item->PricePerDay, 2) }} / day
+                </div>
             </div>
-            
+
             <a href="{{ route('item.details', $item->ItemID) }}" class="item-reference-link" target="_blank">
-                View Item
+                <i class="fas fa-external-link-alt"></i> View Item
             </a>
         </div>
     @endif
@@ -379,10 +599,10 @@
                 <div>
                     <div class="message-bubble">
                         {{ $message->MessageContent }}
-                        
+
                         @if($message->item)
                             <div class="message-item-ref">
-                                <div class="message-item-name">📦 {{ $message->item->ItemName }}</div>
+                                <div class="message-item-name"><i class="fas fa-box"></i> {{ $message->item->ItemName }}</div>
                                 <div class="message-item-price">RM {{ number_format($message->item->PricePerDay, 2) }}/day</div>
                             </div>
                         @endif
@@ -402,14 +622,16 @@
             @if($item)
                 <input type="hidden" name="item_id" value="{{ $item->ItemID }}">
             @endif
-            <input type="text" 
-                   name="message" 
-                   class="chat-input" 
-                   placeholder="Type a message..." 
+            <input type="text"
+                   name="message"
+                   class="chat-input"
+                   placeholder="Type a message..."
                    required
                    autocomplete="off"
                    id="messageInput">
-            <button type="submit" class="send-btn" id="sendBtn">Send</button>
+            <button type="submit" class="send-btn" id="sendBtn">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
         </form>
     </div>
 </div>
@@ -431,7 +653,7 @@
 
         const formData = new FormData(this);
         sendBtn.disabled = true;
-        sendBtn.textContent = 'Sending...';
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
         fetch('{{ route("messages.send") }}', {
             method: 'POST',
@@ -458,7 +680,7 @@
                 if (message.item) {
                     itemRefHTML = `
                         <div class="message-item-ref">
-                            <div class="message-item-name">📦 ${message.item.ItemName}</div>
+                            <div class="message-item-name"><i class="fas fa-box"></i> ${message.item.ItemName}</div>
                             <div class="message-item-price">RM ${parseFloat(message.item.PricePerDay).toFixed(2)}/day</div>
                         </div>
                     `;
@@ -492,7 +714,7 @@
         })
         .finally(() => {
             sendBtn.disabled = false;
-            sendBtn.textContent = 'Send';
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
         });
     });
 
@@ -504,16 +726,16 @@
                 if (data.success && data.messages.length > 0) {
                     data.messages.forEach(message => {
                         let itemRefHTML = '';
-                        
+
                         if (message.item) {
                             itemRefHTML = `
                                 <div class="message-item-ref">
-                                    <div class="message-item-name">📦 ${message.item.ItemName}</div>
+                                    <div class="message-item-name"><i class="fas fa-box"></i> ${message.item.ItemName}</div>
                                     <div class="message-item-price">RM ${parseFloat(message.item.PricePerDay).toFixed(2)}/day</div>
                                 </div>
                             `;
                         }
-                        
+
                         const messageHTML = `
                             <div class="message received">
                                 <div>

@@ -27,8 +27,32 @@ class AuthenticatedSessionController extends Controller
     $request->authenticate();
     $request->session()->regenerate();
 
+    $user = auth()->user();
+
+    // Check if user is suspended (non-admin users only)
+    if (!$user->IsAdmin && $user->isCurrentlySuspended()) {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Prepare suspension message
+        $message = 'Your account has been suspended.';
+
+        if ($user->SuspensionReason) {
+            $message .= ' Reason: ' . $user->SuspensionReason;
+        }
+
+        if ($user->SuspendedUntil) {
+            $message .= ' Suspension expires on: ' . $user->SuspendedUntil->format('M d, Y h:i A');
+        } else {
+            $message .= ' This suspension is permanent.';
+        }
+
+        return redirect()->route('login')->withErrors(['email' => $message]);
+    }
+
     // Redirect admin to admin dashboard
-    if (auth()->user()->IsAdmin) {
+    if ($user->IsAdmin == 1 || $user->IsAdmin === true) {
         return redirect()->route('admin.dashboard');
     }
 

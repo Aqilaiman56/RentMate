@@ -294,20 +294,20 @@
 <div class="wishlist-container">
     <div class="page-header">
         <div>
-            <h1 class="page-title">❤️ My Wishlist</h1>
+            <h1 class="page-title"><i class="fas fa-heart"></i> My Wishlist</h1>
             <p class="wishlist-count">{{ $wishlistItems->count() }} item(s) in your wishlist</p>
         </div>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success">
-            ✓ {{ session('success') }}
+            <i class="fas fa-check"></i> {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-error">
-            ✗ {{ session('error') }}
+            <i class="fas fa-times"></i> {{ session('error') }}
         </div>
     @endif
 
@@ -329,10 +329,10 @@
                              class="item-image">
                     @endif
                     
-                    <div class="wishlist-badge loved" 
+                    <div class="wishlist-badge loved"
                          onclick="removeFromWishlist({{ $wishlist->item->ItemID }})"
                          title="Remove from wishlist">
-                        ❤️
+                        <i class="fas fa-heart"></i>
                     </div>
 
                     <span class="availability-badge {{ $wishlist->item->Availability ? 'badge-available' : 'badge-unavailable' }}">
@@ -344,11 +344,11 @@
                         
                         <div class="item-details">
                             <div class="item-detail">
-                                <span>📍</span>
+                                <span><i class="fas fa-map-marker-alt"></i></span>
                                 <span>{{ $wishlist->item->location->LocationName ?? 'Location N/A' }}</span>
                             </div>
                             <div class="item-detail">
-                                <span>🏷️</span>
+                                <span><i class="fas fa-tag"></i></span>
                                 <span>{{ $wishlist->item->category->CategoryName ?? 'Category N/A' }}</span>
                             </div>
                         </div>
@@ -359,26 +359,26 @@
 
                         <div class="item-meta">
                             <div class="meta-item">
-                                <span>⭐</span>
+                                <span><i class="fas fa-star"></i></span>
                                 <span>{{ number_format($wishlist->item->reviews->avg('Rating') ?? 0, 1) }} ({{ $wishlist->item->reviews->count() }})</span>
                             </div>
                             <div class="meta-item">
-                                <span>📅</span>
+                                <span><i class="fas fa-calendar-check"></i></span>
                                 <span>{{ $wishlist->item->bookings->count() }} bookings</span>
                             </div>
                         </div>
 
                         <div class="date-added">
-                            <span>💝</span>
+                            <span><i class="fas fa-heart"></i></span>
                             <span>Added {{ $wishlist->DateAdded->diffForHumans() }}</span>
                         </div>
 
                         <div class="item-actions">
                             <a href="{{ route('item.details', $wishlist->item->ItemID) }}" class="action-btn btn-view">
-                                👁️ View Details
+                                <i class="fas fa-eye"></i> View Details
                             </a>
                             <button onclick="removeFromWishlist({{ $wishlist->item->ItemID }})" class="action-btn btn-remove">
-                                🗑️ Remove
+                                <i class="fas fa-trash"></i> Remove
                             </button>
                         </div>
                     </div>
@@ -387,11 +387,11 @@
         </div>
     @else
         <div class="empty-state">
-            <div class="empty-icon">💔</div>
+            <div class="empty-icon"><i class="fas fa-heart-broken"></i></div>
             <h2 class="empty-title">Your Wishlist is Empty</h2>
             <p class="empty-text">Start adding items you love to your wishlist and find them easily later!</p>
             <a href="{{ route('user.HomePage') }}" class="browse-btn">
-                <span>🔍</span>
+                <span><i class="fas fa-search"></i></span>
                 Browse Items
             </a>
         </div>
@@ -478,7 +478,8 @@
     function showAlert(type, message) {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type}`;
-        alertDiv.textContent = (type === 'success' ? '✓ ' : '✗ ') + message;
+        const icon = type === 'success' ? '<i class="fas fa-check"></i> ' : '<i class="fas fa-times"></i> ';
+        alertDiv.innerHTML = icon + message;
         
         const container = document.querySelector('.wishlist-container');
         const header = container.querySelector('.page-header');

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Item;
 use App\Models\Penalty;
 use App\Models\Booking;
+use App\Models\Deposit;
 use App\Models\Category;
 use App\Models\Location;
 use Illuminate\Support\Facades\DB;
@@ -22,23 +23,30 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Get statistics
+        // Total Users (non-admin)
         $totalUsers = User::where('IsAdmin', 0)->count();
+
+        // Total Listings (all items)
         $totalListings = Item::count();
-        $totalDeposits = Item::sum('DepositAmount');
+
+        // Total Deposits (sum of all deposits that are held or refunded)
+        $totalDeposits = Deposit::whereIn('Status', ['held', 'refunded'])
+            ->sum('DepositAmount') ?? 0;
+
+        // Reports from Users (total penalties/reports)
         $totalReports = Penalty::count();
         $pendingReports = Penalty::where('ResolvedStatus', 0)->count();
+
+        // Penalty Actions (penalties with amount > 0)
         $totalPenalties = Penalty::whereNotNull('PenaltyAmount')
             ->where('PenaltyAmount', '>', 0)
             ->count();
         $totalPenaltyAmount = Penalty::sum('PenaltyAmount') ?? 0;
-        
-        // Calculate tax from bookings (assuming 6% tax rate)
-        $taxCount = Booking::where('Status', 'Approved')->count();
-        $totalBookingRevenue = Booking::where('Status', 'Approved')
-            ->join('items', 'booking.ItemID', '=', 'items.ItemID')
-            ->sum(DB::raw('DATEDIFF(booking.EndDate, booking.StartDate) * items.PricePerDay'));
-        $totalTaxAmount = $totalBookingRevenue * 0.06; // 6% tax
+
+        // Tax Transactions (from completed bookings)
+        $taxCount = Booking::whereIn('Status', ['completed', 'approved'])->count();
+        $totalTaxAmount = Booking::whereIn('Status', ['completed', 'approved'])
+            ->sum('TaxAmount') ?? 0;
 
         return view('admin.AdminDashboard', compact(
             'totalUsers',

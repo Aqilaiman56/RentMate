@@ -18,15 +18,19 @@ class User extends Authenticatable
     const UPDATED_AT = null; // Disable UpdatedAt
 
     protected $fillable = [
-        'UserName', 
-        'Email', 
-        'PasswordHash', 
+        'UserName',
+        'Email',
+        'PasswordHash',
         'Password',
-        'ProfileImage', 
+        'ProfileImage',
         'PhoneNumber',
         'Location',
-        'UserType', 
-        'IsAdmin'
+        'UserType',
+        'IsAdmin',
+        'IsSuspended',
+        'SuspendedUntil',
+        'SuspensionReason',
+        'SuspendedByAdminID'
     ];
 
     protected $hidden = [
@@ -38,6 +42,8 @@ class User extends Authenticatable
     protected $casts = [
         'CreatedAt' => 'datetime',
         'IsAdmin' => 'boolean',
+        'IsSuspended' => 'boolean',
+        'SuspendedUntil' => 'datetime',
     ];
 
     public function getAuthPassword()
@@ -69,5 +75,40 @@ class User extends Authenticatable
     public function reportsReceived()
     {
         return $this->hasMany(Penalty::class, 'ReportedUserID', 'UserID');
+    }
+
+    /**
+     * Check if user is currently suspended
+     */
+    public function isCurrentlySuspended()
+    {
+        if (!$this->IsSuspended) {
+            return false;
+        }
+
+        // If no expiry date, suspension is permanent
+        if (!$this->SuspendedUntil) {
+            return true;
+        }
+
+        // Check if suspension has expired
+        if (now()->greaterThan($this->SuspendedUntil)) {
+            // Auto-unsuspend if expired
+            $this->update([
+                'IsSuspended' => false,
+                'SuspendedUntil' => null,
+            ]);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Admin who suspended this user
+     */
+    public function suspendedBy()
+    {
+        return $this->belongsTo(User::class, 'SuspendedByAdminID', 'UserID');
     }
 }

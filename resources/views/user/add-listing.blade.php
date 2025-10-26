@@ -458,7 +458,7 @@
                         Upload Images (1-4 images) <span class="required">*</span>
                     </label>
                     <div class="image-upload-area" id="imageUploadArea">
-                        <div class="upload-icon">📸</div>
+                        <div class="upload-icon"><i class="fas fa-camera"></i></div>
                         <div class="upload-text">Click to upload or drag and drop</div>
                         <div class="upload-hint">PNG, JPG or JPEG (MAX. 2MB each) - Maximum 4 images</div>
                         <input

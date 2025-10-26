@@ -248,7 +248,7 @@
 <div class="notifications-container">
     <div class="page-header">
         <div class="header-left">
-            <h1>🔔 Notifications</h1>
+            <h1><i class="fas fa-bell"></i> Notifications</h1>
             <p>
                 @if($unreadCount > 0)
                     {{ $unreadCount }} unread notification(s)
@@ -268,7 +268,7 @@
 
     @if(session('success'))
         <div class="alert alert-success">
-            ✓ {{ session('success') }}
+            <i class="fas fa-check"></i> {{ session('success') }}
         </div>
     @endif
 
@@ -283,16 +283,16 @@
                     <div class="notification-icon {{ $notification->Type }}">
                         @switch($notification->Type)
                             @case('message')
-                                💬
+                                <i class="fas fa-comment"></i>
                                 @break
                             @case('booking')
-                                📅
+                                <i class="fas fa-calendar-check"></i>
                                 @break
                             @case('review')
-                                ⭐
+                                <i class="fas fa-star"></i>
                                 @break
                             @default
-                                🔔
+                                <i class="fas fa-bell"></i>
                         @endswitch
                     </div>
 
@@ -326,7 +326,7 @@
     @else
         <div class="notifications-list">
             <div class="empty-state">
-                <div class="empty-icon">🔔</div>
+                <div class="empty-icon"><i class="fas fa-bell"></i></div>
                 <h2 class="empty-title">No Notifications</h2>
                 <p class="empty-text">You're all caught up! You'll see notifications here when something happens.</p>
             </div>

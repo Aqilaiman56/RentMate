@@ -253,19 +253,19 @@
 @section('content')
 <div class="bookings-container">
     <div class="page-header">
-        <h1 class="page-title">📅 My Bookings</h1>
+        <h1 class="page-title"><i class="fas fa-calendar"></i> My Bookings</h1>
         <p class="page-subtitle">{{ $bookings->total() }} booking(s) found</p>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success">
-            ✓ {{ session('success') }}
+            <i class="fas fa-check"></i> {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-error">
-            ✗ {{ session('error') }}
+            <i class="fas fa-times"></i> {{ session('error') }}
         </div>
     @endif
 
@@ -298,22 +298,22 @@
                         </div>
 
                         <div class="booking-dates">
-                            📅 {{ $booking->StartDate->format('d M Y') }} - {{ $booking->EndDate->format('d M Y') }}
+                            <i class="fas fa-calendar"></i> {{ $booking->StartDate->format('d M Y') }} - {{ $booking->EndDate->format('d M Y') }}
                             <span style="color: #9ca3af;">({{ $booking->StartDate->diffInDays($booking->EndDate) }} days)</span>
                         </div>
 
                         <div class="booking-meta">
                             <div class="meta-item">
-                                <span>📍</span>
+                                <span><i class="fas fa-map-marker-alt"></i></span>
                                 <span>{{ $booking->item->location->LocationName ?? 'N/A' }}</span>
                             </div>
                             <div class="meta-item">
-                                <span>📆</span>
+                                <span><i class="fas fa-clock"></i></span>
                                 <span>Booked {{ $booking->BookingDate ? $booking->BookingDate->diffForHumans() : 'N/A' }}</span>
                             </div>
                             @if($booking->payment)
                                 <div class="meta-item">
-                                    <span>💳</span>
+                                    <span><i class="fas fa-credit-card"></i></span>
                                     <span>{{ $booking->payment->Status === 'successful' ? 'Paid' : 'Pending Payment' }}</span>
                                 </div>
                             @endif
@@ -339,11 +339,11 @@
         @endif
     @else
         <div class="empty-state">
-            <div class="empty-icon">📅</div>
+            <div class="empty-icon"><i class="fas fa-calendar"></i></div>
             <h2 class="empty-title">No Bookings Yet</h2>
             <p class="empty-text">You haven't made any bookings yet. Start exploring items to rent!</p>
             <a href="{{ route('user.HomePage') }}" class="browse-btn">
-                🔍 Browse Items
+                <i class="fas fa-search"></i> Browse Items
             </a>
         </div>
     @endif

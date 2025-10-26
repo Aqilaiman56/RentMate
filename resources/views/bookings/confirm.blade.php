@@ -385,7 +385,7 @@
     </a>
 
     <div class="confirmation-header">
-        <div class="confirmation-icon">📋</div>
+        <div class="confirmation-icon"><i class="fas fa-clipboard-check"></i></div>
         <h1 class="confirmation-title">Confirm Your Booking</h1>
         <p class="confirmation-subtitle">Please review your booking details before proceeding</p>
     </div>
@@ -394,7 +394,7 @@
         <!-- Left Column - Booking Details -->
         <div>
             <div class="confirmation-card">
-                <h2 class="section-title">📦 Item Details</h2>
+                <h2 class="section-title"><i class="fas fa-box"></i> Item Details</h2>
                 
                 <div class="item-preview">
                     @if($item->images?->first())
@@ -410,13 +410,13 @@
                     
                     <div class="item-details">
                         <h3>{{ $item->ItemName }}</h3>
-                        <p>📍 {{ $item->location->LocationName ?? 'N/A' }}</p>
-                        <p>🏷️ {{ $item->category->CategoryName ?? 'N/A' }}</p>
-                        <p>💰 RM {{ number_format($item->PricePerDay, 2) }} per day</p>
+                        <p><i class="fas fa-map-marker-alt"></i> {{ $item->location->LocationName ?? 'N/A' }}</p>
+                        <p><i class="fas fa-tag"></i> {{ $item->category->CategoryName ?? 'N/A' }}</p>
+                        <p><i class="fas fa-money-bill-wave"></i> RM {{ number_format($item->PricePerDay, 2) }} per day</p>
                     </div>
                 </div>
 
-                <h2 class="section-title">📅 Rental Period</h2>
+                <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Rental Period</h2>
                 
                 <div class="detail-row">
                     <span class="detail-label">Start Date</span>
@@ -463,10 +463,10 @@
         <!-- Right Column - Payment Summary -->
         <div>
             <div class="confirmation-card payment-summary">
-                <h2 class="section-title">💳 Payment Summary</h2>
-                
+                <h2 class="section-title"><i class="fas fa-credit-card"></i> Payment Summary</h2>
+
                 <div class="rental-payment-info">
-                    <h4>💵 Rental Payment</h4>
+                    <h4><i class="fas fa-dollar-sign"></i> Rental Payment</h4>
                     <p>The rental fee of <strong>RM {{ number_format($rental_amount, 2) }}</strong> will be paid directly to the owner upon pickup or as agreed. This is NOT included in the online payment.</p>
                 </div>
 
@@ -486,18 +486,18 @@
                 </div>
 
                 <div class="payment-note">
-                    <p><strong>📝 Payment Breakdown:</strong></p>
+                    <p><strong><i class="fas fa-file-invoice-dollar"></i> Payment Breakdown:</strong></p>
                     <p>• <strong>Deposit:</strong> RM {{ number_format($deposit_amount, 2) }} - Held as security</p>
                     <p>• <strong>Tax:</strong> RM {{ number_format($tax_amount, 2) }} - Service fee</p>
                     <p>• <strong>Rental:</strong> RM {{ number_format($rental_amount, 2) }} - Pay to owner</p>
                 </div>
 
                 <div class="info-box">
-                    <p>💰 <strong>Deposit Refund:</strong> Your deposit of RM {{ number_format($deposit_amount, 2) }} will be automatically refunded within 3-5 business days after you return the item in good condition.</p>
+                    <p><i class="fas fa-money-check-alt"></i> <strong>Deposit Refund:</strong> Your deposit of RM {{ number_format($deposit_amount, 2) }} will be automatically refunded within 3-5 business days after you return the item in good condition.</p>
                 </div>
 
                 <div class="warning-box">
-                    <p>⚠️ <strong>Important:</strong> The rental fee (RM {{ number_format($rental_amount, 2) }}) must be paid separately to the owner. Contact them to arrange payment method.</p>
+                    <p><i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> The rental fee (RM {{ number_format($rental_amount, 2) }}) must be paid separately to the owner. Contact them to arrange payment method.</p>
                 </div>
 
                 <form action="{{ route('bookings.create_and_pay') }}" method="POST" id="bookingForm">
@@ -514,7 +514,7 @@
                     </div>
 
                     <button type="submit" class="confirm-btn" id="confirmBtn">
-                        ✓ Pay Deposit (RM {{ number_format($total_amount, 2) }})
+                        <i class="fas fa-check"></i> Pay Deposit (RM {{ number_format($total_amount, 2) }})
                     </button>
                 </form>
 

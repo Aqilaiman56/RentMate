@@ -384,18 +384,17 @@
 
     @if(session('success'))
         <div class="alert alert-success">
-            ✓ {{ session('success') }}
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-error">
-            ✗ {{ session('error') }}
+            <i class="fas fa-times-circle"></i> {{ session('error') }}
         </div>
     @endif
 
     <div class="booking-header">
-        <div class="booking-id">Booking ID: #{{ $booking->BookingID }}</div>
         <h1 class="booking-title">Booking Details</h1>
         <span class="status-badge status-{{ strtolower($booking->Status) }}">
             {{ ucfirst($booking->Status) }}
@@ -406,7 +405,7 @@
         <!-- Left Column -->
         <div>
             <div class="booking-details-card">
-                <h2 class="section-title">📦 Item Details</h2>
+                <h2 class="section-title"><i class="fas fa-box"></i> Item Details</h2>
                 
                 <div class="item-preview">
                     @php
@@ -424,12 +423,12 @@
                     
                     <div class="item-info">
                         <h3>{{ $booking->item->ItemName }}</h3>
-                        <p>📍 {{ $booking->item->location->LocationName ?? 'N/A' }}</p>
-                        <p>💰 RM {{ number_format($booking->item->PricePerDay, 2) }} / day</p>
+                        <p><i class="fas fa-map-marker-alt"></i> {{ $booking->item->location->LocationName ?? 'N/A' }}</p>
+                        <p><i class="fas fa-money-bill-wave"></i> RM {{ number_format($booking->item->PricePerDay, 2) }} / day</p>
                     </div>
                 </div>
 
-                <h2 class="section-title">📅 Booking Information</h2>
+                <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Booking Information</h2>
                 
                 <div class="detail-row">
                     <span class="detail-label">Start Date</span>
@@ -476,7 +475,7 @@
                             <h3>{{ $booking->item->user->UserName }}</h3>
                             <p>{{ $booking->item->user->Email }}</p>
                             @if($booking->item->user->PhoneNumber)
-                                <p>📞 {{ $booking->item->user->PhoneNumber }}</p>
+                                <p><i class="fas fa-phone"></i> {{ $booking->item->user->PhoneNumber }}</p>
                             @endif
                         </div>
                     </div>
@@ -491,20 +490,26 @@
         <!-- Right Column - Payment -->
         <div>
             <div class="payment-card">
-                <h2 class="section-title">💳 Payment Summary</h2>
+                <h2 class="section-title"><i class="fas fa-credit-card"></i> Payment Summary</h2>
                 
                 <div class="amount-breakdown">
+                    @php
+                        $days = ($booking->StartDate && $booking->EndDate) ? $booking->StartDate->diffInDays($booking->EndDate) : 1;
+                        $days = max(1, $days); // Minimum 1 day
+                        $rentalAmount = $booking->item->PricePerDay * $days;
+                        $depositAmount = $booking->item->DepositAmount ?? 0;
+                    @endphp
                     <div class="amount-row">
-                        <span>Rental ({{ $booking->StartDate->diffInDays($booking->EndDate) }} days)</span>
-                        <span>RM {{ number_format($booking->TotalAmount, 2) }}</span>
+                        <span>Rental ({{ $days }} day{{ $days > 1 ? 's' : '' }})</span>
+                        <span>RM {{ number_format($rentalAmount, 2) }}</span>
                     </div>
                     <div class="amount-row" style="color: #f59e0b; font-weight: 600;">
-                        <span>💵 Pay to Owner</span>
-                        <span>RM {{ number_format($booking->TotalAmount, 2) }}</span>
+                        <span><i class="fas fa-hand-holding-usd"></i> Pay to Owner</span>
+                        <span>RM {{ number_format($rentalAmount, 2) }}</span>
                     </div>
                     <div class="amount-row" style="border-top: 1px solid #e5e7eb; padding-top: 10px; margin-top: 10px;">
                         <span>Deposit (Refundable)</span>
-                        <span>RM {{ number_format($booking->DepositAmount, 2) }}</span>
+                        <span>RM {{ number_format($depositAmount, 2) }}</span>
                     </div>
                     <div class="amount-row">
                         <span>Tax</span>
@@ -512,12 +517,12 @@
                     </div>
                     <div class="amount-row total">
                         <span>Pay Online</span>
-                        <span>RM {{ number_format($booking->DepositAmount + 1.00, 2) }}</span>
+                        <span>RM {{ number_format($depositAmount + 1.00, 2) }}</span>
                     </div>
                 </div>
 
                 <div class="rental-notice">
-                    <p><strong>⚠️ Important:</strong> The rental fee of RM {{ number_format($booking->TotalAmount, 2) }} must be paid directly to the owner. Please arrange this with them via messages.</p>
+                    <p><strong><i class="fas fa-exclamation-triangle"></i> Important:</strong> The rental fee of RM {{ number_format($rentalAmount, 2) }} must be paid directly to the owner. Please arrange this with them via messages.</p>
                 </div>
 
                 @if($booking->Status === 'pending')
@@ -525,7 +530,7 @@
                         @csrf
                         <input type="hidden" name="booking_id" value="{{ $booking->BookingID }}">
                         <button type="submit" class="pay-btn">
-                            💳 Pay Deposit Now (RM {{ number_format($booking->DepositAmount + 1.00, 2) }})
+                            <i class="fas fa-credit-card"></i> Pay Deposit Now (RM {{ number_format($depositAmount + 1.00, 2) }})
                         </button>
                     </form>
 
@@ -540,7 +545,7 @@
 
                 @elseif($booking->Status === 'confirmed')
                     <div class="payment-success">
-                        ✓ Deposit Payment Completed - Booking Confirmed
+                        <i class="fas fa-check-circle"></i> Deposit Payment Completed - Booking Confirmed
                     </div>
 
                     @if($booking->payment)
@@ -568,7 +573,7 @@
                         <form action="{{ route('booking.complete', $booking->BookingID) }}" method="POST">
                             @csrf
                             <button type="submit" class="complete-btn" onclick="return confirm('Mark this booking as completed and refund the deposit?')">
-                                ✓ Complete Booking & Refund Deposit
+                                <i class="fas fa-check"></i> Complete Booking & Refund Deposit
                             </button>
                         </form>
                     @endif

@@ -34,6 +34,9 @@ Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 // Public Item Details (No auth required - guests can browse)
 Route::get('/item/{id}', [ItemController::class, 'showPublicDetails'])->name('welcome.item.details');
 
+// Public User Profile (No auth required - anyone can view)
+Route::get('/user-profile/{id}', [App\Http\Controllers\UserProfileController::class, 'show'])->name('user.public.profile');
+
 // User Homepage (Authenticated)
 Route::get('/homepage', [HomeController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -253,6 +256,34 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         }
         return app(AdminUsersController::class)->destroy($id);
     })->name('users.destroy');
+
+    Route::post('/users/{id}/suspend', function($id, Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminUsersController::class)->suspend($request, $id);
+    })->name('users.suspend');
+
+    Route::post('/users/{id}/unsuspend', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminUsersController::class)->unsuspend($id);
+    })->name('users.unsuspend');
+
+    Route::post('/users/{id}/reset-password', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminUsersController::class)->resetPassword($id);
+    })->name('users.resetPassword');
+
+    Route::get('/users/{id}/activity-log', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminUsersController::class)->activityLog($id);
+    })->name('users.activityLog');
     
     // Listings Management
     Route::get('/listings', function(Request $request) {

@@ -17,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'irrevocable-tinkly-clemmie.ngrok-free.dev',
             fn ($host) => str_ends_with($host, '.ngrok-free.dev'),
         ]);
+
+        // Add CheckSuspension middleware to web group
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckSuspension::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

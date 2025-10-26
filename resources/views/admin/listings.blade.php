@@ -8,43 +8,29 @@
         </div>
         <div class="header-actions">
             <button class="btn btn-secondary" onclick="exportListings()">
-                📥 Export Data
-            </button>
-            <button class="btn btn-primary" onclick="addNewListing()">
-                ➕ Add Listing
+                <i class="fas fa-download"></i> Export Data
             </button>
         </div>
     </div>
 
 
-    <div class="header">
-        <div class="header-content">
-            <h1 class="header-title">Listings Management</h1>
-            <p class="header-description">View and manage all property and item listings on the platform</p>
-        </div>
-        <div class="header-actions">
-            <a href="{{ route('admin.listings.export') }}" class="btn btn-secondary">
-                📥 Export Data
-            </a>
-        </div>
-    </div>
 
     @if(session('success'))
         <div class="alert alert-success">
-            ✓ {{ session('success') }}
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-error">
-            ✗ {{ session('error') }}
+            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
         </div>
     @endif
 
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon blue">📦</div>
+            <div class="stat-icon blue"><i class="fas fa-box"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $totalListings }}</div>
                 <div class="stat-label">Total Listings</div>
@@ -52,7 +38,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon green">✓</div>
+            <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $activeListings }}</div>
                 <div class="stat-label">Active Listings</div>
@@ -60,18 +46,10 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon orange">⏳</div>
+            <div class="stat-icon orange"><i class="fas fa-times-circle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $unavailableListings }}</div>
                 <div class="stat-label">Unavailable</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon purple">💰</div>
-            <div class="stat-content">
-                <div class="stat-value">RM {{ number_format($totalDeposits, 2) }}</div>
-                <div class="stat-label">Total Deposits</div>
             </div>
         </div>
     </div>
@@ -79,11 +57,11 @@
     <!-- Filters and Search -->
     <form action="{{ route('admin.listings') }}" method="GET" class="table-controls">
         <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" 
+            <i class="fas fa-search search-icon"></i>
+            <input type="text"
                    name="search"
-                   placeholder="Search listings by name or owner..." 
-                   class="search-input" 
+                   placeholder="Search listings by name or owner..."
+                   class="search-input"
                    value="{{ request('search') }}">
         </div>
         <div class="filter-buttons">
@@ -159,8 +137,12 @@
                         </div>
                     </div>
                     <div class="listing-actions">
-                        <a href="{{ route('item.details', $item->ItemID) }}" class="btn-action btn-view">👁️ View</a>
-                        <button class="btn-action btn-more" onclick="showMoreActions({{ $item->ItemID }}, '{{ $item->ItemName }}')">⋮</button>
+                        <a href="{{ route('item.details', $item->ItemID) }}" class="btn-action btn-view" target="_blank">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <button class="btn-action btn-more" onclick="showMoreActions({{ $item->ItemID }}, '{{ $item->ItemName }}')">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -269,12 +251,12 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            color: white;
         }
 
-        .stat-icon.blue { background: #dbeafe; }
-        .stat-icon.green { background: #d1fae5; }
-        .stat-icon.orange { background: #fed7aa; }
-        .stat-icon.purple { background: #e9d5ff; }
+        .stat-icon.blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .stat-icon.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .stat-icon.orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
 
         .stat-content {
             flex: 1;
@@ -312,10 +294,12 @@
 
         .search-icon {
             position: absolute;
-            left: 12px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 16px;
+            font-size: 14px;
+            color: #9ca3af;
+            pointer-events: none;
         }
 
         .search-input {
@@ -579,6 +563,10 @@
     </style>
 
     <script>
+        function exportListings() {
+            window.location.href = '{{ route('admin.listings.export') }}';
+        }
+
         function showMoreActions(id, name) {
             if (confirm(`Select action for "${name}":\n\nClick OK to delete listing\nClick Cancel to go back`)) {
                 if (confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
@@ -586,17 +574,17 @@
                     const form = document.createElement('form');
                     form.method = 'POST';
                     form.action = `/admin/listings/${id}`;
-                    
+
                     const csrfToken = document.createElement('input');
                     csrfToken.type = 'hidden';
                     csrfToken.name = '_token';
                     csrfToken.value = '{{ csrf_token() }}';
-                    
+
                     const methodField = document.createElement('input');
                     methodField.type = 'hidden';
                     methodField.name = '_method';
                     methodField.value = 'DELETE';
-                    
+
                     form.appendChild(csrfToken);
                     form.appendChild(methodField);
                     document.body.appendChild(form);

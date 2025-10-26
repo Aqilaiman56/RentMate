@@ -165,7 +165,7 @@
 @section('content')
 <div class="messages-container">
     <div class="page-header">
-        <h1 class="page-title">💬 Messages</h1>
+        <h1 class="page-title"><i class="fas fa-comments"></i> Messages</h1>
         <p class="page-subtitle">{{ $conversations->count() }} conversation(s)</p>
     </div>
 
@@ -208,7 +208,7 @@
     @else
         <div class="conversations-list">
             <div class="empty-state">
-                <div class="empty-icon">💬</div>
+                <div class="empty-icon"><i class="fas fa-comments"></i></div>
                 <h2 class="empty-title">No Messages Yet</h2>
                 <p class="empty-text">Start a conversation by contacting a seller from their item listing!</p>
             </div>

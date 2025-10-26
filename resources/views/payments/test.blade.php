@@ -156,7 +156,7 @@
 </head>
 <body>
     <div class="payment-container">
-        <span class="test-badge">🧪 TEST MODE</span>
+        <span class="test-badge"><i class="fas fa-flask"></i> TEST MODE</span>
 
         <h1>Simulated Payment Gateway</h1>
         <p>This is a test payment page. Your ToyyibPay account is under verification. Click a button below to simulate payment success or failure.</p>
@@ -191,10 +191,10 @@
 
         <div class="btn-group">
             <button class="btn btn-success" onclick="simulatePayment('success')">
-                ✓ Pay Now (Success)
+                <i class="fas fa-check"></i> Pay Now (Success)
             </button>
             <button class="btn btn-fail" onclick="simulatePayment('fail')">
-                ✗ Cancel (Failed)
+                <i class="fas fa-times"></i> Cancel (Failed)
             </button>
         </div>
     </div>

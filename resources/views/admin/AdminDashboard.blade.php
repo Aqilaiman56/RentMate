@@ -132,7 +132,7 @@
         <h1 class="header-title">Dashboard Overview</h1>
         <div class="header-actions">
             <button class="notification-btn">
-                🔔
+                <i class="fas fa-bell"></i>
                 <span class="notification-badge">3</span>
             </button>
             <div class="profile-section" id="profileSection">
@@ -146,13 +146,13 @@
                 <!-- Dropdown Menu -->
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="{{ route('profile.edit') }}" class="dropdown-item">
-                        <span class="dropdown-icon">👤</span>
+                        <span class="dropdown-icon"><i class="fas fa-user"></i></span>
                         <span>Profile Settings</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="logout-form">
                         @csrf
                         <button type="submit" class="dropdown-item logout" onclick="confirmLogout(event)">
-                            <span class="dropdown-icon">🚪</span>
+                            <span class="dropdown-icon"><i class="fas fa-sign-out-alt"></i></span>
                             <span>Logout</span>
                         </button>
                     </form>
@@ -165,9 +165,9 @@
         <!-- Total Users Card -->
         <a href="{{ route('admin.users') }}" class="stat-card">
             <div class="stat-card-header">
-                <div class="stat-icon-wrapper blue">👥</div>
+                <div class="stat-icon-wrapper blue"><i class="fas fa-users"></i></div>
                 <div class="stat-trend up">
-                    ↑ 12%
+                    <i class="fas fa-arrow-up"></i> Real-time
                 </div>
             </div>
             <div class="stat-card-body">
@@ -175,17 +175,17 @@
                 <div class="stat-label">Total Users</div>
             </div>
             <div class="stat-card-footer">
-                <span class="stat-details">Active this month</span>
-                <span class="view-details">View details →</span>
+                <span class="stat-details">Registered users</span>
+                <span class="view-details">View details <i class="fas fa-arrow-right"></i></span>
             </div>
         </a>
 
         <!-- Total Listings Card -->
         <a href="{{ route('admin.listings') }}" class="stat-card">
             <div class="stat-card-header">
-                <div class="stat-icon-wrapper green">📦</div>
+                <div class="stat-icon-wrapper green"><i class="fas fa-box"></i></div>
                 <div class="stat-trend up">
-                    ↑ 8%
+                    <i class="fas fa-arrow-up"></i> Real-time
                 </div>
             </div>
             <div class="stat-card-body">
@@ -194,16 +194,16 @@
             </div>
             <div class="stat-card-footer">
                 <span class="stat-details">Items available</span>
-                <span class="view-details">View details →</span>
+                <span class="view-details">View details <i class="fas fa-arrow-right"></i></span>
             </div>
         </a>
 
         <!-- Total Deposits Card -->
         <a href="{{ route('admin.deposits') }}" class="stat-card">
             <div class="stat-card-header">
-                <div class="stat-icon-wrapper orange">💰</div>
+                <div class="stat-icon-wrapper orange"><i class="fas fa-coins"></i></div>
                 <div class="stat-trend up">
-                    ↑ 15%
+                    <i class="fas fa-arrow-up"></i> Real-time
                 </div>
             </div>
             <div class="stat-card-body">
@@ -211,17 +211,17 @@
                 <div class="stat-label">Total Deposits</div>
             </div>
             <div class="stat-card-footer">
-                <span class="stat-details">Collected deposits</span>
-                <span class="view-details">View details →</span>
+                <span class="stat-details">Held & refunded</span>
+                <span class="view-details">View details <i class="fas fa-arrow-right"></i></span>
             </div>
         </a>
 
         <!-- Reports Card -->
         <a href="{{ route('admin.reports') }}" class="stat-card">
             <div class="stat-card-header">
-                <div class="stat-icon-wrapper red">📋</div>
-                <div class="stat-trend down">
-                    ↓ 5%
+                <div class="stat-icon-wrapper red"><i class="fas fa-flag"></i></div>
+                <div class="stat-trend {{ $pendingReports > 0 ? 'up' : 'neutral' }}">
+                    <i class="fas fa-exclamation-circle"></i> {{ $pendingReports ?? 0 }} pending
                 </div>
             </div>
             <div class="stat-card-body">
@@ -229,17 +229,17 @@
                 <div class="stat-label">Reports from Users</div>
             </div>
             <div class="stat-card-footer">
-                <span class="stat-details">{{ $pendingReports ?? 0 }} pending</span>
-                <span class="view-details">View details →</span>
+                <span class="stat-details">{{ $pendingReports ?? 0 }} need review</span>
+                <span class="view-details">View details <i class="fas fa-arrow-right"></i></span>
             </div>
         </a>
 
         <!-- Penalty Actions Card -->
         <a href="{{ route('admin.penalties') }}" class="stat-card">
             <div class="stat-card-header">
-                <div class="stat-icon-wrapper purple">⚠️</div>
-                <div class="stat-trend down">
-                    ↓ 3%
+                <div class="stat-icon-wrapper purple"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i> Real-time
                 </div>
             </div>
             <div class="stat-card-body">
@@ -248,16 +248,16 @@
             </div>
             <div class="stat-card-footer">
                 <span class="stat-details">RM {{ number_format($totalPenaltyAmount ?? 0, 2) }} collected</span>
-                <span class="view-details">View details →</span>
+                <span class="view-details">View details <i class="fas fa-arrow-right"></i></span>
             </div>
         </a>
 
         <!-- Tax Count Card -->
         <a href="{{ route('admin.taxes') }}" class="stat-card">
             <div class="stat-card-header">
-                <div class="stat-icon-wrapper teal">📊</div>
+                <div class="stat-icon-wrapper teal"><i class="fas fa-chart-line"></i></div>
                 <div class="stat-trend up">
-                    ↑ 7%
+                    <i class="fas fa-arrow-up"></i> Real-time
                 </div>
             </div>
             <div class="stat-card-body">
@@ -266,7 +266,7 @@
             </div>
             <div class="stat-card-footer">
                 <span class="stat-details">RM {{ number_format($totalTaxAmount ?? 0, 2) }} collected</span>
-                <span class="view-details">View details →</span>
+                <span class="view-details">View details <i class="fas fa-arrow-right"></i></span>
             </div>
         </a>
     </div>

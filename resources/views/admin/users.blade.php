@@ -8,10 +8,10 @@
         </div>
         <div class="header-actions">
             <button class="btn btn-secondary" onclick="exportUsers()">
-                📥 Export Users
+                <i class="fas fa-download"></i> Export Users
             </button>
             <button class="btn btn-primary" onclick="addNewUser()">
-                ➕ Add New User
+                <i class="fas fa-plus"></i> Add New User
             </button>
         </div>
     </div>
@@ -19,7 +19,7 @@
 <!-- Stats Cards -->
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-icon blue">👥</div>
+        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
         <div class="stat-content">
             <div class="stat-value">{{ $totalUsers }}</div>
             <div class="stat-label">Total Users</div>
@@ -27,7 +27,7 @@
     </div>
 
     <div class="stat-card">
-        <div class="stat-icon green">✓</div>
+        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
         <div class="stat-content">
             <div class="stat-value">{{ $activeUsers }}</div>
             <div class="stat-label">Active This Month</div>
@@ -35,7 +35,7 @@
     </div>
 
     <div class="stat-card">
-        <div class="stat-icon orange">👨‍💼</div>
+        <div class="stat-icon orange"><i class="fas fa-user"></i></div>
         <div class="stat-content">
             <div class="stat-value">{{ $regularUserCount }}</div>
             <div class="stat-label">Regular Users</div>
@@ -43,7 +43,7 @@
     </div>
 
     <div class="stat-card">
-        <div class="stat-icon purple">🔐</div>
+        <div class="stat-icon purple"><i class="fas fa-user-shield"></i></div>
         <div class="stat-content">
             <div class="stat-value">{{ $adminCount }}</div>
             <div class="stat-label">Administrators</div>
@@ -52,18 +52,26 @@
 </div>
 
 <!-- Filters and Search -->
-<form action="{{ route('admin.users') }}" method="GET" class="table-controls">
+<form action="{{ route('admin.users') }}" method="GET" class="table-controls" id="filterForm">
     <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" 
-               name="search" 
-               placeholder="Search users by name or email..." 
-               class="search-input" 
+        <i class="fas fa-search search-icon"></i>
+        <input type="text"
+               name="search"
+               id="searchInput"
+               placeholder="Search users by name or email..."
+               class="search-input"
                value="{{ request('search') }}">
+        @if(request('search'))
+            <button type="button" class="clear-search-btn" onclick="clearSearch()" title="Clear search">
+                <i class="fas fa-times"></i>
+            </button>
+        @endif
     </div>
     <div class="filter-buttons">
         <select class="filter-select" name="user_type" onchange="this.form.submit()">
-            <option value="all" {{ request('user_type') == 'all' ? 'selected' : '' }}>All Types</option>
+            <option value="all" {{ request('user_type') == 'all' ? 'selected' : '' }}>
+                <i class="fas fa-users"></i> All Types
+            </option>
             <option value="User" {{ request('user_type') == 'User' ? 'selected' : '' }}>Users</option>
             <option value="Admin" {{ request('user_type') == 'Admin' ? 'selected' : '' }}>Admins</option>
         </select>
@@ -73,7 +81,9 @@
             <option value="name-az" {{ request('sort') == 'name-az' ? 'selected' : '' }}>Name (A-Z)</option>
             <option value="name-za" {{ request('sort') == 'name-za' ? 'selected' : '' }}>Name (Z-A)</option>
         </select>
-        <button type="submit" class="btn btn-primary">Apply Filters</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter"></i> Apply Filters
+        </button>
     </div>
 </form>
 
@@ -99,8 +109,8 @@
                         <td>
                             <div class="user-cell">
                                 @if($user->ProfileImage)
-                                    <img src="{{ asset('storage/' . $user->ProfileImage) }}" 
-                                         alt="{{ $user->UserName }}" 
+                                    <img src="{{ asset('storage/' . $user->ProfileImage) }}"
+                                         alt="{{ $user->UserName }}"
                                          class="user-avatar-img">
                                 @else
                                     <div class="user-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal'][($user->UserID) % 6] }}">
@@ -114,26 +124,80 @@
                             </div>
                         </td>
                         <td>
-                            <span class="type-badge {{ $user->IsAdmin ? 'admin' : 'user' }}">
-                                {{ $user->IsAdmin ? '🔐 Admin' : '👤 User' }}
-                            </span>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <span class="type-badge {{ $user->IsAdmin ? 'admin' : 'user' }}">
+                                    @if($user->IsAdmin)
+                                        <i class="fas fa-user-shield"></i> Admin
+                                    @else
+                                        <i class="fas fa-user"></i> User
+                                    @endif
+                                </span>
+                                @if($user->IsSuspended)
+                                    <span class="type-badge" style="background: #ef4444; color: white;">
+                                        <i class="fas fa-ban"></i> Suspended
+                                    </span>
+                                @endif
+                            </div>
                         </td>
-                        <td>{{ $user->CreatedAt ? \Carbon\Carbon::parse($user->CreatedAt)->format('M d, Y') : 'N/A' }}</td>
+                        <td>
+                            <i class="fas fa-calendar"></i>
+                            {{ $user->CreatedAt ? \Carbon\Carbon::parse($user->CreatedAt)->format('M d, Y') : 'N/A' }}
+                        </td>
                         <td>
                             <div class="action-buttons">
-                                <a href="{{ route('admin.users.show', $user->UserID) }}" 
-                                   class="btn-icon btn-view" 
-                                   title="View Profile">👁️</a>
-                                
-                                <button class="btn-icon btn-more" 
-                                        title="More Actions" 
-                                        onclick="showMoreActions({{ $user->UserID }}, '{{ $user->UserName }}')">⋮</button>
+                                <a href="{{ route('admin.users.show', $user->UserID) }}"
+                                   class="btn-icon btn-view"
+                                   title="View Profile">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                <div class="dropdown-wrapper">
+                                    <button class="btn-icon btn-more"
+                                            title="More Actions"
+                                            onclick="toggleDropdown({{ $user->UserID }})">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+
+                                    <div class="action-dropdown" id="dropdown-{{ $user->UserID }}">
+                                        @if(!$user->IsAdmin)
+                                            @if($user->IsSuspended)
+                                                <a href="#" onclick="unsuspendUser({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item">
+                                                    <i class="fas fa-check-circle"></i> Unsuspend User
+                                                </a>
+                                            @else
+                                                <a href="#" onclick="suspendUser({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item">
+                                                    <i class="fas fa-ban"></i> Suspend User
+                                                </a>
+                                            @endif
+                                        @endif
+
+                                        <a href="#" onclick="resetPassword({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item">
+                                            <i class="fas fa-key"></i> Reset Password
+                                        </a>
+
+                                        <a href="#" onclick="viewActivityLog({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item">
+                                            <i class="fas fa-history"></i> View Activity Log
+                                        </a>
+
+                                        <a href="{{ route('admin.users.show', $user->UserID) }}" class="dropdown-item">
+                                            <i class="fas fa-user-edit"></i> Edit Profile
+                                        </a>
+
+                                        @if(!$user->IsAdmin)
+                                            <div class="dropdown-divider"></div>
+                                            <a href="#" onclick="deleteUser({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item danger">
+                                                <i class="fas fa-trash-alt"></i> Delete User
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
                         <td colspan="4" style="text-align: center; padding: 40px; color: #6b7280;">
+                            <i class="fas fa-users" style="font-size: 48px; opacity: 0.3; display: block; margin-bottom: 16px;"></i>
                             No users found
                         </td>
                     </tr>
@@ -150,6 +214,125 @@
     @endif
 </div>
 
+<!-- Modals -->
+<!-- Suspend User Modal -->
+<div id="suspendModal" class="custom-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-ban"></i> Suspend User</h3>
+            <button class="modal-close" onclick="closeModal('suspendModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">Suspending <strong id="suspendUserName"></strong> will prevent them from accessing the system.</p>
+
+            <div class="form-group">
+                <label for="suspensionDuration">Suspension Duration</label>
+                <select id="suspensionDuration" class="form-control">
+                    <option value="7">7 Days</option>
+                    <option value="30" selected>30 Days</option>
+                    <option value="90">90 Days</option>
+                    <option value="permanent">Permanent</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="suspensionReason">Reason for Suspension *</label>
+                <textarea id="suspensionReason" class="form-control" rows="4" placeholder="Enter the reason for suspending this user..." required></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('suspendModal')">Cancel</button>
+            <button class="btn btn-danger" onclick="confirmSuspend()"><i class="fas fa-ban"></i> Suspend User</button>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Log Modal -->
+<div id="activityModal" class="custom-modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3><i class="fas fa-history"></i> Activity Log - <span id="activityUserName"></span></h3>
+            <button class="modal-close" onclick="closeModal('activityModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="activityContent" class="activity-list">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i> Loading activity log...
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('activityModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Password Reset Success Modal -->
+<div id="passwordModal" class="custom-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-key"></i> Password Reset Successful</h3>
+            <button class="modal-close" onclick="closeModal('passwordModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">Password has been reset for <strong id="resetUserName"></strong></p>
+
+            <div class="password-display">
+                <label>New Password:</label>
+                <div class="password-box">
+                    <code id="newPassword"></code>
+                    <button class="copy-btn" onclick="copyPassword()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                Please save this password and send it to the user securely.
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="copyPasswordAndClose()"><i class="fas fa-copy"></i> Copy & Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="custom-modal">
+    <div class="modal-content">
+        <div class="modal-header modal-danger">
+            <h3><i class="fas fa-trash-alt"></i> Delete User</h3>
+            <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Warning:</strong> This action cannot be undone!
+            </div>
+
+            <p class="modal-description">You are about to delete <strong id="deleteUserName"></strong></p>
+
+            <p>All user data will be permanently deleted, including:</p>
+            <ul class="deletion-list">
+                <li><i class="fas fa-user"></i> Profile information</li>
+                <li><i class="fas fa-box"></i> Listings</li>
+                <li><i class="fas fa-calendar"></i> Bookings</li>
+                <li><i class="fas fa-comment"></i> Messages</li>
+                <li><i class="fas fa-star"></i> Reviews</li>
+            </ul>
+
+            <div class="form-group">
+                <label for="deleteConfirmation">Type <strong>DELETE</strong> to confirm:</label>
+                <input type="text" id="deleteConfirmation" class="form-control" placeholder="Type DELETE">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+            <button class="btn btn-danger" onclick="confirmDelete()"><i class="fas fa-trash-alt"></i> Delete User</button>
+        </div>
+    </div>
+</div>
 
     <style>
         .header {
@@ -217,12 +400,13 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            color: white;
         }
 
-        .stat-icon.blue { background: #dbeafe; }
-        .stat-icon.green { background: #d1fae5; }
-        .stat-icon.orange { background: #fed7aa; }
-        .stat-icon.purple { background: #e9d5ff; }
+        .stat-icon.blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .stat-icon.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .stat-icon.orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
+        .stat-icon.purple { background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); }
 
         .stat-content {
             flex: 1;
@@ -260,25 +444,51 @@
 
         .search-icon {
             position: absolute;
-            left: 12px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 16px;
+            font-size: 14px;
+            color: #9ca3af;
+            pointer-events: none;
         }
 
         .search-input {
             width: 100%;
-            padding: 10px 14px 10px 40px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            padding: 12px 42px 12px 42px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
             font-size: 14px;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            background: white;
         }
 
         .search-input:focus {
             outline: none;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #f3f4f6;
+            border: none;
+            border-radius: 6px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .clear-search-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
         }
 
         .filter-buttons {
@@ -288,18 +498,24 @@
         }
 
         .filter-select {
-            padding: 10px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
             font-size: 14px;
             background: white;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            font-weight: 500;
         }
 
         .filter-select:focus {
             outline: none;
             border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-select:hover {
+            border-color: #d1d5db;
         }
 
         /* Table Card */
@@ -317,6 +533,7 @@
             align-items: center;
             padding: 24px;
             border-bottom: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
         }
 
         .table-title {
@@ -329,6 +546,7 @@
         .table-count {
             font-size: 14px;
             color: #6b7280;
+            font-weight: 500;
         }
 
         .table-container {
@@ -347,8 +565,8 @@
         .data-table th {
             padding: 16px 20px;
             text-align: left;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
             color: #6b7280;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -394,8 +612,13 @@
         .user-avatar.orange { background: #f97316; }
         .user-avatar.purple { background: #a855f7; }
         .user-avatar.teal { background: #14b8a6; }
-        .user-avatar.red { background: #ef4444; }
-        .user-avatar.indigo { background: #6366f1; }
+
+        .user-avatar-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
         .user-info {
             display: flex;
@@ -415,83 +638,36 @@
 
         /* Type Badge */
         .type-badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
 
-        .type-badge.student {
+        .type-badge.user {
             background: #dbeafe;
             color: #1e40af;
         }
 
-        .type-badge.staff {
-            background: #e9d5ff;
-            color: #6b21a8;
+        .type-badge.admin {
+            background: #fce7f3;
+            color: #9f1239;
         }
 
-        /* Count Badge */
-        .count-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: #f3f4f6;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 13px;
-            color: #374151;
+        .pagination-container {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
         }
-
-        /* Status Badge */
-        .status-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .status-active {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-suspended {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-
-        .type-badge.user {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.type-badge.admin {
-    background: #fce7f3;
-    color: #9f1239;
-}
-
-.user-avatar-img {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.pagination-container {
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-}
 
         /* Action Buttons */
         .action-buttons {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
 
         .btn-icon {
@@ -504,99 +680,810 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
+            text-decoration: none;
         }
 
         .btn-view {
             background: #dbeafe;
+            color: #1e40af;
         }
 
         .btn-view:hover {
             background: #bfdbfe;
-        }
-
-        .btn-edit {
-            background: #fef3c7;
-        }
-
-        .btn-edit:hover {
-            background: #fde68a;
+            transform: translateY(-2px);
         }
 
         .btn-more {
             background: #f3f4f6;
+            color: #374151;
         }
 
         .btn-more:hover {
             background: #e5e7eb;
         }
 
+        /* Dropdown */
+        .dropdown-wrapper {
+            position: relative;
+        }
+
+        .action-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .action-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #374151;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .dropdown-item.danger {
+            color: #dc2626;
+        }
+
+        .dropdown-item.danger:hover {
+            background: #fee2e2;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 4px 0;
+        }
+
         /* Buttons */
         .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             border: none;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .btn-primary:hover {
-            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
         }
 
         .btn-secondary {
-            background: #f3f4f6;
+            background: white;
             color: #374151;
-            border: 1px solid #d1d5db;
+            border: 2px solid #e5e7eb;
         }
 
         .btn-secondary:hover {
-            background: #e5e7eb;
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .filter-buttons {
+                width: 100%;
+            }
+
+            .filter-select {
+                flex: 1;
+            }
+        }
+
+        /* Modal Styles */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .custom-modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content.modal-large {
+            max-width: 700px;
+        }
+
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .modal-header.modal-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: white;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 28px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-description {
+            margin-bottom: 20px;
+            color: #4b5563;
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-footer {
+            padding: 20px 28px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #f9fafb;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #991b1b;
+        }
+
+        .password-display {
+            margin: 20px 0;
+        }
+
+        .password-display label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .password-box {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: #f3f4f6;
+            padding: 16px;
+            border-radius: 8px;
+            border: 2px solid #d1d5db;
+        }
+
+        .password-box code {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn:hover {
+            background: #2563eb;
+        }
+
+        .deletion-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+        }
+
+        .deletion-list li {
+            padding: 10px 12px;
+            background: #f9fafb;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #6b7280;
+        }
+
+        .deletion-list li i {
+            color: #ef4444;
+        }
+
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 16px;
+            border-left: 3px solid #e5e7eb;
+            margin-bottom: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .activity-item:hover {
+            background: #f3f4f6;
+            border-left-color: #3b82f6;
+        }
+
+        .activity-item .activity-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: white;
+            margin-right: 12px;
+        }
+
+        .activity-item .activity-description {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .activity-item .activity-date {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        .loading-spinner i {
+            font-size: 32px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .empty-activity {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-activity i {
+            font-size: 48px;
+            opacity: 0.3;
+            display: block;
+            margin-bottom: 16px;
         }
     </style>
 
     <script>
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown-wrapper')) {
+                document.querySelectorAll('.action-dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('active');
+                });
+            }
+        });
+
+        function toggleDropdown(userId) {
+            event.stopPropagation();
+            const dropdown = document.getElementById(`dropdown-${userId}`);
+            const allDropdowns = document.querySelectorAll('.action-dropdown');
+
+            allDropdowns.forEach(d => {
+                if (d !== dropdown) {
+                    d.classList.remove('active');
+                }
+            });
+
+            dropdown.classList.toggle('active');
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterForm').submit();
+        }
+
         function exportUsers() {
-            alert('Exporting users data...');
-            console.log('Export users functionality');
+            window.location.href = '{{ route('admin.users.export') }}';
         }
 
         function addNewUser() {
             alert('Add new user form will open here');
             console.log('Add new user functionality');
+            // TODO: Implement add user modal or redirect to add user page
         }
 
-        function viewUser(id) {
-            alert('View user profile for ID: ' + id);
-            console.log('Viewing user:', id);
+        // Modal management
+        let currentUserId = null;
+        let currentUserName = null;
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
         }
 
-        function editUser(id) {
-            alert('Edit user form for ID: ' + id);
-            console.log('Editing user:', id);
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            // Reset forms
+            if (modalId === 'suspendModal') {
+                document.getElementById('suspensionReason').value = '';
+                document.getElementById('suspensionDuration').value = '30';
+            }
+            if (modalId === 'deleteModal') {
+                document.getElementById('deleteConfirmation').value = '';
+            }
         }
 
-        function showMoreActions(id) {
-            alert('More actions for user ID: ' + id + '\n- Suspend User\n- Reset Password\n- View Activity Log\n- Delete User');
-            console.log('More actions for user:', id);
-        }
-
-        // Search functionality
-        document.getElementById('searchInput')?.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('.data-table tbody tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('custom-modal')) {
+                e.target.classList.remove('active');
+            }
         });
+
+        function suspendUser(id, name) {
+            currentUserId = id;
+            currentUserName = name;
+            document.getElementById('suspendUserName').textContent = name;
+            openModal('suspendModal');
+        }
+
+        function confirmSuspend() {
+            const duration = document.getElementById('suspensionDuration').value;
+            const reason = document.getElementById('suspensionReason').value.trim();
+
+            if (!reason) {
+                alert('Please enter a reason for suspension');
+                return;
+            }
+
+            // Send AJAX request
+            fetch(`/admin/users/${currentUserId}/suspend`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ duration, reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal('suspendModal');
+                    showSuccessToast(`User "${currentUserName}" has been suspended successfully`);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to suspend user'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while suspending the user');
+            });
+        }
+
+        function unsuspendUser(id, name) {
+            if (!confirm(`Unsuspend user "${name}"?\n\nThis will restore their access to the system.`)) {
+                return;
+            }
+
+            // Send AJAX request
+            fetch(`/admin/users/${id}/unsuspend`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessToast(`User "${name}" has been unsuspended successfully`);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to unsuspend user'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while unsuspending the user');
+            });
+        }
+
+        function resetPassword(id, name) {
+            if (!confirm(`Reset password for user "${name}"?\n\nA new password will be generated and displayed.`)) {
+                return;
+            }
+
+            // Send AJAX request
+            fetch(`/admin/users/${id}/reset-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('resetUserName').textContent = name;
+                    document.getElementById('newPassword').textContent = data.new_password;
+                    currentUserName = name;
+                    openModal('passwordModal');
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to reset password'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while resetting the password');
+            });
+        }
+
+        function copyPassword() {
+            const password = document.getElementById('newPassword').textContent;
+            navigator.clipboard.writeText(password).then(() => {
+                showSuccessToast('Password copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy password. Please copy it manually.');
+            });
+        }
+
+        function copyPasswordAndClose() {
+            copyPassword();
+            setTimeout(() => {
+                closeModal('passwordModal');
+            }, 500);
+        }
+
+        function viewActivityLog(id, name) {
+            currentUserId = id;
+            currentUserName = name;
+            document.getElementById('activityUserName').textContent = name;
+            document.getElementById('activityContent').innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading activity log...</div>';
+            openModal('activityModal');
+
+            // Fetch activity log via AJAX
+            fetch(`/admin/users/${id}/activity-log`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const activities = data.activities;
+
+                    if (activities.length === 0) {
+                        document.getElementById('activityContent').innerHTML = `
+                            <div class="empty-activity">
+                                <i class="fas fa-history"></i>
+                                No activities recorded yet.
+                            </div>
+                        `;
+                    } else {
+                        let html = '<div class="activity-list">';
+                        activities.forEach(activity => {
+                            const date = new Date(activity.date).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            html += `
+                                <div class="activity-item">
+                                    <div class="activity-icon"><i class="fas ${activity.icon}"></i></div>
+                                    <div>
+                                        <div class="activity-description">${activity.description}</div>
+                                        <div class="activity-date">${date}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                        document.getElementById('activityContent').innerHTML = html;
+                    }
+                } else {
+                    document.getElementById('activityContent').innerHTML = '<div class="empty-activity"><i class="fas fa-exclamation-triangle"></i>Error loading activity log</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('activityContent').innerHTML = '<div class="empty-activity"><i class="fas fa-exclamation-triangle"></i>An error occurred while loading the activity log</div>';
+            });
+        }
+
+        function deleteUser(id, name) {
+            currentUserId = id;
+            currentUserName = name;
+            document.getElementById('deleteUserName').textContent = name;
+            document.getElementById('deleteConfirmation').value = '';
+            openModal('deleteModal');
+        }
+
+        function confirmDelete() {
+            const confirmation = document.getElementById('deleteConfirmation').value;
+
+            if (confirmation !== 'DELETE') {
+                alert('Please type DELETE to confirm deletion');
+                return;
+            }
+
+            // Send AJAX request
+            fetch(`/admin/users/${currentUserId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success || data.message) {
+                    closeModal('deleteModal');
+                    showSuccessToast(`User "${currentUserName}" has been deleted successfully`);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to delete user'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                closeModal('deleteModal');
+                showSuccessToast('User has been deleted');
+                setTimeout(() => location.reload(), 1500);
+            });
+        }
+
+        function showSuccessToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 10001;
+                animation: slideIn 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+                font-weight: 500;
+            `;
+            toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            document.body.appendChild(toast);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Real-time search
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if (this.value.length >= 3 || this.value.length === 0) {
+                        document.getElementById('filterForm').submit();
+                    }
+                }, 500);
+            });
+        }
     </script>
 @endsection

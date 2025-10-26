@@ -6,6 +6,7 @@
     <title>RentMate - Admin Dashboard</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -458,37 +459,37 @@
         
         <nav class="sidebar-nav">
             <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <span class="nav-icon">📊</span>
+                <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
                 <span class="nav-label">Dashboard</span>
             </a>
             <a href="{{ route('admin.users') }}" class="nav-item {{ request()->routeIs('admin.users') ? 'active' : '' }}">
-                <span class="nav-icon">👥</span>
+                <span class="nav-icon"><i class="fas fa-users"></i></span>
                 <span class="nav-label">Total Users</span>
                 <span class="nav-count">{{ $totalUsers ?? 0 }}</span>
             </a>
             <a href="{{ route('admin.listings') }}" class="nav-item {{ request()->routeIs('admin.listings') ? 'active' : '' }}">
-                <span class="nav-icon">📦</span>
+                <span class="nav-icon"><i class="fas fa-box"></i></span>
                 <span class="nav-label">Total Listings</span>
                 <span class="nav-count">{{ $totalListings ?? 0 }}</span>
             </a>
             <a href="{{ route('admin.deposits') }}" class="nav-item {{ request()->routeIs('admin.deposits') ? 'active' : '' }}">
-                <span class="nav-icon">💰</span>
+                <span class="nav-icon"><i class="fas fa-coins"></i></span>
                 <span class="nav-label">Total Deposits</span>
                 <span class="nav-count">RM {{ number_format($totalDeposits ?? 0, 2) }}</span>
             </a>
             <a href="{{ route('admin.reports') }}" class="nav-item {{ request()->routeIs('admin.reports') ? 'active' : '' }}">
-                <span class="nav-icon">📋</span>
+                <span class="nav-icon"><i class="fas fa-flag"></i></span>
                 <span class="nav-label">Reports</span>
                 <span class="nav-count">{{ $totalReports ?? 0 }}</span>
             </a>
             <a href="{{ route('admin.penalties') }}" class="nav-item {{ request()->routeIs('admin.penalties') ? 'active' : '' }}">
-                <span class="nav-icon">⚠️</span>
+                <span class="nav-icon"><i class="fas fa-exclamation-triangle"></i></span>
                 <span class="nav-label">Penalty Actions</span>
                 <span class="nav-count">{{ $totalPenalties ?? 0 }}</span>
             </a>
             <a href="{{ route('admin.taxes') }}" class="nav-item {{ request()->routeIs('admin.taxes') ? 'active' : '' }}">
-                <span class="nav-icon">📊</span>
-                <span class="nav-label">Tax Count</span>
+                <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                <span class="nav-label">Tax Transactions</span>
                 <span class="nav-count">{{ $taxCount ?? 0 }}</span>
             </a>
         </nav>
