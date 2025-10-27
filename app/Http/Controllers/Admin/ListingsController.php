@@ -98,8 +98,7 @@ class ListingsController extends Controller
             'location',
             'images',
             'bookings.user',
-            'reviews.user',
-            'deposits'
+            'reviews.user'
         ])->findOrFail($id);
 
         // Get statistics
@@ -109,7 +108,7 @@ class ListingsController extends Controller
             ->where('EndDate', '>=', now())
             ->count();
         $completedBookings = $item->bookings()->where('Status', 'Completed')->count();
-        $totalRevenue = $item->bookings()->where('Status', 'Completed')->sum('TotalAmount');
+        $totalRevenue = $item->bookings()->where('Status', 'Completed')->sum('TotalPaid') ?? 0;
         $averageRating = $item->reviews()->avg('Rating') ?? 0;
         $totalReviews = $item->reviews()->count();
 

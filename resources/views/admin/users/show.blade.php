@@ -2,7 +2,7 @@
 
 @section('title', 'User Profile - Admin')
 
-@section('content')
+@section('main-content')
 <div class="user-profile-container">
     <!-- Back Button -->
     <div class="back-nav">
@@ -88,9 +88,6 @@
                 <button class="btn btn-primary" onclick="resetPassword({{ $user->UserID }}, '{{ $user->UserName }}')">
                     <i class="fas fa-key"></i> Reset Password
                 </button>
-                <a href="{{ route('user.public.profile', $user->UserID) }}" class="btn btn-secondary" target="_blank">
-                    <i class="fas fa-eye"></i> View Public Profile
-                </a>
             </div>
         </div>
     </div>
@@ -236,7 +233,7 @@
                                 <td>{{ $booking->item ? $booking->item->ItemName : 'N/A' }}</td>
                                 <td>{{ $booking->StartDate ? \Carbon\Carbon::parse($booking->StartDate)->format('M d, Y') : 'N/A' }}</td>
                                 <td>{{ $booking->EndDate ? \Carbon\Carbon::parse($booking->EndDate)->format('M d, Y') : 'N/A' }}</td>
-                                <td>RM {{ number_format($booking->TotalAmount, 2) }}</td>
+                                <td>RM {{ number_format($booking->TotalPaid ?? 0, 2) }}</td>
                                 <td>
                                     <span class="status-badge status-{{ strtolower($booking->Status) }}">
                                         {{ $booking->Status }}

@@ -2,7 +2,7 @@
 
 @section('title', 'Listing Details - Admin')
 
-@section('content')
+@section('main-content')
 <div class="listing-detail-container">
     <!-- Back Button -->
     <div class="back-nav">
@@ -118,9 +118,6 @@
                     <button class="btn btn-danger" onclick="deleteListing({{ $item->ItemID }}, '{{ $item->ItemName }}')">
                         <i class="fas fa-trash"></i> Delete Listing
                     </button>
-                    <a href="{{ route('user.public.profile', $item->UserID) }}" class="btn btn-secondary" target="_blank">
-                        <i class="fas fa-user"></i> View Owner Profile
-                    </a>
                 </div>
             </div>
         </div>
@@ -242,7 +239,7 @@
                                 </td>
                                 <td>{{ $booking->StartDate ? \Carbon\Carbon::parse($booking->StartDate)->format('M d, Y') : 'N/A' }}</td>
                                 <td>{{ $booking->EndDate ? \Carbon\Carbon::parse($booking->EndDate)->format('M d, Y') : 'N/A' }}</td>
-                                <td>RM {{ number_format($booking->TotalAmount, 2) }}</td>
+                                <td>RM {{ number_format($booking->TotalPaid ?? 0, 2) }}</td>
                                 <td>
                                     <span class="status-badge status-{{ strtolower($booking->Status) }}">
                                         {{ $booking->Status }}

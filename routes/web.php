@@ -300,6 +300,13 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         return app(AdminListingsController::class)->export();
     })->name('listings.export');
 
+    Route::get('/listings/{id}', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminListingsController::class)->show($id);
+    })->name('listings.show');
+
     Route::delete('/listings/{id}', function($id) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');

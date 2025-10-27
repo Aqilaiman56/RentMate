@@ -14,7 +14,7 @@ class UserProfileController extends Controller
     {
         $user = User::where('UserID', $id)
             ->with(['items' => function($query) {
-                $query->where('AvailabilityStatus', 'Available')
+                $query->where('Availability', 1)
                       ->latest()
                       ->take(6);
             }])
@@ -22,7 +22,7 @@ class UserProfileController extends Controller
 
         // Get statistics
         $totalListings = $user->items()->count();
-        $activeListings = $user->items()->where('AvailabilityStatus', 'Available')->count();
+        $activeListings = $user->items()->where('Availability', 1)->count();
         $totalBookings = $user->bookings()->count();
         $completedBookings = $user->bookings()->where('Status', 'completed')->count();
 

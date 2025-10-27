@@ -137,7 +137,7 @@
                         </div>
                     </div>
                     <div class="listing-actions">
-                        <a href="{{ route('item.details', $item->ItemID) }}" class="btn-action btn-view" target="_blank">
+                        <a href="{{ route('admin.listings.show', $item->ItemID) }}" class="btn-action btn-view">
                             <i class="fas fa-eye"></i> View
                         </a>
                         <button class="btn-action btn-more" onclick="showMoreActions({{ $item->ItemID }}, '{{ $item->ItemName }}')">

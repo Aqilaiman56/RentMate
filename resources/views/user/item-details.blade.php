@@ -5,6 +5,10 @@
 
 @push('styles')
 <style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    }
+
     .item-details-container {
         max-width: 1200px;
         margin: 0 auto;
@@ -14,15 +18,17 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        color: #4461F2;
+        color: #4A5FDC;
         text-decoration: none;
         font-weight: 600;
         margin-bottom: 20px;
-        transition: gap 0.3s;
+        transition: all 0.2s;
+        font-family: inherit;
     }
 
     .back-button:hover {
         gap: 12px;
+        color: #3D4FC7;
     }
 
     .item-content {
@@ -40,17 +46,17 @@
         width: 100%;
         height: 500px;
         object-fit: cover;
-        border-radius: 20px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     }
 
     /* Image Grid Layouts */
     .images-grid {
         display: grid;
         gap: 10px;
-        border-radius: 20px;
+        border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         position: relative;
     }
 
@@ -85,7 +91,7 @@
         height: 100%;
         object-fit: cover;
         cursor: pointer;
-        transition: transform 0.3s;
+        transition: transform 0.2s;
     }
 
     .grid-image:hover {
@@ -127,15 +133,15 @@
         border-radius: 50%;
         font-size: 24px;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
     .wishlist-btn:hover {
-        transform: scale(1.1);
+        transform: scale(1.08);
     }
 
     .item-header {
@@ -144,19 +150,19 @@
 
     .item-category {
         display: inline-block;
-        background: #e8eeff;
-        color: #4461F2;
+        background: #EEF2FF;
+        color: #4A5FDC;
         padding: 6px 16px;
-        border-radius: 20px;
-        font-size: 13px;
+        border-radius: 8px;
+        font-size: 0.875rem;
         font-weight: 600;
         margin-bottom: 12px;
     }
 
     .item-title {
-        font-size: 32px;
+        font-size: 2rem;
         font-weight: 700;
-        color: #1f2937;
+        color: #1A202C;
         margin-bottom: 12px;
     }
 
@@ -164,8 +170,8 @@
         display: flex;
         gap: 20px;
         align-items: center;
-        color: #6b7280;
-        font-size: 14px;
+        color: #718096;
+        font-size: 0.875rem;
     }
 
     .meta-item {
@@ -183,9 +189,10 @@
     .item-owner {
         background: white;
         padding: 20px;
-        border-radius: 15px;
+        border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         margin-bottom: 20px;
+        border: 1px solid #E2E8F0;
     }
 
     .owner-header {
@@ -203,59 +210,69 @@
     }
 
     .owner-info h3 {
-        font-size: 16px;
+        font-size: 1rem;
         font-weight: 600;
-        color: #1f2937;
+        color: #1A202C;
         margin-bottom: 4px;
     }
 
     .owner-info p {
-        font-size: 13px;
-        color: #6b7280;
+        font-size: 0.875rem;
+        color: #718096;
     }
 
     .contact-owner-btn {
         width: 100%;
-        background: #e8eeff;
-        color: #4461F2;
+        background: #EEF2FF;
+        color: #4A5FDC;
         border: none;
-        padding: 12px;
-        border-radius: 10px;
+        padding: 0.875rem 1rem;
+        border-radius: 8px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
+        font-family: inherit;
     }
 
     .contact-owner-btn:hover {
-        background: #d0ddff;
+        background: #E0E7FF;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(74, 95, 220, 0.2);
+    }
+
+    .contact-owner-btn:active {
+        transform: translateY(0);
     }
 
     .item-description {
         background: white;
         padding: 25px;
-        border-radius: 15px;
+        border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         margin-bottom: 20px;
+        border: 1px solid #E2E8F0;
     }
 
     .section-title {
-        font-size: 18px;
+        font-size: 1.125rem;
         font-weight: 600;
-        color: #1f2937;
+        color: #1A202C;
         margin-bottom: 15px;
     }
 
     .description-text {
-        color: #4b5563;
+        color: #4A5568;
         line-height: 1.6;
+        font-size: 0.95rem;
     }
 
     .item-details-list {
         background: white;
         padding: 25px;
-        border-radius: 15px;
+        border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         margin-bottom: 20px;
+        border: 1px solid #E2E8F0;
     }
 
     .detail-row {
@@ -270,35 +287,36 @@
     }
 
     .detail-label {
-        color: #6b7280;
-        font-size: 14px;
+        color: #718096;
+        font-size: 0.875rem;
     }
 
     .detail-value {
-        color: #1f2937;
+        color: #2D3748;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 0.875rem;
     }
 
     .booking-card {
         background: white;
         padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
         position: sticky;
         top: 100px;
+        border: 1px solid #E2E8F0;
     }
 
     .price-display {
-        font-size: 36px;
+        font-size: 2.25rem;
         font-weight: 700;
-        color: #4461F2;
+        color: #4A5FDC;
         margin-bottom: 8px;
     }
 
     .price-unit {
-        font-size: 16px;
-        color: #6b7280;
+        font-size: 1rem;
+        color: #718096;
         font-weight: 400;
     }
 
@@ -321,24 +339,28 @@
 
     .form-label {
         display: block;
-        font-size: 13px;
+        font-size: 0.95rem;
         font-weight: 600;
-        color: #374151;
+        color: #2D3748;
         margin-bottom: 8px;
     }
 
     .form-input {
         width: 100%;
-        padding: 12px;
-        border: 2px solid #e5e7eb;
-        border-radius: 10px;
-        font-size: 14px;
-        transition: border-color 0.3s;
+        padding: 0.875rem 1rem;
+        border: 1.5px solid #E2E8F0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: white;
+        font-family: inherit;
+        color: #2D3748;
     }
 
     .form-input:focus {
         outline: none;
-        border-color: #4461F2;
+        border-color: #4A5FDC;
+        box-shadow: 0 0 0 3px rgba(74, 95, 220, 0.1);
     }
 
     .total-calculation {
@@ -352,40 +374,45 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 8px;
-        font-size: 14px;
-        color: #6b7280;
+        font-size: 0.875rem;
+        color: #718096;
     }
 
     .calc-row.total {
-        font-size: 18px;
+        font-size: 1.125rem;
         font-weight: 700;
-        color: #1f2937;
+        color: #1A202C;
         padding-top: 8px;
-        border-top: 2px solid #e5e7eb;
+        border-top: 2px solid #E2E8F0;
         margin-top: 8px;
     }
 
     .book-now-btn {
         width: 100%;
-        background: #4461F2;
+        background: #4A5FDC;
         color: white;
         border: none;
-        padding: 16px;
-        border-radius: 10px;
-        font-size: 16px;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
+        font-family: inherit;
     }
 
     .book-now-btn:hover {
-        background: #3651E2;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(68, 97, 242, 0.3);
+        background: #3D4FC7;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(74, 95, 220, 0.3);
+    }
+
+    .book-now-btn:active {
+        transform: translateY(0);
     }
 
     .book-now-btn:disabled {
-        background: #9ca3af;
+        background: #A0AEC0;
         cursor: not-allowed;
         transform: none;
     }
@@ -393,9 +420,10 @@
     .reviews-section {
         background: white;
         padding: 30px;
-        border-radius: 15px;
+        border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         margin-top: 40px;
+        border: 1px solid #E2E8F0;
     }
 
     .reviews-header {
@@ -416,9 +444,9 @@
     }
 
     .rating-large {
-        font-size: 48px;
+        font-size: 3rem;
         font-weight: 700;
-        color: #1f2937;
+        color: #1A202C;
     }
 
     .rating-breakdown {
@@ -434,8 +462,8 @@
 
     .bar-label {
         width: 60px;
-        font-size: 13px;
-        color: #6b7280;
+        font-size: 0.875rem;
+        color: #718096;
     }
 
     .bar-container {
@@ -455,8 +483,8 @@
     .bar-count {
         width: 40px;
         text-align: right;
-        font-size: 13px;
-        color: #6b7280;
+        font-size: 0.875rem;
+        color: #718096;
     }
 
     .review-card {
@@ -483,15 +511,15 @@
     }
 
     .reviewer-info h4 {
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
-        color: #1f2937;
+        color: #1A202C;
         margin-bottom: 4px;
     }
 
     .review-date {
-        font-size: 12px;
-        color: #9ca3af;
+        font-size: 0.75rem;
+        color: #A0AEC0;
     }
 
     .review-rating {
@@ -502,15 +530,15 @@
     }
 
     .review-text {
-        color: #4b5563;
+        color: #4A5568;
         line-height: 1.6;
-        font-size: 14px;
+        font-size: 0.875rem;
     }
 
     .no-reviews {
         text-align: center;
         padding: 40px;
-        color: #9ca3af;
+        color: #A0AEC0;
     }
 
     .availability-badge {
@@ -518,8 +546,8 @@
         align-items: center;
         gap: 6px;
         padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 13px;
+        border-radius: 8px;
+        font-size: 0.875rem;
         font-weight: 600;
     }
 
