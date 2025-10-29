@@ -516,6 +516,35 @@
                         <i class="fas fa-comments"></i> Contact Owner
                     </a>
                 </div>
+            @else
+                <!-- Renter Information Card (shown to item owner) -->
+                <div class="owner-card">
+                    <h2 class="section-title"><i class="fas fa-user-circle"></i> Renter Information</h2>
+
+                    <div class="owner-info">
+                        @if($booking->user->ProfileImage)
+                            <img src="{{ asset('storage/' . $booking->user->ProfileImage) }}"
+                                 alt="{{ $booking->user->UserName }}"
+                                 class="owner-avatar">
+                        @else
+                            <div class="avatar-placeholder">
+                                {{ strtoupper(substr($booking->user->UserName, 0, 1)) }}
+                            </div>
+                        @endif
+
+                        <div class="owner-details">
+                            <h3>{{ $booking->user->UserName }}</h3>
+                            <p><i class="fas fa-envelope"></i> {{ $booking->user->Email }}</p>
+                            @if($booking->user->PhoneNumber)
+                                <p><i class="fas fa-phone"></i> {{ $booking->user->PhoneNumber }}</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <a href="{{ route('messages.show', ['userId' => $booking->user->UserID, 'item_id' => $booking->item->ItemID]) }}" class="contact-btn">
+                        <i class="fas fa-comments"></i> Contact Renter
+                    </a>
+                </div>
             @endif
         </div>
 

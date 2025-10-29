@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Deposit;
 use App\Models\Booking;
+use App\Models\RefundQueue;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -108,6 +109,9 @@ class DepositsController extends Controller
             'booking.item.user'
         ])->findOrFail($id);
 
+        // Check if there's a refund queue entry
+        $refundQueue = RefundQueue::where('DepositID', $id)->first();
+
         return response()->json([
             'success' => true,
             'deposit' => [
@@ -120,6 +124,10 @@ class DepositsController extends Controller
                 'user' => [
                     'name' => $deposit->booking->user->UserName,
                     'email' => $deposit->booking->user->Email,
+                    'avatar' => $deposit->booking->user->ProfileImage ? asset('storage/' . $deposit->booking->user->ProfileImage) : null,
+                    'bank_name' => $deposit->booking->user->BankName ?? 'Not provided',
+                    'bank_account_number' => $deposit->booking->user->BankAccountNumber ?? 'Not provided',
+                    'bank_account_holder' => $deposit->booking->user->BankAccountHolderName ?? 'Not provided',
                 ],
                 'item' => [
                     'name' => $deposit->booking->item->ItemName,
@@ -129,43 +137,69 @@ class DepositsController extends Controller
                     'start_date' => $deposit->booking->StartDate->format('M d, Y'),
                     'end_date' => $deposit->booking->EndDate->format('M d, Y'),
                     'duration' => $deposit->booking->StartDate->diffInDays($deposit->booking->EndDate) . ' days',
+                    'status' => ucfirst($deposit->booking->Status),
                 ],
+                'refund_queue' => $refundQueue ? [
+                    'status' => ucfirst($refundQueue->Status),
+                    'reference' => $refundQueue->RefundReference,
+                    'processed_at' => $refundQueue->ProcessedAt ? $refundQueue->ProcessedAt->format('M d, Y g:i A') : null,
+                ] : null,
             ]
         ]);
     }
 
     /**
-     * Process refund for a deposit
+     * Process refund for a deposit - Creates refund queue entry
      */
     public function refund(Request $request, $id)
     {
         try {
-            $deposit = Deposit::findOrFail($id);
-            
+            $deposit = Deposit::with('booking.user')->findOrFail($id);
+
             // Check if can be refunded
-            if (!$deposit->canRefund()) {
+            if ($deposit->Status !== 'held') {
                 return back()->with('error', 'This deposit cannot be refunded (Status: ' . $deposit->Status . ')');
             }
-            
+
+            // Check if user has bank details
+            $user = $deposit->booking->user;
+            if (!$user->BankName || !$user->BankAccountNumber || !$user->BankAccountHolderName) {
+                return back()->with('error', 'User has not provided bank account details. Cannot process refund.');
+            }
+
+            // Check if refund queue entry already exists
+            $existingQueue = RefundQueue::where('DepositID', $id)->first();
+            if ($existingQueue) {
+                return back()->with('error', 'Refund request already exists for this deposit.');
+            }
+
             DB::beginTransaction();
-            
-            // Update deposit status
-            $deposit->Status = 'refunded';
-            $deposit->RefundDate = Carbon::now();
-            $deposit->Notes = $request->input('notes', 'Refunded by admin');
+
+            // Create refund queue entry
+            $refundQueue = RefundQueue::create([
+                'DepositID' => $deposit->DepositID,
+                'BookingID' => $deposit->BookingID,
+                'UserID' => $user->UserID,
+                'RefundAmount' => $deposit->DepositAmount,
+                'Status' => 'pending',
+                'BankName' => $user->BankName,
+                'BankAccountNumber' => $user->BankAccountNumber,
+                'BankAccountHolderName' => $user->BankAccountHolderName,
+                'Notes' => $request->input('notes', 'Refund initiated by admin'),
+            ]);
+
+            // Update deposit status to processing
+            $deposit->Status = 'processing_refund';
+            $deposit->Notes = 'Refund queued - Ref: #RQ' . str_pad($refundQueue->RefundQueueID, 4, '0', STR_PAD_LEFT);
             $deposit->save();
-            
-            // Optional: Add wallet/payment logic here
-            // Example: Update user wallet balance
-            // $deposit->booking->user->wallet->increment('balance', $deposit->DepositAmount);
-            
+
             DB::commit();
-            
-            return back()->with('success', 'Deposit of RM ' . number_format($deposit->DepositAmount, 2) . ' refunded successfully');
-            
+
+            return redirect()->route('admin.refund-queue')->with('success', 'Refund request created successfully. Please process the bank transfer.');
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to process refund: ' . $e->getMessage());
+            return back()->with('error', 'Failed to create refund request: ' . $e->getMessage());
         }
     }
 
