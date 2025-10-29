@@ -245,6 +245,15 @@
         background: #fecaca;
     }
 
+    .btn-bookings {
+        background: #4461F2;
+        color: white;
+    }
+
+    .btn-bookings:hover {
+        background: #3651E2;
+    }
+
     .empty-state {
         text-align: center;
         padding: 60px 20px;
@@ -374,6 +383,12 @@
                         </div>
 
                         <div class="listing-actions">
+                            <a href="{{ route('user.listings.bookings', $item->ItemID) }}" class="action-btn btn-bookings" title="View Bookings ({{ $item->bookings->count() }})">
+                                <i class="fas fa-calendar-check"></i> Bookings ({{ $item->bookings->count() }})
+                            </a>
+                        </div>
+
+                        <div class="listing-actions" style="margin-top: 10px;">
                             <a href="{{ route('item.details', $item->ItemID) }}" class="action-btn btn-view">
                                 <i class="fas fa-eye"></i> View
                             </a>

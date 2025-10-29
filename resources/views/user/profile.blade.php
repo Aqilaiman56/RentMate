@@ -1,154 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RentMate - My Profile</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+@extends('layouts.app')
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(180deg, #E8EEFF 0%, #F5F7FF 100%);
-            min-height: 100vh;
-        }
+@section('title', 'GoRentUMS - My Profile')
 
-        .header {
-            background: white;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
+@php
+    $hideSearch = true;
+@endphp
 
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #4461F2;
-            text-decoration: none;
-        }
-
-        .header-icons {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
-            text-decoration: none;
-            padding: 8px;
-            border-radius: 8px;
-            transition: background-color 0.2s;
-        }
-
-        .icon-btn:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .profile-section {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .profile-section:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .profile-name {
-            font-weight: 500;
-            font-size: 14px;
-            color: #1f2937;
-        }
-
-        .profile-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 8px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            min-width: 200px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            overflow: hidden;
-        }
-
-        .profile-dropdown.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: #333;
-            text-decoration: none;
-            transition: background-color 0.2s;
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .dropdown-item:hover {
-            background-color: #f5f5f5;
-        }
-
-        .dropdown-item.logout {
-            color: #dc3545;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .dropdown-item.logout:hover {
-            background-color: #fff5f5;
-        }
-
-        .dropdown-icon {
-            font-size: 18px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .logout-form {
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
+@push('styles')
+<style>
+    .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 30px 20px;
@@ -420,58 +280,11 @@
                 padding: 20px 15px;
             }
         }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <a href="{{ route('user.HomePage') }}" class="logo">RentMate</a>
+</style>
+@endpush
 
-        <div class="header-icons">
-            <a href="{{ route('notifications.index') }}" class="icon-btn"><i class="fas fa-bell"></i></a>
-            <a href="{{ route('messages.index') }}" class="icon-btn"><i class="fas fa-envelope"></i></a>
-
-            <div class="profile-section" id="profileSection">
-                @if(auth()->user()->ProfileImage)
-                    <img src="{{ asset('storage/' . auth()->user()->ProfileImage) }}" alt="Profile" class="profile-pic">
-                @else
-                    <img src="https://via.placeholder.com/40" alt="Profile" class="profile-pic">
-                @endif
-                <span class="profile-name">{{ auth()->user()->UserName ?? 'User' }}</span>
-
-                <div class="profile-dropdown" id="profileDropdown">
-                    <a href="{{ route('user.profile') }}" class="dropdown-item">
-                        <span class="dropdown-icon"><i class="fas fa-user"></i></span>
-                        <span>Profile Settings</span>
-                    </a>
-                    <a href="{{ route('user.listings') }}" class="dropdown-item">
-                        <span class="dropdown-icon"><i class="fas fa-box"></i></span>
-                        <span>My Listings</span>
-                    </a>
-                    <a href="{{ route('user.add-listing') }}" class="dropdown-item">
-                        <span class="dropdown-icon"><i class="fas fa-plus"></i></span>
-                        <span>Add Listing</span>
-                    </a>
-                    <a href="{{ route('user.bookings') }}" class="dropdown-item">
-                        <span class="dropdown-icon"><i class="fas fa-calendar"></i></span>
-                        <span>My Bookings</span>
-                    </a>
-                    <a href="{{ route('user.wishlist') }}" class="dropdown-item">
-                        <span class="dropdown-icon"><i class="fas fa-heart"></i></span>
-                        <span>Wishlist</span>
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}" class="logout-form">
-                        @csrf
-                        <button type="submit" class="dropdown-item logout" onclick="confirmLogout(event)">
-                            <span class="dropdown-icon"><i class="fas fa-sign-out-alt"></i></span>
-                            <span>Logout</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="container">
+@section('content')
+<div class="container">
         <div class="profile-header">
             @if($user->ProfileImage)
                 <img src="{{ asset('storage/' . $user->ProfileImage) }}" alt="Profile Picture" class="profile-avatar">
@@ -562,42 +375,84 @@
                 <button type="submit" class="btn btn-primary">Update Profile</button>
             </div>
         </form>
+
+        <!-- Bank Account Information Section -->
+        <form method="POST" action="{{ route('user.profile.bank.update') }}" class="profile-form" style="margin-top: 20px;">
+            @csrf
+            @method('PATCH')
+
+            <h2 class="form-title"><i class="fas fa-university"></i> Bank Account Information</h2>
+
+            <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 0; font-size: 13px; color: #1E40AF; line-height: 1.6;">
+                    <i class="fas fa-info-circle"></i> <strong>Important:</strong> Your bank account details are required for receiving deposit refunds.
+                    Please ensure the information is accurate. Your data is encrypted and secure.
+                </p>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="BankName" class="form-label">
+                        <i class="fas fa-building"></i> Bank Name *
+                    </label>
+                    <select id="BankName" name="BankName" class="form-input" required>
+                        <option value="">-- Select Your Bank --</option>
+                        <option value="Maybank" {{ old('BankName', $user->BankName) == 'Maybank' ? 'selected' : '' }}>Maybank</option>
+                        <option value="CIMB Bank" {{ old('BankName', $user->BankName) == 'CIMB Bank' ? 'selected' : '' }}>CIMB Bank</option>
+                        <option value="Public Bank" {{ old('BankName', $user->BankName) == 'Public Bank' ? 'selected' : '' }}>Public Bank</option>
+                        <option value="RHB Bank" {{ old('BankName', $user->BankName) == 'RHB Bank' ? 'selected' : '' }}>RHB Bank</option>
+                        <option value="Hong Leong Bank" {{ old('BankName', $user->BankName) == 'Hong Leong Bank' ? 'selected' : '' }}>Hong Leong Bank</option>
+                        <option value="AmBank" {{ old('BankName', $user->BankName) == 'AmBank' ? 'selected' : '' }}>AmBank</option>
+                        <option value="Bank Islam" {{ old('BankName', $user->BankName) == 'Bank Islam' ? 'selected' : '' }}>Bank Islam</option>
+                        <option value="Bank Rakyat" {{ old('BankName', $user->BankName) == 'Bank Rakyat' ? 'selected' : '' }}>Bank Rakyat</option>
+                        <option value="BSN" {{ old('BankName', $user->BankName) == 'BSN' ? 'selected' : '' }}>BSN (Bank Simpanan Nasional)</option>
+                        <option value="Affin Bank" {{ old('BankName', $user->BankName) == 'Affin Bank' ? 'selected' : '' }}>Affin Bank</option>
+                        <option value="Alliance Bank" {{ old('BankName', $user->BankName) == 'Alliance Bank' ? 'selected' : '' }}>Alliance Bank</option>
+                        <option value="OCBC Bank" {{ old('BankName', $user->BankName) == 'OCBC Bank' ? 'selected' : '' }}>OCBC Bank</option>
+                        <option value="Standard Chartered" {{ old('BankName', $user->BankName) == 'Standard Chartered' ? 'selected' : '' }}>Standard Chartered</option>
+                        <option value="HSBC Bank" {{ old('BankName', $user->BankName) == 'HSBC Bank' ? 'selected' : '' }}>HSBC Bank</option>
+                        <option value="UOB Bank" {{ old('BankName', $user->BankName) == 'UOB Bank' ? 'selected' : '' }}>UOB Bank</option>
+                        <option value="Other" {{ old('BankName', $user->BankName) == 'Other' ? 'selected' : '' }}>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="BankAccountNumber" class="form-label">
+                        <i class="fas fa-credit-card"></i> Account Number *
+                    </label>
+                    <input type="text"
+                           id="BankAccountNumber"
+                           name="BankAccountNumber"
+                           value="{{ old('BankAccountNumber', $user->BankAccountNumber) }}"
+                           class="form-input"
+                           placeholder="Enter your account number"
+                           pattern="[0-9]{8,20}"
+                           maxlength="20"
+                           required>
+                    <small class="file-input-help">Enter 8-20 digits only</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="BankAccountHolderName" class="form-label">
+                        <i class="fas fa-user"></i> Account Holder Name *
+                    </label>
+                    <input type="text"
+                           id="BankAccountHolderName"
+                           name="BankAccountHolderName"
+                           value="{{ old('BankAccountHolderName', $user->BankAccountHolderName) }}"
+                           class="form-input"
+                           placeholder="Enter name as per bank account"
+                           required>
+                    <small class="file-input-help">Must match your bank account exactly</small>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Bank Details
+                </button>
+            </div>
+        </form>
     </div>
 
-    <script>
-        // Profile Dropdown Toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const profileSection = document.getElementById('profileSection');
-            const profileDropdown = document.getElementById('profileDropdown');
-
-            if (profileSection && profileDropdown) {
-                profileSection.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    profileDropdown.classList.toggle('show');
-                });
-
-                document.addEventListener('click', function(e) {
-                    if (!profileSection.contains(e.target)) {
-                        profileDropdown.classList.remove('show');
-                    }
-                });
-
-                profileDropdown.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            }
-        });
-
-        // Logout Confirmation
-        function confirmLogout(event) {
-            event.preventDefault();
-
-            if (confirm('Are you sure you want to logout?')) {
-                event.target.closest('form').submit();
-            }
-
-            return false;
-        }
-    </script>
-</body>
-</html>
+@endsection

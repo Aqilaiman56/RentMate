@@ -182,11 +182,15 @@ Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(fu
     // User Profile Settings
     Route::get('/profile', [ProfileController::class, 'userProfile'])->name('profile');
     Route::patch('/profile', [ProfileController::class, 'userUpdateProfile'])->name('profile.update');
+    Route::patch('/profile/bank', [ProfileController::class, 'updateBankDetails'])->name('profile.bank.update');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     
     // User Listings Management
     Route::get('/listings', [ItemController::class, 'userListings'])->name('listings');
-    
+
+    // View Bookings for a Listing
+    Route::get('/listings/{id}/bookings', [ItemController::class, 'viewItemBookings'])->name('listings.bookings');
+
     // Add New Listing
     Route::get('/add-listing', [ItemController::class, 'create'])->name('add-listing');
     

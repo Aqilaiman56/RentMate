@@ -88,7 +88,10 @@ class ProfileController extends Controller
             'UserName' => 'required|string|max:255',
             'Email' => 'required|email|unique:users,Email,' . $user->UserID . ',UserID',
             'PhoneNumber' => 'nullable|string|max:20',
-            'Location' => 'nullable|string|max:255', // Added
+            'Location' => 'nullable|string|max:255',
+            'BankName' => 'nullable|string|max:100',
+            'BankAccountNumber' => 'nullable|string|max:50',
+            'BankAccountHolderName' => 'nullable|string|max:100',
             'ProfileImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -106,9 +109,26 @@ class ProfileController extends Controller
 
         return Redirect::route('user.profile')->with('success', 'Profile updated successfully');
     }
-    
 
-        /**
+    /**
+     * Update bank account details
+     */
+    public function updateBankDetails(Request $request): RedirectResponse
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'BankName' => 'required|string|max:100',
+            'BankAccountNumber' => 'required|string|max:50',
+            'BankAccountHolderName' => 'required|string|max:100',
+        ]);
+
+        $user->update($validated);
+
+        return Redirect::route('user.profile')->with('success', 'Bank account details updated successfully');
+    }
+
+    /**
      * Submit a report against another user
      */
     public function submitReport(Request $request): RedirectResponse

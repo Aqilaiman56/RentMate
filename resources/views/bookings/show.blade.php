@@ -97,6 +97,7 @@
         border-radius: 15px;
         padding: 25px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        margin-bottom: 20px;
     }
 
     .section-title {
@@ -169,58 +170,89 @@
         display: flex;
         align-items: center;
         gap: 15px;
-        margin-bottom: 15px;
+        padding: 15px;
+        background: #f9fafb;
+        border-radius: 12px;
+        margin-bottom: 20px;
     }
 
     .owner-avatar {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
         object-fit: cover;
+        border: 3px solid #e5e7eb;
+        flex-shrink: 0;
     }
 
     .avatar-placeholder {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
-        background: #4461F2;
+        background: linear-gradient(135deg, #4461F2 0%, #3651E2 100%);
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
-        font-weight: 600;
+        font-size: 28px;
+        font-weight: 700;
+        border: 3px solid #e5e7eb;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(68, 97, 242, 0.2);
+    }
+
+    .owner-details {
+        flex: 1;
+        min-width: 0;
     }
 
     .owner-details h3 {
-        font-size: 16px;
+        font-size: 17px;
         font-weight: 600;
         color: #1f2937;
-        margin-bottom: 3px;
+        margin-bottom: 5px;
     }
 
     .owner-details p {
         font-size: 13px;
         color: #6b7280;
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .owner-details p i {
+        color: #9ca3af;
+        font-size: 12px;
+        width: 14px;
     }
 
     .contact-btn {
         width: 100%;
-        background: #e8eeff;
-        color: #4461F2;
-        padding: 12px;
-        border-radius: 8px;
+        background: #4461F2;
+        color: white;
+        padding: 14px 20px;
+        border-radius: 10px;
         border: none;
         font-weight: 600;
+        font-size: 15px;
         cursor: pointer;
         transition: all 0.2s;
         text-decoration: none;
-        display: block;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 2px 8px rgba(68, 97, 242, 0.3);
     }
 
     .contact-btn:hover {
-        background: #d0ddff;
+        background: #3651E2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(68, 97, 242, 0.4);
     }
 
     .payment-card {
@@ -458,30 +490,30 @@
 
             @if($booking->item->UserID !== auth()->id())
                 <div class="owner-card">
-                    <h2 class="section-title">Item Owner</h2>
-                    
+                    <h2 class="section-title"><i class="fas fa-user"></i> Item Owner</h2>
+
                     <div class="owner-info">
                         @if($booking->item->user->ProfileImage)
-                            <img src="{{ asset('storage/' . $booking->item->user->ProfileImage) }}" 
-                                 alt="{{ $booking->item->user->UserName }}" 
+                            <img src="{{ asset('storage/' . $booking->item->user->ProfileImage) }}"
+                                 alt="{{ $booking->item->user->UserName }}"
                                  class="owner-avatar">
                         @else
                             <div class="avatar-placeholder">
                                 {{ strtoupper(substr($booking->item->user->UserName, 0, 1)) }}
                             </div>
                         @endif
-                        
+
                         <div class="owner-details">
                             <h3>{{ $booking->item->user->UserName }}</h3>
-                            <p>{{ $booking->item->user->Email }}</p>
+                            <p><i class="fas fa-envelope"></i> {{ $booking->item->user->Email }}</p>
                             @if($booking->item->user->PhoneNumber)
                                 <p><i class="fas fa-phone"></i> {{ $booking->item->user->PhoneNumber }}</p>
                             @endif
                         </div>
                     </div>
-                    
+
                     <a href="{{ route('messages.show', ['userId' => $booking->item->user->UserID, 'item_id' => $booking->item->ItemID]) }}" class="contact-btn">
-                        💬 Contact Owner
+                        <i class="fas fa-comments"></i> Contact Owner
                     </a>
                 </div>
             @endif

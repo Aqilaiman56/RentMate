@@ -533,12 +533,83 @@
         color: #4A5568;
         line-height: 1.6;
         font-size: 0.875rem;
+        margin-bottom: 12px;
+    }
+
+    .review-image-container {
+        margin-top: 12px;
+    }
+
+    .review-image {
+        max-width: 300px;
+        width: 100%;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid #e5e7eb;
+    }
+
+    .review-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .no-reviews {
         text-align: center;
         padding: 40px;
         color: #A0AEC0;
+    }
+
+    /* Image Modal */
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        animation: fadeIn 0.3s;
+    }
+
+    .image-modal.show {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .image-modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        animation: zoomIn 0.3s;
+    }
+
+    @keyframes zoomIn {
+        from { transform: scale(0.5); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .close-image-modal {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close-image-modal:hover {
+        background: rgba(0, 0, 0, 0.8);
     }
 
     .availability-badge {
@@ -831,6 +902,15 @@
                         @endfor
                     </div>
                     <p class="review-text">{{ $review->Comment }}</p>
+
+                    @if($review->ReviewImage)
+                        <div class="review-image-container">
+                            <img src="{{ asset('storage/' . $review->ReviewImage) }}"
+                                 alt="Review image"
+                                 class="review-image"
+                                 onclick="openImageModal('{{ asset('storage/' . $review->ReviewImage) }}')">
+                        </div>
+                    @endif
                 </div>
             @endforeach
         @else
@@ -911,6 +991,39 @@
             // Don't prevent default - let it submit
         });
     });
-    
+
+    // Image Modal Functions
+    function openImageModal(imageSrc) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modal.classList.add('show');
+        modalImg.src = imageSrc;
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside the image
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('imageModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeImageModal();
+                }
+            });
+        }
+    });
+
 </script>
 @endpush
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="close-image-modal" onclick="closeImageModal()">&times;</span>
+    <img class="image-modal-content" id="modalImage">
+</div>

@@ -21,6 +21,7 @@ class Review extends Model
         'ItemID',
         'Rating',
         'Comment',
+        'ReviewImage',
         'DatePosted',
         'IsReported'
     ];

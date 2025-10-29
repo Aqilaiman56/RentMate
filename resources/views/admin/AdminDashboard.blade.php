@@ -20,13 +20,6 @@
             background-color: rgba(0, 0, 0, 0.05);
         }
 
-        .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
         .profile-name {
             font-weight: 500;
             font-size: 14px;
@@ -136,13 +129,9 @@
                 <span class="notification-badge">3</span>
             </button>
             <div class="profile-section" id="profileSection">
-                @if(auth()->user()->ProfileImage)
-                    <img src="{{ asset('storage/' . auth()->user()->ProfileImage) }}" alt="Admin" class="profile-pic">
-                @else
-                    <img src="https://via.placeholder.com/40" alt="Admin" class="profile-pic">
-                @endif
                 <span class="profile-name">{{ auth()->user()->UserName ?? 'Admin' }}</span>
-                
+                <i class="fas fa-chevron-down" style="font-size: 12px; color: #666;"></i>
+
                 <!-- Dropdown Menu -->
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="{{ route('profile.edit') }}" class="dropdown-item">

@@ -335,7 +335,7 @@ class BookingController extends Controller
      */
     public function userBookings()
     {
-        $bookings = Booking::with(['item', 'item.location', 'item.images', 'payment'])
+        $bookings = Booking::with(['item', 'item.location', 'item.images', 'item.reviews', 'payment'])
             ->where('UserID', auth()->id())
             ->orderBy('BookingDate', 'desc')
             ->paginate(10);

@@ -166,24 +166,9 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon btn-view" 
-                                            title="View Details" 
-                                            onclick="viewDeposit({{ $deposit->DepositID }})">
-                                        👁️
-                                    </button>
-                                    @if($deposit->Status === 'held')
-                                        <form action="{{ route('admin.deposits.refund', $deposit->DepositID) }}" 
-                                              method="POST" 
-                                              style="display: inline;"
-                                              onsubmit="return confirm('Process refund for RM {{ number_format($deposit->DepositAmount, 2) }}?')">
-                                            @csrf
-                                            <button type="submit" class="btn-icon btn-refund" title="Process Refund">
-                                                💰
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
+                                <button class="btn-action" onclick="viewDeposit({{ $deposit->DepositID }})">
+                                    <i class="fas fa-ellipsis-v"></i> Actions
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -205,6 +190,22 @@
             {{ $deposits->appends(request()->query())->links() }}
         </div>
     @endif
+
+    <!-- Deposit Details Modal -->
+    <div id="depositModal" class="modal">
+        <div class="modal-overlay" onclick="closeDepositModal()"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">Deposit Details</h2>
+                <button class="modal-close" onclick="closeDepositModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="depositModalContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
 
     <style>
         .alert {
@@ -606,39 +607,30 @@
             color: #854d0e;
         }
 
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-icon {
-            width: 36px;
-            height: 36px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
+        /* Action Button */
+        .btn-action {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 16px;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .btn-view {
-            background: #dbeafe;
+        .btn-action:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
         }
 
-        .btn-view:hover {
-            background: #bfdbfe;
-        }
-
-        .btn-refund {
-            background: #d1fae5;
-        }
-
-        .btn-refund:hover {
-            background: #a7f3d0;
+        .btn-action i {
+            font-size: 14px;
         }
 
         /* Buttons */
@@ -672,6 +664,239 @@
         .btn-secondary:hover {
             background: #e5e7eb;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-container {
+            position: relative;
+            background: white;
+            border-radius: 16px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 28px;
+            border-bottom: 2px solid #e5e7eb;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 18px;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 28px;
+            max-height: calc(90vh - 100px);
+            overflow-y: auto;
+        }
+
+        .detail-section {
+            margin-bottom: 28px;
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .detail-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .detail-value.large {
+            font-size: 24px;
+            color: #3b82f6;
+        }
+
+        .detail-value.status {
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .user-detail {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+
+        .user-detail-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .user-detail-info {
+            flex: 1;
+        }
+
+        .user-detail-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .user-detail-email {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .action-buttons-modal {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-modal-primary {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-modal-primary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-modal-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-modal-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-modal-primary:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
     </style>
 
     <script>
@@ -681,21 +906,116 @@
                 .then(data => {
                     if (data.success) {
                         const deposit = data.deposit;
-                        alert(`Deposit Details #D${id.toString().padStart(3, '0')}
-                        
-User: ${deposit.user.name} (${deposit.user.email})
-Item: ${deposit.item.name}
-Owner: ${deposit.item.owner}
+                        const modalContent = document.getElementById('depositModalContent');
 
-Amount: RM ${deposit.amount}
-Status: ${deposit.status}
-Date Collected: ${deposit.date_collected}
-${deposit.refund_date !== 'N/A' ? 'Refund Date: ' + deposit.refund_date : ''}
+                        // Build modal content
+                        let content = `
+                            <!-- Transaction Information -->
+                            <div class="detail-section">
+                                <div class="detail-section-title">Transaction Information</div>
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Transaction ID</div>
+                                        <div class="detail-value">#D${id.toString().padStart(3, '0')}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Status</div>
+                                        <div class="detail-value status">
+                                            <span class="status-badge status-${deposit.status.toLowerCase()}">${deposit.status}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Deposit Amount</div>
+                                        <div class="detail-value large">RM ${deposit.amount}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Date Collected</div>
+                                        <div class="detail-value">${deposit.date_collected}</div>
+                                    </div>
+                                    ${deposit.refund_date !== 'N/A' ? `
+                                        <div class="detail-item">
+                                            <div class="detail-label">Refund Date</div>
+                                            <div class="detail-value">${deposit.refund_date}</div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
 
-Booking Period: ${deposit.booking.start_date} to ${deposit.booking.end_date}
-Duration: ${deposit.booking.duration}
+                            <!-- User Information -->
+                            <div class="detail-section">
+                                <div class="detail-section-title">Renter Information</div>
+                                <div class="user-detail">
+                                    ${deposit.user.avatar ?
+                                        `<img src="${deposit.user.avatar}" alt="${deposit.user.name}" class="user-detail-avatar">` :
+                                        `<div class="user-avatar blue" style="width: 48px; height: 48px; font-size: 18px;">${deposit.user.name.substring(0, 2).toUpperCase()}</div>`
+                                    }
+                                    <div class="user-detail-info">
+                                        <div class="user-detail-name">${deposit.user.name}</div>
+                                        <div class="user-detail-email">${deposit.user.email}</div>
+                                    </div>
+                                </div>
+                            </div>
 
-Notes: ${deposit.notes}`);
+                            <!-- Item Information -->
+                            <div class="detail-section">
+                                <div class="detail-section-title">Item Information</div>
+                                <div class="detail-grid">
+                                    <div class="detail-item full-width">
+                                        <div class="detail-label">Item Name</div>
+                                        <div class="detail-value">${deposit.item.name}</div>
+                                    </div>
+                                    <div class="detail-item full-width">
+                                        <div class="detail-label">Item Owner</div>
+                                        <div class="detail-value">${deposit.item.owner}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Booking Information -->
+                            <div class="detail-section">
+                                <div class="detail-section-title">Booking Information</div>
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Start Date</div>
+                                        <div class="detail-value">${deposit.booking.start_date}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">End Date</div>
+                                        <div class="detail-value">${deposit.booking.end_date}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Duration</div>
+                                        <div class="detail-value">${deposit.booking.duration}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Booking Status</div>
+                                        <div class="detail-value">${deposit.booking.status || 'N/A'}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${deposit.notes && deposit.notes !== 'N/A' ? `
+                                <div class="detail-section">
+                                    <div class="detail-section-title">Additional Notes</div>
+                                    <div class="detail-value">${deposit.notes}</div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons-modal">
+                                ${deposit.status.toLowerCase() === 'held' ? `
+                                    <button class="btn-modal btn-modal-primary" onclick="processRefund(${id})">
+                                        <i class="fas fa-check-circle"></i> Process Refund
+                                    </button>
+                                ` : ''}
+                                <button class="btn-modal btn-modal-secondary" onclick="closeDepositModal()">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        `;
+
+                        modalContent.innerHTML = content;
+                        document.getElementById('depositModal').classList.add('show');
                     }
                 })
                 .catch(error => {
@@ -703,6 +1023,35 @@ Notes: ${deposit.notes}`);
                     alert('Failed to load deposit details');
                 });
         }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.remove('show');
+        }
+
+        function processRefund(depositId) {
+            if (confirm('Are you sure you want to process this refund?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/deposits/${depositId}/refund`;
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = csrfToken;
+
+                form.appendChild(csrfInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeDepositModal();
+            }
+        });
 
         function generateReport() {
             fetch('/admin/deposits-report')

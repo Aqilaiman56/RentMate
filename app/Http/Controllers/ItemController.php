@@ -276,39 +276,69 @@ class ItemController extends Controller
         $validated = $request->validate([
             'ItemID' => 'required|exists:items,ItemID',
             'Rating' => 'required|integer|min:1|max:5',
-            'Comment' => 'required|string|max:1000'
+            'Comment' => 'required|string|max:1000',
+            'ReviewImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
-        
+
         // Check if user has booked this item
         $hasBooked = Booking::where('UserID', auth()->id())
             ->where('ItemID', $validated['ItemID'])
             ->whereIn('Status', ['Confirmed', 'confirmed', 'completed', 'Completed'])
             ->exists();
-        
+
         if (!$hasBooked) {
             return back()->with('error', 'You can only review items you have rented');
         }
-        
+
         // Check if already reviewed
         $existingReview = Review::where('UserID', auth()->id())
             ->where('ItemID', $validated['ItemID'])
             ->exists();
-        
+
         if ($existingReview) {
             return back()->with('error', 'You have already reviewed this item');
         }
-        
+
+        // Handle image upload
+        $reviewImagePath = null;
+        if ($request->hasFile('ReviewImage')) {
+            $reviewImagePath = $request->file('ReviewImage')->store('review_images', 'public');
+        }
+
         Review::create([
             'UserID' => auth()->id(),
             'ItemID' => $validated['ItemID'],
             'Rating' => $validated['Rating'],
             'Comment' => $validated['Comment'],
+            'ReviewImage' => $reviewImagePath,
             'DatePosted' => now(),
             'IsReported' => false
         ]);
-        
+
         return back()->with('success', 'Review added successfully!');
     }
 
-    
+    /**
+     * View bookings for a specific item (Owner only)
+     */
+    public function viewItemBookings($id)
+    {
+        $item = Item::with(['user', 'location', 'category', 'images'])
+            ->findOrFail($id);
+
+        // Check if the authenticated user is the owner
+        if ($item->UserID !== auth()->id()) {
+            abort(403, 'Unauthorized access. You are not the owner of this item.');
+        }
+
+        // Get all bookings for this item with related data
+        $bookings = Booking::with(['user', 'payment', 'deposit'])
+            ->where('ItemID', $id)
+            ->orderBy('BookingDate', 'desc')
+            ->paginate(10);
+
+        return view('user.item-bookings', compact('item', 'bookings'));
+    }
+
+
 }
