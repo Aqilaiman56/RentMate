@@ -360,7 +360,36 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         }
         return app(AdminDepositsController::class)->forfeit($request, $id);
     })->name('deposits.forfeit');
-    
+
+    // Refund Queue Management
+    Route::get('/refund-queue', function(Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\RefundQueueController::class)->index($request);
+    })->name('refund-queue');
+
+    Route::post('/refund-queue/{id}/processing', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\RefundQueueController::class)->markProcessing($id);
+    })->name('refund-queue.processing');
+
+    Route::post('/refund-queue/{id}/complete', function($id, Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\RefundQueueController::class)->complete($request, $id);
+    })->name('refund-queue.complete');
+
+    Route::post('/refund-queue/{id}/failed', function($id, Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\RefundQueueController::class)->markFailed($request, $id);
+    })->name('refund-queue.failed');
+
     // Reports Management
     Route::get('/reports', function(Request $request) {
         if (!auth()->user()->IsAdmin) {

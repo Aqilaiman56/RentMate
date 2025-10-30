@@ -477,6 +477,10 @@
                 <span class="nav-label">Total Deposits</span>
                 <span class="nav-count">RM {{ number_format($totalDeposits ?? 0, 2) }}</span>
             </a>
+            <a href="{{ route('admin.refund-queue') }}" class="nav-item {{ request()->routeIs('admin.refund-queue') ? 'active' : '' }}">
+                <span class="nav-icon"><i class="fas fa-hand-holding-usd"></i></span>
+                <span class="nav-label">Refund Queue</span>
+            </a>
             <a href="{{ route('admin.reports') }}" class="nav-item {{ request()->routeIs('admin.reports') ? 'active' : '' }}">
                 <span class="nav-icon"><i class="fas fa-flag"></i></span>
                 <span class="nav-label">Reports</span>

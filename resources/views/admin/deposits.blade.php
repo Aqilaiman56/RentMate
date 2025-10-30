@@ -954,6 +954,22 @@
                                         <div class="user-detail-email">${deposit.user.email}</div>
                                     </div>
                                 </div>
+
+                                <!-- Bank Account Details -->
+                                <div class="detail-grid" style="margin-top: 16px;">
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fas fa-university"></i> Bank Name</div>
+                                        <div class="detail-value">${deposit.user.bank_name}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fas fa-credit-card"></i> Account Number</div>
+                                        <div class="detail-value" style="font-family: monospace; color: #3b82f6;">${deposit.user.bank_account_number}</div>
+                                    </div>
+                                    <div class="detail-item full-width">
+                                        <div class="detail-label"><i class="fas fa-user"></i> Account Holder Name</div>
+                                        <div class="detail-value">${deposit.user.bank_account_holder}</div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Item Information -->
@@ -998,6 +1014,37 @@
                                 <div class="detail-section">
                                     <div class="detail-section-title">Additional Notes</div>
                                     <div class="detail-value">${deposit.notes}</div>
+                                </div>
+                            ` : ''}
+
+                            ${deposit.refund_queue ? `
+                                <div class="detail-section">
+                                    <div class="detail-section-title">Refund Queue Status</div>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <div class="detail-label">Refund Status</div>
+                                            <div class="detail-value status">
+                                                <span class="status-badge status-${deposit.refund_queue.status.toLowerCase()}">${deposit.refund_queue.status}</span>
+                                            </div>
+                                        </div>
+                                        ${deposit.refund_queue.reference ? `
+                                            <div class="detail-item">
+                                                <div class="detail-label">Reference Number</div>
+                                                <div class="detail-value">${deposit.refund_queue.reference}</div>
+                                            </div>
+                                        ` : ''}
+                                        ${deposit.refund_queue.processed_at ? `
+                                            <div class="detail-item">
+                                                <div class="detail-label">Processed At</div>
+                                                <div class="detail-value">${deposit.refund_queue.processed_at}</div>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    <div style="margin-top: 16px; padding: 12px; background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 8px;">
+                                        <a href="/admin/refund-queue" style="color: #1e40af; font-weight: 600; text-decoration: none;">
+                                            <i class="fas fa-external-link-alt"></i> View in Refund Queue
+                                        </a>
+                                    </div>
                                 </div>
                             ` : ''}
 
