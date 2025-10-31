@@ -522,4 +522,36 @@ class BookingController extends Controller
         \Log::info("Auto-completed {$completed} bookings and updated item availability");
         return $completed;
     }
+
+    /**
+     * Get unavailable dates for an item (API endpoint)
+     */
+    public function getUnavailableDates($itemId)
+    {
+        $item = Item::findOrFail($itemId);
+
+        // Get all confirmed/ongoing bookings for this item
+        $bookings = $item->bookings()
+            ->whereIn('Status', ['confirmed', 'Confirmed', 'ongoing', 'Ongoing', 'pending'])
+            ->where('EndDate', '>=', now())
+            ->get(['StartDate', 'EndDate']);
+
+        $unavailableDates = [];
+
+        foreach ($bookings as $booking) {
+            $start = Carbon::parse($booking->StartDate);
+            $end = Carbon::parse($booking->EndDate);
+
+            // Generate all dates in the range
+            while ($start->lte($end)) {
+                $unavailableDates[] = $start->format('Y-m-d');
+                $start->addDay();
+            }
+        }
+
+        // Remove duplicates and return
+        return response()->json([
+            'unavailable_dates' => array_unique($unavailableDates)
+        ]);
+    }
 }

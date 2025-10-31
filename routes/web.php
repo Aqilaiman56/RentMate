@@ -111,6 +111,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/booking/{id}', [BookingController::class, 'show'])->name('booking.show');
     Route::post('/booking/{id}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
     Route::post('/booking/{id}/complete', [BookingController::class, 'complete'])->name('booking.complete');
+    Route::get('/api/items/{itemId}/unavailable-dates', [BookingController::class, 'getUnavailableDates'])->name('booking.unavailable_dates');
 });
 
 /*

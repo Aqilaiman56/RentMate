@@ -415,7 +415,7 @@
         }
 
         .book-now-btn {
-            width: 100%;
+            width: 30%;
             background: #4461F2;
             color: white;
             border: none;
@@ -425,6 +425,8 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            display: block;
+            margin: 0 auto;
         }
 
         .book-now-btn:hover {
@@ -827,6 +829,44 @@
                     @endif
                 </div>
 
+                <div class="item-details-list">
+                    <h2 class="section-title">Item Details</h2>
+                    <div class="detail-row">
+                        <span class="detail-label">Category</span>
+                        <span class="detail-value">{{ $item->category->CategoryName ?? 'N/A' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Location</span>
+                        <span class="detail-value"><i class="fa-solid fa-location-dot"></i> {{ $item->location->LocationName ?? 'N/A' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Deposit Amount</span>
+                        <span class="detail-value">RM {{ number_format($item->DepositAmount, 2) }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Availability</span>
+                        <span class="detail-value">
+                            @if($item->Availability && $item->AvailableQuantity > 0)
+                                <span class="availability-badge badge-available">
+                                    <i class="fa-solid fa-check"></i> {{ $item->AvailableQuantity }} {{ $item->AvailableQuantity > 1 ? 'units' : 'unit' }} available
+                                </span>
+                            @else
+                                <span class="availability-badge badge-unavailable">
+                                    <i class="fa-solid fa-xmark"></i> Currently unavailable
+                                </span>
+                            @endif
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Quantity</span>
+                        <span class="detail-value">{{ $item->Quantity }} {{ $item->Quantity > 1 ? 'units' : 'unit' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Listed</span>
+                        <span class="detail-value">{{ $item->DateAdded ? $item->DateAdded->format('M d, Y') : 'N/A' }}</span>
+                    </div>
+                </div>
+
                 <div class="item-owner">
                     <div class="owner-header">
                         @if($item->user && $item->user->ProfileImage)
@@ -870,40 +910,6 @@
                     </div>
                 </div>
 
-                <div class="item-details-list">
-                    <h2 class="section-title">Item Details</h2>
-                    <div class="detail-row">
-                        <span class="detail-label">Category</span>
-                        <span class="detail-value">{{ $item->category->CategoryName ?? 'N/A' }}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Location</span>
-                        <span class="detail-value"><i class="fa-solid fa-location-dot"></i> {{ $item->location->LocationName ?? 'N/A' }}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Deposit Amount</span>
-                        <span class="detail-value">RM {{ number_format($item->DepositAmount, 2) }}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Availability</span>
-                        <span class="detail-value">
-                            @if($item->Availability && $item->AvailableQuantity > 0)
-                                <span class="availability-badge badge-available">
-                                    <i class="fa-solid fa-check"></i> {{ $item->AvailableQuantity }} {{ $item->AvailableQuantity > 1 ? 'units' : 'unit' }} available
-                                </span>
-                            @else
-                                <span class="availability-badge badge-unavailable">
-                                    <i class="fa-solid fa-xmark"></i> Currently unavailable
-                                </span>
-                            @endif
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Listed</span>
-                        <span class="detail-value">{{ $item->DateAdded ? $item->DateAdded->format('M d, Y') : 'N/A' }}</span>
-                    </div>
-                </div>
-
                 <div class="booking-card">
                     <div class="price-display">
                         RM {{ number_format($item->PricePerDay, 2) }}
@@ -926,7 +932,7 @@
                             <p style="color: #6b7280; font-weight: 500;">This is your listing</p>
                             <p style="color: #9ca3af; font-size: 14px; margin-top: 5px;">You cannot book your own item</p>
                         </div>
-                    @elseif($item->Availability)
+                    @else
                         <form id="bookingForm" class="booking-form">
                             <div class="form-group">
                                 <label class="form-label" for="start_date">Start Date</label>
@@ -961,12 +967,8 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="book-now-btn">Review Booking</button>
+                            <button type="submit" class="book-now-btn">Book Now</button>
                         </form>
-                    @else
-                        <div style="text-align: center; padding: 20px; color: #9ca3af;">
-                            <p>This item is currently unavailable</p>
-                        </div>
                     @endif
                 </div>
             </div>

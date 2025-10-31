@@ -670,7 +670,7 @@
                             <img src="https://via.placeholder.com/300x200/4461F2/fff?text={{ urlencode($item->ItemName) }}"
                                  class="item-image">
                         @endif
-                        
+
                         <div class="item-details">
                             <div class="item-title">{{ $item->ItemName }}</div>
                             <div class="item-location">
