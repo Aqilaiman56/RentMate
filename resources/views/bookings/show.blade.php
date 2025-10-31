@@ -573,7 +573,7 @@
                         <span>RM {{ number_format($depositAmount, 2) }}</span>
                     </div>
                     <div class="amount-row">
-                        <span>Tax</span>
+                        <span>Service Fee</span>
                         <span>RM 1.00</span>
                     </div>
                     <div class="amount-row total">

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Item;
 use App\Models\Deposit;
-use App\Models\Tax;
+use App\Models\ServiceFee;
 use App\Models\Notification;
 use App\Models\Payment;
 use App\Services\ToyyibPayService;
@@ -55,8 +55,8 @@ class BookingController extends Controller
         // Calculate amounts
         $rentalAmount = $item->PricePerDay * $days;
         $depositAmount = $item->DepositAmount;
-        $taxAmount = 1.00;
-        $totalAmount = $depositAmount + $taxAmount;
+        $serviceFeeAmount = 1.00;
+        $totalAmount = $depositAmount + $serviceFeeAmount;
 
         // Prepare booking data
         $bookingData = [
@@ -66,7 +66,7 @@ class BookingController extends Controller
             'days' => $days,
             'rental_amount' => $rentalAmount,
             'deposit_amount' => $depositAmount,
-            'tax_amount' => $taxAmount,
+            'service_fee_amount' => $serviceFeeAmount,
             'total_amount' => $totalAmount
         ];
 
@@ -136,11 +136,11 @@ class BookingController extends Controller
                 'DateCollected' => now()
             ]);
 
-            // Create tax record
-            Tax::create([
+            // Create service fee record
+            ServiceFee::create([
                 'UserID' => auth()->id(),
                 'BookingID' => $booking->BookingID,
-                'TaxAmount' => 1.00,
+                'ServiceFeeAmount' => 1.00,
                 'DateCollected' => now()
             ]);
 
@@ -220,7 +220,7 @@ class BookingController extends Controller
                 'StartDate' => $startDate,
                 'EndDate' => $endDate,
                 'TotalPaid' => 0, // Will be updated after payment
-                'TaxAmount' => 1.00,
+                'ServiceFeeAmount' => 1.00,
                 'Status' => 'pending',
                 'BookingDate' => now()
             ]);
@@ -233,11 +233,11 @@ class BookingController extends Controller
                 'DateCollected' => now()
             ]);
 
-            // Create tax record
-            Tax::create([
+            // Create service fee record
+            ServiceFee::create([
                 'UserID' => auth()->id(),
                 'BookingID' => $booking->BookingID,
-                'TaxAmount' => 1.00,
+                'ServiceFeeAmount' => 1.00,
                 'DateCollected' => now()
             ]);
 
@@ -260,10 +260,10 @@ class BookingController extends Controller
             // Create payment and redirect to ToyyibPay
             $toyyibpay = app(ToyyibPayService::class);
 
-            // Calculate payment amount (Deposit + Tax)
+            // Calculate payment amount (Deposit + Service Fee)
             $depositAmount = $item->DepositAmount;
-            $taxAmount = 1.00;
-            $totalAmount = $depositAmount + $taxAmount;
+            $serviceFeeAmount = 1.00;
+            $totalAmount = $depositAmount + $serviceFeeAmount;
 
             // Create payment record
             $payment = Payment::create([

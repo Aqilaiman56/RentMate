@@ -15,7 +15,7 @@ use App\Http\Controllers\Admin\ListingsController as AdminListingsController;
 use App\Http\Controllers\Admin\DepositsController as AdminDepositsController;
 use App\Http\Controllers\Admin\ReportsController as AdminReportsController;
 use App\Http\Controllers\Admin\PenaltiesController as AdminPenaltiesController;
-use App\Http\Controllers\Admin\TaxesController as AdminTaxesController;
+use App\Http\Controllers\Admin\ServiceFeesController as AdminServiceFeesController;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -464,22 +464,22 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         return $controller->export();
     })->name('penalties.export');
 
-    // Taxes Management
-    Route::get('/taxes', function(Request $request) {
+    // Service Fees Management
+    Route::get('/service-fees', function(Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new AdminTaxesController();
+        $controller = new AdminServiceFeesController();
         return $controller->index($request);
-    })->name('taxes');
+    })->name('service-fees');
 
-    Route::get('/taxes-export', function(Request $request) {
+    Route::get('/service-fees-export', function(Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new AdminTaxesController();
+        $controller = new AdminServiceFeesController();
         return $controller->export($request);
-    })->name('taxes.export');
+    })->name('service-fees.export');
 });
 
 /*

@@ -952,7 +952,7 @@
                                     <span>RM {{ number_format($item->DepositAmount, 2) }}</span>
                                 </div>
                                 <div class="calc-row">
-                                    <span>Tax (Online)</span>
+                                    <span>Service Fee (Online)</span>
                                     <span>RM 1.00</span>
                                 </div>
                                 <div class="calc-row total" style="background: #eff6ff; padding: 8px; border-radius: 6px; margin-top: 8px;">
@@ -1055,7 +1055,7 @@
     <script>
         const pricePerDay = {{ $item->PricePerDay }};
         const depositAmount = {{ $item->DepositAmount }};
-        const taxAmount = 1.00;
+        const serviceFeeAmount = 1.00;
 
         document.getElementById('start_date').addEventListener('change', calculateTotal);
         document.getElementById('end_date').addEventListener('change', calculateTotal);
@@ -1067,7 +1067,7 @@
             if (startDate && endDate && endDate > startDate) {
                 const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
                 const rentalTotal = pricePerDay * days;
-                const payOnline = depositAmount + taxAmount;
+                const payOnline = depositAmount + serviceFeeAmount;
 
                 document.getElementById('numDays').textContent = days;
                 document.getElementById('rentalTotal').textContent = 'RM ' + rentalTotal.toFixed(2);

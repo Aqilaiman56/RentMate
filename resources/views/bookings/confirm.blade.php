@@ -476,11 +476,11 @@
                         <span>RM {{ number_format($deposit_amount, 2) }}</span>
                     </div>
                     <div class="summary-row">
-                        <span>Service Tax</span>
-                        <span>RM {{ number_format($tax_amount, 2) }}</span>
+                        <span>Service Fee</span>
+                        <span>RM {{ number_format($service_fee_amount, 2) }}</span>
                     </div>
                     <div class="summary-row total">
-                        <span>Pay Now (Deposit + Tax)</span>
+                        <span>Pay Now (Deposit + Service Fee)</span>
                         <span class="price-highlight">RM {{ number_format($total_amount, 2) }}</span>
                     </div>
                 </div>
@@ -488,7 +488,7 @@
                 <div class="payment-note">
                     <p><strong><i class="fas fa-file-invoice-dollar"></i> Payment Breakdown:</strong></p>
                     <p>• <strong>Deposit:</strong> RM {{ number_format($deposit_amount, 2) }} - Held as security</p>
-                    <p>• <strong>Tax:</strong> RM {{ number_format($tax_amount, 2) }} - Service fee</p>
+                    <p>• <strong>Service Fee:</strong> RM {{ number_format($service_fee_amount, 2) }} - Platform service fee</p>
                     <p>• <strong>Rental:</strong> RM {{ number_format($rental_amount, 2) }} - Pay to owner</p>
                 </div>
 

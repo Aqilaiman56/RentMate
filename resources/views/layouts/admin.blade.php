@@ -491,10 +491,10 @@
                 <span class="nav-label">Penalty Actions</span>
                 <span class="nav-count">{{ $totalPenalties ?? 0 }}</span>
             </a>
-            <a href="{{ route('admin.taxes') }}" class="nav-item {{ request()->routeIs('admin.taxes') ? 'active' : '' }}">
+            <a href="{{ route('admin.service-fees') }}" class="nav-item {{ request()->routeIs('admin.service-fees') ? 'active' : '' }}">
                 <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                <span class="nav-label">Tax Transactions</span>
-                <span class="nav-count">{{ $taxCount ?? 0 }}</span>
+                <span class="nav-label">Service Fee Transactions</span>
+                <span class="nav-count">{{ $serviceFeeCount ?? 0 }}</span>
             </a>
         </nav>
     </aside>

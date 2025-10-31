@@ -20,7 +20,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Create payment for booking (Deposit + Tax only)
+     * Create payment for booking (Deposit + Service Fee only)
      */
     public function createPayment(Request $request)
     {
@@ -40,10 +40,10 @@ class PaymentController extends Controller
                 ->with('error', 'Payment has already been made for this booking');
         }
 
-        // Calculate amount (Deposit + Tax ONLY, no rental fee)
+        // Calculate amount (Deposit + Service Fee ONLY, no rental fee)
         $depositAmount = $booking->DepositAmount;
-        $taxAmount = 1.00;
-        $totalAmount = $depositAmount + $taxAmount;
+        $serviceFeeAmount = 1.00;
+        $totalAmount = $depositAmount + $serviceFeeAmount;
 
         // Create payment record
         $payment = Payment::create([

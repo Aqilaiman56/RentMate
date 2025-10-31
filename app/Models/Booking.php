@@ -23,7 +23,7 @@ class Booking extends Model
         'EndDate',
         'TotalAmount',
         'DepositAmount',
-        'TaxAmount',
+        'ServiceFeeAmount',
         'TotalPaid',
         'Status',
         'ReturnConfirmed',
@@ -34,7 +34,7 @@ class Booking extends Model
         'StartDate' => 'date',
         'EndDate' => 'date',
         'BookingDate' => 'datetime',
-        'TaxAmount' => 'decimal:2',
+        'ServiceFeeAmount' => 'decimal:2',
         'TotalPaid' => 'decimal:2',
         'ReturnConfirmed' => 'boolean'
     ];
@@ -93,11 +93,11 @@ class Booking extends Model
     }
 
         /**
-     * Get the tax for this booking
+     * Get the service fee for this booking
      */
-    public function tax()
+    public function serviceFee()
     {
-        return $this->hasOne(Tax::class, 'BookingID', 'BookingID');
+        return $this->hasOne(ServiceFee::class, 'BookingID', 'BookingID');
     }
 
     /**

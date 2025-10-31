@@ -498,8 +498,8 @@
             </div>
         </a>
 
-        <!-- Tax Count Card -->
-        <a href="{{ route('admin.taxes') }}" class="stat-card">
+        <!-- Service Fee Count Card -->
+        <a href="{{ route('admin.service-fees') }}" class="stat-card">
             <div class="stat-card-header">
                 <div class="stat-icon-wrapper teal"><i class="fas fa-chart-line"></i></div>
                 <div class="stat-trend up">
@@ -507,11 +507,11 @@
                 </div>
             </div>
             <div class="stat-card-body">
-                <div class="stat-value">{{ $taxCount ?? 0 }}</div>
-                <div class="stat-label">Tax Transactions</div>
+                <div class="stat-value">{{ $serviceFeeCount ?? 0 }}</div>
+                <div class="stat-label">Service Fee Transactions</div>
             </div>
             <div class="stat-card-footer">
-                <span class="stat-details">RM {{ number_format($totalTaxAmount ?? 0, 2) }} collected</span>
+                <span class="stat-details">RM {{ number_format($totalServiceFeeAmount ?? 0, 2) }} collected</span>
                 <span class="view-details">View details <i class="fas fa-arrow-right"></i></span>
             </div>
         </a>

@@ -27,7 +27,7 @@ class AdminSidebarComposer
                 'totalDeposits' => Deposit::whereIn('Status', ['held', 'refunded'])->sum('DepositAmount') ?? 0,
                 'totalReports' => Penalty::count(),
                 'totalPenalties' => Penalty::whereNotNull('PenaltyAmount')->where('PenaltyAmount', '>', 0)->count(),
-                'taxCount' => Booking::whereIn('Status', ['completed', 'approved'])->count(),
+                'serviceFeeCount' => Booking::whereIn('Status', ['completed', 'approved'])->count(),
             ]);
         }
     }

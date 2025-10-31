@@ -44,10 +44,10 @@ class DashboardController extends Controller
             ->count();
         $totalPenaltyAmount = Penalty::sum('PenaltyAmount') ?? 0;
 
-        // Tax Transactions (from completed bookings)
-        $taxCount = Booking::whereIn('Status', ['completed', 'approved'])->count();
-        $totalTaxAmount = Booking::whereIn('Status', ['completed', 'approved'])
-            ->sum('TaxAmount') ?? 0;
+        // Service Fee Transactions (from completed bookings)
+        $serviceFeeCount = Booking::whereIn('Status', ['completed', 'approved'])->count();
+        $totalServiceFeeAmount = Booking::whereIn('Status', ['completed', 'approved'])
+            ->sum('ServiceFeeAmount') ?? 0;
 
         // Notifications
         $notifications = $this->getNotifications();
@@ -60,8 +60,8 @@ class DashboardController extends Controller
             'pendingReports',
             'totalPenalties',
             'totalPenaltyAmount',
-            'taxCount',
-            'totalTaxAmount',
+            'serviceFeeCount',
+            'totalServiceFeeAmount',
             'notifications'
         ));
     }
