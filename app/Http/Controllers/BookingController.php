@@ -554,4 +554,115 @@ class BookingController extends Controller
             'unavailable_dates' => array_unique($unavailableDates)
         ]);
     }
+
+    /**
+     * Approve a booking (Item owner only)
+     */
+    public function approve($id)
+    {
+        $booking = Booking::with(['item', 'user'])->findOrFail($id);
+
+        // Only item owner can approve
+        if ($booking->item->UserID !== auth()->id()) {
+            abort(403, 'You are not authorized to approve this booking.');
+        }
+
+        // Only pending bookings can be approved
+        if ($booking->Status !== 'pending') {
+            return back()->with('error', 'Only pending bookings can be approved.');
+        }
+
+        // Check if dates are still available
+        if (!$booking->item->isAvailableForDates($booking->StartDate->format('Y-m-d'), $booking->EndDate->format('Y-m-d'), $booking->BookingID)) {
+            return back()->with('error', 'These dates are no longer available. The booking request has conflicts with another approved booking.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Update booking status to confirmed
+            $booking->update(['Status' => 'confirmed']);
+
+            // Update item availability
+            $booking->item->updateAvailabilityStatus();
+
+            // Notify the renter
+            Notification::create([
+                'UserID' => $booking->UserID,
+                'Type' => 'booking',
+                'Title' => '✅ Booking Request Approved',
+                'Content' => 'Your booking request for "' . $booking->item->ItemName . '" has been approved by the owner. Your rental starts on ' . $booking->StartDate->format('d M Y') . '.',
+                'RelatedID' => $booking->BookingID,
+                'RelatedType' => 'booking',
+                'CreatedAt' => now()
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', 'Booking approved successfully! The renter has been notified.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Booking approval error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to approve booking. Please try again.');
+        }
+    }
+
+    /**
+     * Reject a booking (Item owner only)
+     */
+    public function reject($id)
+    {
+        $booking = Booking::with(['item', 'user', 'deposit'])->findOrFail($id);
+
+        // Only item owner can reject
+        if ($booking->item->UserID !== auth()->id()) {
+            abort(403, 'You are not authorized to reject this booking.');
+        }
+
+        // Only pending bookings can be rejected
+        if ($booking->Status !== 'pending') {
+            return back()->with('error', 'Only pending bookings can be rejected.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Update booking status to cancelled/rejected
+            $booking->update(['Status' => 'rejected']);
+
+            // Refund deposit if exists
+            if ($booking->deposit) {
+                $booking->deposit->update([
+                    'Status' => 'refunded',
+                    'DateRefunded' => now(),
+                    'RefundMethod' => 'Booking Rejected',
+                    'RefundReference' => 'REJ-' . $booking->BookingID . '-' . time()
+                ]);
+            }
+
+            // Update item availability
+            $booking->item->updateAvailabilityStatus();
+
+            // Notify the renter
+            Notification::create([
+                'UserID' => $booking->UserID,
+                'Type' => 'booking',
+                'Title' => '❌ Booking Request Declined',
+                'Content' => 'Your booking request for "' . $booking->item->ItemName . '" has been declined by the owner. Your deposit will be refunded within 3-5 business days.',
+                'RelatedID' => $booking->BookingID,
+                'RelatedType' => 'booking',
+                'CreatedAt' => now()
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', 'Booking rejected. The renter will be refunded.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Booking rejection error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to reject booking. Please try again.');
+        }
+    }
 }

@@ -161,6 +161,11 @@
         color: #1e40af;
     }
 
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
     .empty-state {
         background: white;
         border-radius: 15px;

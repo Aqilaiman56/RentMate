@@ -188,8 +188,7 @@ class DepositsController extends Controller
                 'Notes' => $request->input('notes', 'Refund initiated by admin'),
             ]);
 
-            // Update deposit status to processing
-            $deposit->Status = 'processing_refund';
+            // Update deposit notes (keep status as 'held' until refund is processed)
             $deposit->Notes = 'Refund queued - Ref: #RQ' . str_pad($refundQueue->RefundQueueID, 4, '0', STR_PAD_LEFT);
             $deposit->save();
 

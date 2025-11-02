@@ -233,6 +233,16 @@
         color: #1e40af;
     }
 
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .pending-highlight {
+        background: #fffbeb !important;
+        border-left: 4px solid #f59e0b;
+    }
+
     .action-btn {
         background: #4461F2;
         color: white;
@@ -398,7 +408,7 @@
                 </thead>
                 <tbody>
                     @foreach($bookings as $booking)
-                        <tr>
+                        <tr class="{{ $booking->Status === 'pending' ? 'pending-highlight' : '' }}">
                             <td>
                                 <div class="renter-info">
                                     @if($booking->user->ProfileImage)

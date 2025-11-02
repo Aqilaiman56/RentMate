@@ -3,7 +3,8 @@
     "allow": [
       "Bash(php artisan migrate:rollback:*)",
       "Bash(php -l:*)",
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

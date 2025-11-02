@@ -566,6 +566,136 @@
             color: #6b7280;
         }
 
+        /* Calendar Styles */
+        .availability-calendar {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-nav-btn {
+            background: #e8eeff;
+            border: none;
+            color: #4461F2;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .calendar-nav-btn:hover {
+            background: #4461F2;
+            color: white;
+        }
+
+        .calendar-month-year {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 16px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            padding: 8px 4px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .calendar-day:not(.empty):not(.past):not(.unavailable):hover {
+            background: #e8eeff;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.empty {
+            cursor: default;
+        }
+
+        .calendar-day.past {
+            color: #CBD5E0;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.today {
+            font-weight: 700;
+            border: 2px solid #4461F2;
+        }
+
+        .calendar-day.available {
+            background: #d1fae5;
+            color: #065f46;
+            font-weight: 600;
+        }
+
+        .calendar-day.unavailable {
+            background: #fee2e2;
+            color: #991b1b;
+            cursor: not-allowed;
+            font-weight: 600;
+        }
+
+        .calendar-day.selected {
+            background: #4461F2;
+            color: white;
+            font-weight: 700;
+        }
+
+        .calendar-day.in-range {
+            background: #C7D2FE;
+            color: #3730A3;
+        }
+
+        .calendar-legend {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
         .reviews-section {
             background: white;
             padding: 30px;
@@ -934,14 +1064,38 @@
                         </div>
                     @else
                         <form id="bookingForm" class="booking-form">
+                            <!-- Availability Calendar -->
+                            <div class="availability-calendar">
+                                <div class="calendar-header">
+                                    <button type="button" class="calendar-nav-btn" id="prevMonth">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                    </button>
+                                    <div class="calendar-month-year" id="currentMonthYear"></div>
+                                    <button type="button" class="calendar-nav-btn" id="nextMonth">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <div class="calendar-grid" id="calendarGrid"></div>
+                                <div class="calendar-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-box" style="background: #d1fae5;"></div>
+                                        <span>Available</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-box" style="background: #fee2e2;"></div>
+                                        <span>Unavailable</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label class="form-label" for="start_date">Start Date</label>
-                                <input type="date" id="start_date" name="start_date" class="form-input" min="{{ date('Y-m-d') }}" required>
+                                <input type="date" id="start_date" name="start_date" class="form-input" min="{{ date('Y-m-d') }}" required readonly>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="end_date">End Date</label>
-                                <input type="date" id="end_date" name="end_date" class="form-input" min="{{ date('Y-m-d') }}" required>
+                                <input type="date" id="end_date" name="end_date" class="form-input" min="{{ date('Y-m-d') }}" required readonly>
                             </div>
 
                             <div class="total-calculation" id="totalCalculation" style="display: none;">
@@ -1058,6 +1212,151 @@
         const pricePerDay = {{ $item->PricePerDay }};
         const depositAmount = {{ $item->DepositAmount }};
         const serviceFeeAmount = 1.00;
+        const itemId = {{ $item->ItemID }};
+
+        let unavailableDates = [];
+        let currentMonth = new Date();
+        let selectedStartDate = null;
+        let selectedEndDate = null;
+
+        // Fetch unavailable dates
+        async function fetchUnavailableDates() {
+            try {
+                const response = await fetch(`/api/items/${itemId}/unavailable-dates`);
+                const data = await response.json();
+                unavailableDates = data.unavailable_dates || [];
+                renderCalendar();
+            } catch (error) {
+                console.error('Error fetching unavailable dates:', error);
+                renderCalendar();
+            }
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+
+            // Update month/year display
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentMonthYear').textContent = `${monthNames[month]} ${year}`;
+
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Build calendar grid
+            let html = '';
+
+            // Day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                html += `<div class="calendar-day-header">${day}</div>`;
+            });
+
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="calendar-day empty"></div>';
+            }
+
+            // Days of month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateStr = formatDate(date);
+                const isPast = date < today;
+                const isUnavailable = unavailableDates.includes(dateStr);
+                const isToday = date.getTime() === today.getTime();
+
+                let classes = ['calendar-day'];
+                if (isPast) classes.push('past');
+                else if (isUnavailable) classes.push('unavailable');
+                else classes.push('available');
+
+                if (isToday) classes.push('today');
+
+                // Check if selected
+                if (selectedStartDate && dateStr === formatDate(selectedStartDate)) {
+                    classes.push('selected');
+                } else if (selectedEndDate && dateStr === formatDate(selectedEndDate)) {
+                    classes.push('selected');
+                } else if (selectedStartDate && selectedEndDate && date > selectedStartDate && date < selectedEndDate) {
+                    classes.push('in-range');
+                }
+
+                const clickable = !isPast && !isUnavailable;
+                const onclick = clickable ? `onclick="selectDate('${dateStr}')"` : '';
+
+                html += `<div class="${classes.join(' ')}" ${onclick} data-date="${dateStr}">${day}</div>`;
+            }
+
+            document.getElementById('calendarGrid').innerHTML = html;
+        }
+
+        // Format date to YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Select date from calendar
+        function selectDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+
+            if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+                // Start new selection
+                selectedStartDate = date;
+                selectedEndDate = null;
+                document.getElementById('start_date').value = dateStr;
+                document.getElementById('end_date').value = '';
+            } else if (date > selectedStartDate) {
+                // Check if any unavailable dates in range
+                const hasUnavailable = checkUnavailableInRange(selectedStartDate, date);
+                if (hasUnavailable) {
+                    alert('Cannot select date range with unavailable dates. Please choose different dates.');
+                    return;
+                }
+
+                selectedEndDate = date;
+                document.getElementById('end_date').value = dateStr;
+            } else {
+                // Selected date is before start date, make it the new start
+                selectedStartDate = date;
+                selectedEndDate = null;
+                document.getElementById('start_date').value = dateStr;
+                document.getElementById('end_date').value = '';
+            }
+
+            renderCalendar();
+            calculateTotal();
+        }
+
+        // Check if there are unavailable dates in range
+        function checkUnavailableInRange(start, end) {
+            const current = new Date(start);
+            while (current <= end) {
+                if (unavailableDates.includes(formatDate(current))) {
+                    return true;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            return false;
+        }
+
+        // Navigate months
+        document.getElementById('prevMonth').addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderCalendar();
+        });
 
         document.getElementById('start_date').addEventListener('change', calculateTotal);
         document.getElementById('end_date').addEventListener('change', calculateTotal);
@@ -1080,6 +1379,11 @@
                 document.getElementById('totalCalculation').style.display = 'none';
             }
         }
+
+        // Initialize calendar on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchUnavailableDates();
+        });
 
         // Handle form submission
         document.getElementById('bookingForm').addEventListener('submit', function(e) {

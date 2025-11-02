@@ -85,6 +85,11 @@
         color: #1e40af;
     }
 
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
     .booking-grid {
         display: grid;
         grid-template-columns: 1fr 400px;
@@ -587,22 +592,45 @@
                 </div>
 
                 @if($booking->Status === 'pending')
-                    <form action="{{ route('payment.create') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="booking_id" value="{{ $booking->BookingID }}">
-                        <button type="submit" class="pay-btn">
-                            <i class="fas fa-credit-card"></i> Pay Deposit Now (RM {{ number_format($depositAmount + 1.00, 2) }})
-                        </button>
-                    </form>
+                    @if($booking->item->UserID === auth()->id())
+                        {{-- Owner view: Show approve/reject buttons --}}
+                        <div class="rental-notice" style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+                            <p><strong><i class="fas fa-clock"></i> Pending Approval:</strong> This booking is awaiting your approval. Please review the details and decide whether to approve or reject.</p>
+                        </div>
 
-                    <form action="{{ route('booking.cancel', $booking->BookingID) }}" 
-                          method="POST" 
-                          onsubmit="return confirm('Are you sure you want to cancel this booking?')">
-                        @csrf
-                        <button type="submit" class="cancel-btn">
-                            ✗ Cancel Booking
-                        </button>
-                    </form>
+                        <form action="{{ route('booking.approve', $booking->BookingID) }}"
+                              method="POST"
+                              style="margin-bottom: 10px;"
+                              onsubmit="return confirm('Approve this booking request? The renter will be notified.')">
+                            @csrf
+                            <button type="submit" class="complete-btn" style="background: #10b981;">
+                                <i class="fas fa-check-circle"></i> Approve Booking
+                            </button>
+                        </form>
+
+                        <form action="{{ route('booking.reject', $booking->BookingID) }}"
+                              method="POST"
+                              onsubmit="return confirm('Reject this booking request? The renter will be refunded.')">
+                            @csrf
+                            <button type="submit" class="cancel-btn" style="background: #ef4444; color: white;">
+                                <i class="fas fa-times-circle"></i> Reject Booking
+                            </button>
+                        </form>
+                    @else
+                        {{-- Renter view: Show payment and cancel buttons --}}
+                        <div class="rental-notice" style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+                            <p><strong><i class="fas fa-clock"></i> Awaiting Owner Approval:</strong> Your booking request is pending approval from the item owner. You will be notified once they respond.</p>
+                        </div>
+
+                        <form action="{{ route('booking.cancel', $booking->BookingID) }}"
+                              method="POST"
+                              onsubmit="return confirm('Are you sure you want to cancel this booking request?')">
+                            @csrf
+                            <button type="submit" class="cancel-btn">
+                                <i class="fas fa-times"></i> Cancel Request
+                            </button>
+                        </form>
+                    @endif
 
                 @elseif($booking->Status === 'confirmed')
                     <div class="payment-success">
@@ -663,8 +691,47 @@
 
                 @elseif($booking->Status === 'cancelled')
                     <div class="payment-success" style="background: #fee2e2; color: #991b1b;">
-                        ✗ Booking Cancelled
+                        <i class="fas fa-times-circle"></i> Booking Cancelled
                     </div>
+
+                    @if($booking->deposit && $booking->deposit->Status === 'refunded')
+                        <div class="payment-info">
+                            <div class="payment-info-row">
+                                <span>Refund Status:</span>
+                                <span>{{ ucfirst($booking->deposit->Status) }}</span>
+                            </div>
+                            <div class="payment-info-row">
+                                <span>Refund Date:</span>
+                                <span>{{ $booking->deposit->DateRefunded ? $booking->deposit->DateRefunded->format('d M Y') : 'Processing' }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+                @elseif($booking->Status === 'rejected')
+                    <div class="payment-success" style="background: #fee2e2; color: #991b1b;">
+                        <i class="fas fa-ban"></i> Booking Rejected by Owner
+                    </div>
+
+                    <div class="rental-notice" style="background: #fee2e2; border-left: 4px solid #ef4444;">
+                        <p><strong><i class="fas fa-info-circle"></i> Notice:</strong> The owner has declined your booking request. Your deposit will be refunded within 3-5 business days.</p>
+                    </div>
+
+                    @if($booking->deposit)
+                        <div class="payment-info">
+                            <div class="payment-info-row">
+                                <span>Deposit Amount:</span>
+                                <span>RM {{ number_format($booking->deposit->DepositAmount, 2) }}</span>
+                            </div>
+                            <div class="payment-info-row">
+                                <span>Refund Status:</span>
+                                <span>{{ ucfirst($booking->deposit->Status) }}</span>
+                            </div>
+                            <div class="payment-info-row">
+                                <span>Refund Date:</span>
+                                <span>{{ $booking->deposit->DateRefunded ? $booking->deposit->DateRefunded->format('d M Y') : 'Processing' }}</span>
+                            </div>
+                        </div>
+                    @endif
                 @endif
             </div>
         </div>

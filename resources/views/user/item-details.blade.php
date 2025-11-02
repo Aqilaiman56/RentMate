@@ -1002,7 +1002,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="book-now-btn">Review Booking</button>
+                        <button type="submit" class="book-now-btn">Book Now</button>
                     </form>
                 @endif
             </div>
