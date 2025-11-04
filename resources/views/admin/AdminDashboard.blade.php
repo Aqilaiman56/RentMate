@@ -92,34 +92,54 @@
         /* Notification Button */
         .notification-btn {
             position: relative;
-            background: none;
-            border: none;
-            font-size: 24px;
+            background: white;
+            border: 2px solid #E5E7EB;
+            font-size: 20px;
             cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: background-color 0.2s;
+            padding: 10px 14px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            color: #374151;
         }
 
         .notification-btn:hover {
-            background-color: rgba(0, 0, 0, 0.05);
+            background-color: #F5F7FF;
+            border-color: #4461F2;
+            color: #4461F2;
+        }
+
+        .notification-btn:active {
+            transform: scale(0.95);
+        }
+
+        .notification-btn.active {
+            background-color: #4461F2;
+            border-color: #4461F2;
+            color: white;
+        }
+
+        .notification-btn.active .notification-badge {
+            animation: none;
+            background: #ef4444;
         }
 
         .notification-badge {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: -6px;
+            right: -6px;
             background: #dc3545;
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            min-width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
+            padding: 0 5px;
             animation: pulse 2s infinite;
+            border: 2px solid white;
         }
 
         @keyframes pulse {
@@ -129,20 +149,20 @@
 
         /* Notification Dropdown */
         .notification-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 60px;
-            margin-top: 8px;
+            position: fixed;
+            top: 80px;
+            right: 50px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            width: 400px;
+            width: 420px;
             max-width: 90vw;
+            max-height: 600px;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s ease;
-            z-index: 1000;
+            z-index: 1001;
             overflow: hidden;
         }
 
@@ -150,6 +170,18 @@
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .notification-header {
@@ -188,14 +220,16 @@
             gap: 12px;
             padding: 14px 20px;
             border-bottom: 1px solid #f3f4f6;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             text-decoration: none;
             color: inherit;
             position: relative;
+            cursor: pointer;
         }
 
         .notification-item:hover {
             background-color: #f9fafb;
+            transform: translateX(2px);
         }
 
         .notification-item:last-child {
@@ -326,11 +360,46 @@
             background: #fef3c7;
             color: #d97706;
         }
+
+        /* Responsive Notification */
+        @media (max-width: 768px) {
+            .notification-dropdown {
+                position: fixed;
+                top: 70px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+                max-height: 500px;
+            }
+
+            .notification-btn {
+                padding: 8px 12px;
+                font-size: 18px;
+            }
+        }
+
+        /* Notification List Scrollbar */
+        .notification-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notification-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .notification-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .notification-list::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
     </style>
 
         <h1 class="header-title">Dashboard Overview</h1>
         <div class="header-actions">
-            <button class="notification-btn" id="notificationBtn" onclick="toggleNotifications()">
+            <button class="notification-btn" id="notificationBtn" type="button">
                 <i class="fas fa-bell"></i>
                 @if(($notifications['total_count'] ?? 0) > 0)
                     <span class="notification-badge">{{ $notifications['total_count'] }}</span>
@@ -545,16 +614,55 @@
         });
 
         // Notification Dropdown Toggle
-        function toggleNotifications() {
+        function toggleNotifications(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
             const dropdown = document.getElementById('notificationDropdown');
             const profileDropdown = document.getElementById('profileDropdown');
+            const notificationBtn = document.getElementById('notificationBtn');
 
             // Close profile dropdown if open
-            profileDropdown.classList.remove('show');
+            if (profileDropdown) {
+                profileDropdown.classList.remove('show');
+            }
 
             // Toggle notification dropdown
-            dropdown.classList.toggle('show');
+            if (dropdown) {
+                const isOpen = dropdown.classList.toggle('show');
+
+                // Toggle active class on button
+                if (notificationBtn) {
+                    if (isOpen) {
+                        notificationBtn.classList.add('active');
+                    } else {
+                        notificationBtn.classList.remove('active');
+                    }
+                }
+            }
         }
+
+        // Initialize notification dropdown handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationBtn = document.getElementById('notificationBtn');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+
+            // Prevent dropdown from closing when clicking inside
+            if (notificationDropdown) {
+                notificationDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            // Handle notification button click
+            if (notificationBtn) {
+                notificationBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleNotifications(e);
+                });
+            }
+        });
 
         // Close dropdowns when clicking outside
         document.addEventListener('click', function(e) {
@@ -564,13 +672,18 @@
             const profileDropdown = document.getElementById('profileDropdown');
 
             // Close notification dropdown if clicking outside
-            if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
-                notificationDropdown.classList.remove('show');
+            if (notificationDropdown && notificationBtn) {
+                if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.remove('show');
+                    notificationBtn.classList.remove('active');
+                }
             }
 
             // Close profile dropdown if clicking outside
-            if (!profileSection.contains(e.target)) {
-                profileDropdown.classList.remove('show');
+            if (profileSection && profileDropdown) {
+                if (!profileSection.contains(e.target)) {
+                    profileDropdown.classList.remove('show');
+                }
             }
         });
 
