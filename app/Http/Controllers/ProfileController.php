@@ -131,35 +131,101 @@ class ProfileController extends Controller
     /**
      * Submit a report against another user
      */
+    /**
+     * Show report form
+     */
+    public function showReportForm(): View
+    {
+        $currentUserId = auth()->id();
+
+        // Get users that the current user has interacted with
+        // 1. Users whose items the current user has booked (item owners)
+        $itemOwnerIds = \App\Models\Booking::where('booking.UserID', $currentUserId)
+            ->join('items', 'booking.ItemID', '=', 'items.ItemID')
+            ->pluck('items.UserID')
+            ->unique();
+
+        // 2. Users who have booked the current user's items (renters)
+        $renterIds = \App\Models\Booking::join('items', 'booking.ItemID', '=', 'items.ItemID')
+            ->where('items.UserID', $currentUserId)
+            ->pluck('booking.UserID')
+            ->unique();
+
+        // Combine both lists and remove duplicates
+        $relatedUserIds = $itemOwnerIds->merge($renterIds)->unique()->values();
+
+        // Get user details for these related users
+        $users = \App\Models\User::whereIn('UserID', $relatedUserIds)
+            ->where('UserID', '!=', $currentUserId)
+            ->where('IsAdmin', 0)
+            ->select('UserID', 'UserName', 'Email')
+            ->orderBy('UserName')
+            ->get();
+
+        // Get all bookings (both as renter and as item owner)
+        // Bookings where current user is the renter
+        $myBookings = \App\Models\Booking::where('booking.UserID', $currentUserId)
+            ->with(['item', 'item.user'])
+            ->get();
+
+        // Bookings where current user is the item owner
+        $bookingsOnMyItems = \App\Models\Booking::join('items', 'booking.ItemID', '=', 'items.ItemID')
+            ->where('items.UserID', $currentUserId)
+            ->with(['item', 'user'])
+            ->select('booking.*')
+            ->get();
+
+        // Combine both booking types
+        $bookings = $myBookings->merge($bookingsOnMyItems)
+            ->sortByDesc('BookingDate')
+            ->unique('BookingID')
+            ->values();
+
+        return view('user.report', compact('users', 'bookings'));
+    }
+
+    /**
+     * Submit a report
+     */
     public function submitReport(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'ReportedUserID' => 'required|exists:users,UserID',
+            'ReportType' => 'required|in:item-damage,late-return,dispute,fraud,harassment,other',
+            'Subject' => 'required|string|max:255',
+            'ReportedUserID' => 'nullable|exists:users,UserID',
             'BookingID' => 'nullable|exists:booking,BookingID',
-            'ItemID' => 'nullable|exists:items,ItemID',
-            'Description' => 'required|string|max:1000',
-            'EvidencePath' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'Description' => 'required|string|min:20|max:2000',
+            'EvidencePath' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240'
         ]);
 
         // Handle evidence upload
+        $evidencePath = null;
         if ($request->hasFile('EvidencePath')) {
-            $validated['EvidencePath'] = $request->file('EvidencePath')->store('evidence', 'public');
+            $evidencePath = $request->file('EvidencePath')->store('evidence', 'public');
         }
 
-        \App\Models\Penalty::create([
+        // Get ItemID from booking if provided
+        $itemId = null;
+        if (isset($validated['BookingID'])) {
+            $booking = \App\Models\Booking::find($validated['BookingID']);
+            $itemId = $booking->ItemID ?? null;
+        }
+
+        \App\Models\Report::create([
             'ReportedByID' => auth()->id(),
-            'ReportedUserID' => $validated['ReportedUserID'],
+            'ReportedUserID' => $validated['ReportedUserID'] ?? null,
             'BookingID' => $validated['BookingID'] ?? null,
-            'ItemID' => $validated['ItemID'] ?? null,
+            'ItemID' => $itemId,
+            'ReportType' => $validated['ReportType'],
+            'Priority' => 'medium',
+            'Subject' => $validated['Subject'],
             'Description' => $validated['Description'],
-            'EvidencePath' => $validated['EvidencePath'] ?? null,
-            'PenaltyAmount' => null,
-            'ResolvedStatus' => 0,
+            'EvidencePath' => $evidencePath,
+            'Status' => 'pending',
             'DateReported' => now(),
-            'ApprovedByAdminID' => null
         ]);
 
-        return Redirect::route('user.profile')->with('success', 'Report submitted successfully. Admin will review it soon.');
+        return Redirect::route('user.report')->with('success', 'Report submitted successfully. Admin will review it soon.');
     }
 
 

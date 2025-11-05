@@ -32,6 +32,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            gap: 30px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -40,43 +41,76 @@
         .logo {
             font-size: 24px;
             font-weight: 700;
-            color: #4461F2;
             text-decoration: none;
-        }
-
-        .search-bar {
+            white-space: nowrap;
             display: flex;
-            gap: 12px;
             align-items: center;
         }
 
-        .search-input {
-            padding: 12px 20px;
-            border: 2px solid #E5E7EB;
-            border-radius: 25px;
+        .logo-go {
+            color: #1e3a8a;
+        }
+
+        .logo-rent {
+            color: #60a5fa;
+        }
+
+        .logo-ums {
+            color: #1e3a8a;
+        }
+
+        .header-search-container {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .header-search-bar {
+            position: relative;
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-search-input {
+            flex: 1;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
             font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .header-search-input:focus {
             outline: none;
-            min-width: 150px;
-        }
-
-        .search-input:focus {
             border-color: #4461F2;
+            box-shadow: 0 0 0 3px rgba(68, 97, 242, 0.1);
         }
 
-        .search-btn {
+        .header-search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        .header-search-button {
+            padding: 12px 24px;
             background: #4461F2;
             color: white;
-            padding: 12px 32px;
             border: none;
-            border-radius: 25px;
+            border-radius: 50px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            white-space: nowrap;
         }
 
-        .search-btn:hover {
+        .header-search-button:hover {
             background: #3651E2;
+            transform: translateY(-1px);
         }
 
         .header-icons {
@@ -226,16 +260,28 @@
         }
 
         @media (max-width: 768px) {
-            .search-bar {
-                display: none;
+            .header {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+            }
+
+            .header-search-container {
+                order: 3;
+                width: 100%;
+                margin-top: 15px;
+                max-width: 100%;
+            }
+
+            .header-search-bar {
+                flex-direction: column;
+            }
+
+            .header-search-button {
+                width: 100%;
             }
 
             .profile-name {
                 display: none;
-            }
-
-            .header {
-                padding: 15px 20px;
             }
 
             .main-content {
@@ -248,24 +294,27 @@
 </head>
 <body>
     <header class="header">
-        <a href="{{ route('user.HomePage') }}" class="logo">GoRentUMS</a>
-        
-        <form action="{{ route('user.HomePage') }}" method="GET" class="search-bar">
-            <input type="date" name="availability" class="search-input" placeholder="Availability" value="{{ request('availability') }}">
-            <input type="text" name="search" class="search-input" placeholder="Item name" value="{{ request('search') }}">
-            <select name="location" class="search-input">
-                <option value="">Select Location</option>
-                @php
-                    $allLocations = \App\Models\Location::all();
-                @endphp
-                @foreach($allLocations as $location)
-                    <option value="{{ $location->LocationID }}" {{ request('location') == $location->LocationID ? 'selected' : '' }}>
-                        {{ $location->LocationName }}
-                    </option>
-                @endforeach
-            </select>
-            <button type="submit" class="search-btn">Search</button>
-        </form>
+        <a href="{{ route('user.HomePage') }}" class="logo">
+            <span class="logo-go">Go</span><span class="logo-rent">Rent</span><span class="logo-ums">UMS</span>
+        </a>
+
+        <!-- Search Bar in Header -->
+        <div class="header-search-container">
+            <form action="{{ route('user.HomePage') }}" method="GET" class="header-search-bar">
+                <span class="header-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input
+                    type="text"
+                    name="search"
+                    class="header-search-input"
+                    placeholder="Search items, categories, or locations..."
+                    value="{{ request('search') }}"
+                >
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
+                <button type="submit" class="header-search-button">Search</button>
+            </form>
+        </div>
 
         <div class="header-icons">
             <a href="{{ route('notifications.index') }}" class="icon-btn" id="notificationIcon">
@@ -306,6 +355,10 @@
                     <a href="{{ route('user.wishlist') }}" class="dropdown-item">
                         <span class="dropdown-icon"><i class="fas fa-heart"></i></span>
                         <span>Wishlist</span>
+                    </a>
+                    <a href="{{ route('user.report') }}" class="dropdown-item">
+                        <span class="dropdown-icon"><i class="fas fa-flag"></i></span>
+                        <span>Report Issue</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="logout-form">
                         @csrf

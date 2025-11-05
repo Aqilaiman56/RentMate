@@ -37,6 +37,11 @@ Route::get('/item/{id}', [ItemController::class, 'showPublicDetails'])->name('we
 // Public User Profile (No auth required - anyone can view)
 Route::get('/user-profile/{id}', [App\Http\Controllers\UserProfileController::class, 'show'])->name('user.public.profile');
 
+// Terms of Service (Public)
+Route::get('/terms', function () {
+    return view('pages.terms');
+})->name('terms');
+
 // User Homepage (Authenticated)
 Route::get('/homepage', [HomeController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -202,8 +207,9 @@ Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(fu
     
     // User Wishlist
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
-    
+
     // Report Submission
+    Route::get('/report', [ProfileController::class, 'showReportForm'])->name('report');
     Route::post('/report', [ProfileController::class, 'submitReport'])->name('report.submit');
 });
 

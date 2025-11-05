@@ -94,7 +94,7 @@
                 <div class="footer-legal">
                     <a href="#">Privacy Policy</a>
                     <span class="divider">•</span>
-                    <a href="#">Terms of Service</a>
+                    <a href="{{ route('terms') }}">Terms of Service</a>
                     <span class="divider">•</span>
                     <a href="#">Cookie Policy</a>
                 </div>
