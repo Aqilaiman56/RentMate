@@ -432,6 +432,30 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         return $controller->dismiss($request, $id);
     })->name('reports.dismiss');
 
+    Route::post('/reports/{id}/suspend-user', function($id, Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        $controller = new AdminReportsController();
+        return $controller->suspendUser($request, $id);
+    })->name('reports.suspend-user');
+
+    Route::post('/reports/{id}/issue-warning', function($id, Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        $controller = new AdminReportsController();
+        return $controller->issueWarning($request, $id);
+    })->name('reports.issue-warning');
+
+    Route::post('/reports/{id}/hold-deposit', function($id, Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        $controller = new AdminReportsController();
+        return $controller->holdDeposit($request, $id);
+    })->name('reports.hold-deposit');
+
     Route::get('/reports-export', function() {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Report;
 use App\Models\Penalty;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -167,6 +168,145 @@ class ReportsController extends Controller
         return back()->with('success', 'Report dismissed');
     }
 
+    public function suspendUser(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'suspension_duration' => 'required|string',
+            'suspension_end_date' => 'nullable|date|after:today',
+            'suspension_reason' => 'required|string',
+            'admin_notes' => 'nullable|string',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $report = Report::findOrFail($id);
+            $reportedUser = $report->reportedUser;
+
+            // Calculate suspension end date
+            $suspendedUntil = null;
+            if ($request->suspension_duration === 'permanent') {
+                $suspendedUntil = null;
+            } elseif ($request->suspension_duration === 'custom') {
+                $suspendedUntil = Carbon::parse($request->suspension_end_date);
+            } else {
+                $days = (int)$request->suspension_duration;
+                $suspendedUntil = Carbon::now()->addDays($days);
+            }
+
+            // Suspend the user
+            $reportedUser->update([
+                'IsSuspended' => true,
+                'SuspendedUntil' => $suspendedUntil,
+                'SuspensionReason' => $request->suspension_reason,
+                'SuspendedByAdminID' => auth()->id(),
+            ]);
+
+            // Update report status
+            $report->Status = 'resolved';
+            $report->ReviewedByAdminID = auth()->id();
+            $report->AdminNotes = $request->admin_notes ?? 'User suspended: ' . $request->suspension_reason;
+            $report->DateResolved = Carbon::now();
+            $report->save();
+
+            DB::commit();
+
+            $duration = $suspendedUntil ? 'until ' . $suspendedUntil->format('M d, Y') : 'permanently';
+            return back()->with('success', "User {$reportedUser->UserName} has been suspended {$duration}");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to suspend user: ' . $e->getMessage());
+        }
+    }
+
+    public function issueWarning(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'warning_level' => 'required|in:minor,moderate,severe,final',
+            'warning_message' => 'required|string',
+            'admin_notes' => 'nullable|string',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $report = Report::findOrFail($id);
+
+            // Create warning record (stored in admin notes for now, or create a warnings table)
+            $warningData = [
+                'level' => $request->warning_level,
+                'message' => $request->warning_message,
+                'issued_by' => auth()->id(),
+                'issued_at' => Carbon::now()->toDateTimeString(),
+            ];
+
+            // Update report
+            $report->Status = 'resolved';
+            $report->ReviewedByAdminID = auth()->id();
+            $report->AdminNotes = "WARNING ISSUED (" . strtoupper($request->warning_level) . "):\n"
+                                . $request->warning_message . "\n\n"
+                                . "Admin Notes: " . ($request->admin_notes ?? 'N/A');
+            $report->DateResolved = Carbon::now();
+            $report->save();
+
+            // TODO: Send email notification to the user
+            // You can implement email notification here
+
+            DB::commit();
+            return back()->with('success', ucfirst($request->warning_level) . ' warning issued to ' . $report->reportedUser->UserName);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to issue warning: ' . $e->getMessage());
+        }
+    }
+
+    public function holdDeposit(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'hold_amount' => 'required|numeric|min:0',
+            'hold_reason' => 'required|string',
+            'admin_notes' => 'nullable|string',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $report = Report::findOrFail($id);
+
+            // Create a penalty record to hold the deposit
+            Penalty::create([
+                'ReportID' => $report->ReportID,
+                'ReportedByID' => $report->ReportedByID,
+                'ReportedUserID' => $report->ReportedUserID,
+                'BookingID' => $report->BookingID,
+                'ItemID' => $report->ItemID,
+                'ApprovedByAdminID' => auth()->id(),
+                'Description' => 'DEPOSIT HOLD: ' . $request->hold_reason,
+                'PenaltyAmount' => $request->hold_amount,
+                'ResolvedStatus' => false,
+                'DateReported' => Carbon::now(),
+            ]);
+
+            // Update report
+            $report->Status = 'resolved';
+            $report->ReviewedByAdminID = auth()->id();
+            $report->AdminNotes = "DEPOSIT HOLD: RM " . number_format($request->hold_amount, 2) . "\n"
+                                . "Reason: " . $request->hold_reason . "\n\n"
+                                . "Admin Notes: " . ($request->admin_notes ?? 'N/A');
+            $report->DateResolved = Carbon::now();
+            $report->save();
+
+            DB::commit();
+            return back()->with('success', 'Deposit of RM ' . number_format($request->hold_amount, 2) . ' held against ' . $report->reportedUser->UserName);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to hold deposit: ' . $e->getMessage());
+        }
+    }
+
     public function export()
     {
         $reports = Report::with(['reporter', 'reportedUser', 'penalty'])->get();
@@ -179,9 +319,9 @@ class ReportsController extends Controller
 
         $callback = function() use ($reports) {
             $file = fopen('php://output', 'w');
-            
+
             fputcsv($file, ['Report ID', 'Type', 'Priority', 'Reporter', 'Reported User', 'Subject', 'Status', 'Date', 'Penalty Amount']);
-            
+
             foreach ($reports as $report) {
                 fputcsv($file, [
                     '#R' . str_pad($report->ReportID, 3, '0', STR_PAD_LEFT),
@@ -195,7 +335,7 @@ class ReportsController extends Controller
                     $report->penalty ? 'RM ' . number_format($report->penalty->PenaltyAmount, 2) : 'N/A',
                 ]);
             }
-            
+
             fclose($file);
         };
 

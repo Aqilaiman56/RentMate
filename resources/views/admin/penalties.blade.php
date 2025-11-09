@@ -8,27 +8,27 @@
         </div>
         <div class="header-actions">
             <a href="{{ route('admin.penalties.export') }}" class="btn btn-secondary">
-                📥 Export Data
+                Export Data
             </a>
         </div>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success">
-            ✓ {{ session('success') }}
+            {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-error">
-            ✗ {{ session('error') }}
+            {{ session('error') }}
         </div>
     @endif
 
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon red">⚠️</div>
+            <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $totalPenalties }}</div>
                 <div class="stat-label">Total Penalties</div>
@@ -36,7 +36,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon orange">⏳</div>
+            <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $pendingPenalties }}</div>
                 <div class="stat-label">Pending Review</div>
@@ -44,7 +44,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon green">✓</div>
+            <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $resolvedPenalties }}</div>
                 <div class="stat-label">Resolved</div>
@@ -52,7 +52,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon blue">💰</div>
+            <div class="stat-icon blue"><i class="fas fa-dollar-sign"></i></div>
             <div class="stat-content">
                 <div class="stat-value">RM {{ number_format($totalAmount, 2) }}</div>
                 <div class="stat-label">Total Amount</div>
@@ -63,7 +63,7 @@
     <!-- Filters and Search -->
     <form action="{{ route('admin.penalties') }}" method="GET" class="table-controls">
         <div class="search-box">
-            <span class="search-icon">🔍</span>
+            <i class="fas fa-search search-icon"></i>
             <input type="text" name="search" placeholder="Search penalties..." class="search-input" value="{{ request('search') }}">
         </div>
         <div class="filter-buttons">
@@ -142,14 +142,18 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn-icon btn-view" title="View Details" onclick="viewPenalty({{ $penalty->PenaltyID }})">👁️</button>
+                                    <button class="btn-icon btn-view" title="View Details" onclick="viewPenalty({{ $penalty->PenaltyID }})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                     @if(!$penalty->ResolvedStatus)
-                                        <form action="{{ route('admin.penalties.resolve', $penalty->PenaltyID) }}" 
-                                              method="POST" 
+                                        <form action="{{ route('admin.penalties.resolve', $penalty->PenaltyID) }}"
+                                              method="POST"
                                               style="display: inline;"
                                               onsubmit="return confirm('Mark this penalty as resolved?')">
                                             @csrf
-                                            <button type="submit" class="btn-icon btn-check" title="Mark as Resolved">✓</button>
+                                            <button type="submit" class="btn-icon btn-check" title="Mark as Resolved">
+                                                <i class="fas fa-check"></i>
+                                            </button>
                                         </form>
                                     @endif
                                 </div>
@@ -248,8 +252,8 @@
         .stat-label { font-size: 14px; color: #6b7280; }
         .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 20px; gap: 20px; flex-wrap: wrap; }
         .search-box { position: relative; flex: 1; min-width: 250px; max-width: 400px; }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; }
-        .search-input { width: 100%; padding: 10px 14px 10px 40px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
+        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #6b7280; }
+        .search-input { width: 100%; padding: 10px 14px 10px 45px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
         .search-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         .filter-buttons { display: flex; gap: 12px; }
         .filter-select { padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; transition: all 0.2s; }

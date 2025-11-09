@@ -8,27 +8,27 @@
         </div>
         <div class="header-actions">
             <a href="{{ route('admin.reports.export') }}" class="btn btn-secondary">
-                📥 Export Reports
+                Export Reports
             </a>
         </div>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success">
-            ✓ {{ session('success') }}
+            {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-error">
-            ✗ {{ session('error') }}
+            {{ session('error') }}
         </div>
     @endif
 
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon red">📋</div>
+            <div class="stat-icon red"><i class="fas fa-clipboard-list"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $totalReports }}</div>
                 <div class="stat-label">Total Reports</div>
@@ -36,7 +36,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon orange">⏳</div>
+            <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $pendingReports }}</div>
                 <div class="stat-label">Pending Review</div>
@@ -44,7 +44,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon green">✓</div>
+            <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $resolvedReports }}</div>
                 <div class="stat-label">Resolved</div>
@@ -52,7 +52,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon purple">❌</div>
+            <div class="stat-icon purple"><i class="fas fa-times-circle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $dismissedReports }}</div>
                 <div class="stat-label">Dismissed</div>
@@ -63,7 +63,7 @@
     <!-- Filters and Search -->
     <form action="{{ route('admin.reports') }}" method="GET" class="table-controls">
         <div class="search-box">
-            <span class="search-icon">🔍</span>
+            <i class="fas fa-search search-icon"></i>
             <input type="text" name="search" placeholder="Search reports..." class="search-input" value="{{ request('search') }}">
         </div>
         <div class="filter-buttons">
@@ -157,9 +157,13 @@
                             <td><span class="status-badge status-{{ $report->Status }}">{{ ucfirst($report->Status) }}</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn-icon btn-view" title="View Details" onclick="viewReport({{ $report->ReportID }})">👁️</button>
+                                    <button class="btn-icon btn-view" title="View Details" onclick="viewReport({{ $report->ReportID }})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                     @if($report->Status == 'pending' || $report->Status == 'investigating')
-                                        <button class="btn-icon btn-action" title="Take Action" onclick="showActionModal({{ $report->ReportID }}, '{{ $report->Subject }}')">⚡</button>
+                                        <button class="btn-icon btn-action" title="Take Action" onclick="showActionModal({{ $report->ReportID }}, '{{ $report->Subject }}')">
+                                            <i class="fas fa-bolt"></i>
+                                        </button>
                                     @endif
                                 </div>
                             </td>
@@ -184,50 +188,194 @@
         </div>
     @endif
 
+    <!-- View Report Details Modal -->
+    <div id="viewModal" class="modal" style="display: none;">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2 id="viewModalTitle">Report Details</h2>
+                <span class="close" onclick="closeViewModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="reportDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
     <!-- Action Modal -->
     <div id="actionModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close" onclick="closeActionModal()">&times;</span>
-            <h2 id="modalTitle">Take Action on Report</h2>
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2 id="modalTitle">Take Action on Report</h2>
+                <span class="close" onclick="closeActionModal()">&times;</span>
+            </div>
             <form id="actionForm" method="POST">
                 @csrf
-                <div class="form-group">
-                    <label>Action Type:</label>
-                    <select name="action_type" id="actionType" class="form-control" onchange="togglePenaltyFields()">
-                        <option value="">Select Action</option>
-                        <option value="resolve">Resolve Report</option>
-                        <option value="dismiss">Dismiss Report</option>
-                    </select>
-                </div>
-
-                <div id="penaltyFields" style="display: none;">
+                <div class="modal-body">
                     <div class="form-group">
-                        <label>
-                            <input type="checkbox" name="apply_penalty" id="applyPenalty" onchange="togglePenaltyAmount()">
-                            Apply Penalty
+                        <label class="form-label">
+                            Action Type
                         </label>
+                        <select name="action_type" id="actionType" class="form-control" onchange="toggleActionFields()" required>
+                            <option value="">Select Action</option>
+                            <optgroup label="User Actions">
+                                <option value="suspend">Suspend User</option>
+                                <option value="warning">Issue Warning</option>
+                                <option value="hold_deposit">Hold Deposit</option>
+                            </optgroup>
+                            <optgroup label="Report Actions">
+                                <option value="resolve">Resolve Report</option>
+                                <option value="dismiss">Dismiss Report</option>
+                            </optgroup>
+                        </select>
                     </div>
 
-                    <div id="penaltyAmountFields" style="display: none;">
-                        <div class="form-group">
-                            <label>Penalty Amount (RM):</label>
-                            <input type="number" name="penalty_amount" class="form-control" step="0.01" min="0">
+                    <!-- Suspend User Fields -->
+                    <div id="suspendFields" class="action-fields" style="display: none;">
+                        <div class="alert-info">
+                            <div>
+                                <strong>Suspend User Account</strong>
+                                <p>The reported user will be unable to access their account during suspension period.</p>
+                            </div>
                         </div>
+
                         <div class="form-group">
-                            <label>Penalty Reason:</label>
-                            <textarea name="penalty_description" class="form-control" rows="3"></textarea>
+                            <label class="form-label">
+                                Suspension Duration
+                            </label>
+                            <select name="suspension_duration" id="suspensionDuration" class="form-control" onchange="toggleCustomDate()">
+                                <option value="">Select Duration</option>
+                                <option value="3">3 Days</option>
+                                <option value="7">7 Days (1 Week)</option>
+                                <option value="14">14 Days (2 Weeks)</option>
+                                <option value="30">30 Days (1 Month)</option>
+                                <option value="90">90 Days (3 Months)</option>
+                                <option value="custom">Custom Date</option>
+                                <option value="permanent">Permanent</option>
+                            </select>
                         </div>
+
+                        <div id="customDateField" class="form-group" style="display: none;">
+                            <label class="form-label">Custom Suspension End Date</label>
+                            <input type="date" name="suspension_end_date" class="form-control" min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Suspension Reason
+                            </label>
+                            <textarea name="suspension_reason" class="form-control" rows="3" placeholder="Explain why this user is being suspended..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Warning Fields -->
+                    <div id="warningFields" class="action-fields" style="display: none;">
+                        <div class="alert-warning">
+                            <div>
+                                <strong>Issue Official Warning</strong>
+                                <p>A formal warning will be recorded and sent to the user via email.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Warning Level
+                            </label>
+                            <select name="warning_level" class="form-control">
+                                <option value="minor">Minor Warning</option>
+                                <option value="moderate" selected>Moderate Warning</option>
+                                <option value="severe">Severe Warning</option>
+                                <option value="final">Final Warning</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Warning Message
+                            </label>
+                            <textarea name="warning_message" class="form-control" rows="4" placeholder="Enter the warning message to be sent to the user..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Hold Deposit Fields -->
+                    <div id="holdDepositFields" class="action-fields" style="display: none;">
+                        <div class="alert-danger">
+                            <div>
+                                <strong>Hold Security Deposit</strong>
+                                <p>Temporarily hold an amount from the user's deposits for damages or violations.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Hold Amount (RM)
+                            </label>
+                            <input type="number" name="hold_amount" class="form-control" step="0.01" min="0" placeholder="0.00">
+                            <small class="form-hint">Amount to be held from user's deposits</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Reason for Hold
+                            </label>
+                            <textarea name="hold_reason" class="form-control" rows="3" placeholder="Explain why this amount is being held..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Resolve/Dismiss Fields -->
+                    <div id="resolveFields" class="action-fields" style="display: none;">
+                        <div class="alert-success">
+                            <div>
+                                <strong>Resolve Report</strong>
+                                <p>Mark this report as resolved and optionally apply a penalty.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="apply_penalty" id="applyPenalty" onchange="togglePenaltyAmount()">
+                                <span>Apply Penalty to Reported User</span>
+                            </label>
+                        </div>
+
+                        <div id="penaltyAmountFields" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Penalty Amount (RM)
+                                </label>
+                                <input type="number" name="penalty_amount" class="form-control" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Penalty Reason
+                                </label>
+                                <textarea name="penalty_description" class="form-control" rows="3" placeholder="Explain the reason for this penalty..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="dismissFields" class="action-fields" style="display: none;">
+                        <div class="alert-secondary">
+                            <div>
+                                <strong>Dismiss Report</strong>
+                                <p>Mark this report as dismissed without taking action.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Notes (Common for all) -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            Admin Notes
+                        </label>
+                        <textarea name="admin_notes" class="form-control" rows="4" placeholder="Add any internal notes about this action..." required></textarea>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Admin Notes:</label>
-                    <textarea name="admin_notes" class="form-control" rows="4" required></textarea>
-                </div>
-
-                <div class="modal-actions">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeActionModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Submit Action</button>
+                    <button type="submit" class="btn btn-primary">
+                        Submit Action
+                    </button>
                 </div>
             </form>
         </div>
@@ -272,63 +420,225 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal-content {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
+            border-radius: 16px;
             max-width: 600px;
             width: 90%;
             max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-content.modal-lg {
+            max-width: 800px;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(90vh - 160px);
             overflow-y: auto;
         }
 
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            background: #f9fafb;
+        }
+
         .close {
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            transition: all 0.2s;
+            font-size: 24px;
+            color: #6b7280;
             line-height: 1;
         }
 
         .close:hover {
+            background: #fee2e2;
             color: #ef4444;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        .form-group label {
-            display: block;
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             color: #1f2937;
+            font-size: 14px;
+        }
+
+        .label-icon {
+            font-size: 16px;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
             font-size: 14px;
+            transition: all 0.2s;
+            font-family: inherit;
         }
 
         .form-control:focus {
             outline: none;
             border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        .modal-actions {
+        .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-hint {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .checkbox-label:hover {
+            background: #f3f4f6;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-label span {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .action-fields {
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .alert-info, .alert-warning, .alert-danger, .alert-success, .alert-secondary {
             display: flex;
             gap: 12px;
-            justify-content: flex-end;
-            margin-top: 24px;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-secondary {
+            background: #f3f4f6;
+            border-left: 4px solid #6b7280;
+        }
+
+        .info-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .alert-info strong, .alert-warning strong, .alert-danger strong, .alert-success strong, .alert-secondary strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #1f2937;
+        }
+
+        .alert-info p, .alert-warning p, .alert-danger p, .alert-success p, .alert-secondary p {
+            margin: 0;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .btn-icon {
+            margin-right: 6px;
         }
 
         /* Keep all your existing styles from document #10 */
@@ -350,8 +660,8 @@
         .stat-label { font-size: 14px; color: #6b7280; }
         .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 20px; gap: 20px; flex-wrap: wrap; }
         .search-box { position: relative; flex: 1; min-width: 250px; max-width: 400px; }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; }
-        .search-input { width: 100%; padding: 10px 14px 10px 40px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
+        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #6b7280; }
+        .search-input { width: 100%; padding: 10px 14px 10px 45px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
         .search-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         .filter-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
         .filter-select { padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; transition: all 0.2s; }
@@ -397,7 +707,7 @@
         .status-resolved { background: #d1fae5; color: #065f46; }
         .status-dismissed { background: #f3f4f6; color: #6b7280; }
         .action-buttons { display: flex; gap: 8px; }
-        .btn-icon { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .btn-icon { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
         .btn-view { background: #dbeafe; }
         .btn-view:hover { background: #bfdbfe; }
         .btn-action { background: #fef3c7; }
@@ -410,30 +720,107 @@
     </style>
 
     <script>
+        let currentReportId = null;
+
         function viewReport(id) {
             fetch(`/admin/reports/${id}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const report = data.report;
-                        alert(`Report Details #R${id.toString().padStart(3, '0')}
+                        const content = `
+                            <div style="display: grid; gap: 24px;">
+                                <div>
+                                    <h3 style="margin: 0 0 16px 0; font-size: 16px; color: #6b7280;">Report Information</h3>
+                                    <div style="display: grid; gap: 12px;">
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #374151;">Report ID:</span>
+                                            <span>#R${id.toString().padStart(3, '0')}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #374151;">Type:</span>
+                                            <span>${report.type}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #374151;">Priority:</span>
+                                            <span>${report.priority}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #374151;">Status:</span>
+                                            <span>${report.status}</span>
+                                        </div>
+                                    </div>
+                                </div>
 
-Type: ${report.type}
-Priority: ${report.priority}
-Subject: ${report.subject}
-Status: ${report.status}
+                                <div>
+                                    <h3 style="margin: 0 0 16px 0; font-size: 16px; color: #6b7280;">Parties Involved</h3>
+                                    <div style="display: grid; gap: 12px;">
+                                        <div style="padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Reporter:</span>
+                                            <span>${report.reporter.name}</span><br>
+                                            <span style="color: #6b7280; font-size: 13px;">${report.reporter.email}</span>
+                                        </div>
+                                        <div style="padding: 12px; background: #fee2e2; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #991b1b; display: block; margin-bottom: 4px;">Reported User:</span>
+                                            <span>${report.reported_user.name}</span><br>
+                                            <span style="color: #7f1d1d; font-size: 13px;">${report.reported_user.email}</span>
+                                        </div>
+                                    </div>
+                                </div>
 
-Reporter: ${report.reporter.name} (${report.reporter.email})
-Reported User: ${report.reported_user.name} (${report.reported_user.email})
+                                <div>
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Subject</h3>
+                                    <p style="margin: 0; padding: 12px; background: #f9fafb; border-radius: 8px;">${report.subject}</p>
+                                </div>
 
-Description: ${report.description}
+                                <div>
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Description</h3>
+                                    <p style="margin: 0; padding: 12px; background: #f9fafb; border-radius: 8px; white-space: pre-wrap;">${report.description}</p>
+                                </div>
 
-Date Reported: ${report.date_reported}
-Date Resolved: ${report.date_resolved}
+                                ${report.booking ? `
+                                <div>
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Related Booking</h3>
+                                    <div style="padding: 12px; background: #dbeafe; border-radius: 8px;">
+                                        <span style="font-weight: 600;">Booking #${report.booking.id}</span><br>
+                                        <span>Item: ${report.booking.item}</span><br>
+                                        <span style="color: #1e40af; font-size: 13px;">${report.booking.dates}</span>
+                                    </div>
+                                </div>
+                                ` : ''}
 
-${report.penalty ? 'Penalty Applied: ' + report.penalty.amount + ' (Resolved: ' + report.penalty.resolved + ')' : 'No penalty applied'}
+                                ${report.penalty ? `
+                                <div>
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Penalty Applied</h3>
+                                    <div style="padding: 12px; background: #fee2e2; border-radius: 8px;">
+                                        <span style="font-weight: 600; color: #991b1b;">Amount: ${report.penalty.amount}</span><br>
+                                        <span style="font-size: 13px;">Resolved: ${report.penalty.resolved}</span>
+                                    </div>
+                                </div>
+                                ` : ''}
 
-Admin Notes: ${report.admin_notes}`);
+                                <div>
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Timeline</h3>
+                                    <div style="display: grid; gap: 8px;">
+                                        <div style="padding: 10px; background: #f9fafb; border-radius: 8px; font-size: 13px;">
+                                            <span style="font-weight: 600;">Reported:</span> ${report.date_reported}
+                                        </div>
+                                        <div style="padding: 10px; background: #f9fafb; border-radius: 8px; font-size: 13px;">
+                                            <span style="font-weight: 600;">Resolved:</span> ${report.date_resolved}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                ${report.admin_notes !== 'No notes' ? `
+                                <div>
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Admin Notes</h3>
+                                    <p style="margin: 0; padding: 12px; background: #fef3c7; border-radius: 8px; white-space: pre-wrap;">${report.admin_notes}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                        document.getElementById('reportDetailsContent').innerHTML = content;
+                        document.getElementById('viewModal').style.display = 'flex';
                     }
                 })
                 .catch(error => {
@@ -442,19 +829,55 @@ Admin Notes: ${report.admin_notes}`);
                 });
         }
 
+        function closeViewModal() {
+            document.getElementById('viewModal').style.display = 'none';
+        }
+
         function showActionModal(reportId, subject) {
+            currentReportId = reportId;
             document.getElementById('actionModal').style.display = 'flex';
             document.getElementById('modalTitle').textContent = `Take Action: ${subject}`;
-            document.getElementById('actionForm').action = '';
+            document.getElementById('actionForm').reset();
+            hideAllActionFields();
         }
 
         function closeActionModal() {
             document.getElementById('actionModal').style.display = 'none';
+            currentReportId = null;
         }
 
-        function togglePenaltyFields() {
+        function hideAllActionFields() {
+            document.querySelectorAll('.action-fields').forEach(field => {
+                field.style.display = 'none';
+            });
+        }
+
+        function toggleActionFields() {
             const actionType = document.getElementById('actionType').value;
-            document.getElementById('penaltyFields').style.display = actionType === 'resolve' ? 'block' : 'none';
+            hideAllActionFields();
+
+            switch(actionType) {
+                case 'suspend':
+                    document.getElementById('suspendFields').style.display = 'block';
+                    break;
+                case 'warning':
+                    document.getElementById('warningFields').style.display = 'block';
+                    break;
+                case 'hold_deposit':
+                    document.getElementById('holdDepositFields').style.display = 'block';
+                    break;
+                case 'resolve':
+                    document.getElementById('resolveFields').style.display = 'block';
+                    break;
+                case 'dismiss':
+                    document.getElementById('dismissFields').style.display = 'block';
+                    break;
+            }
+        }
+
+        function toggleCustomDate() {
+            const duration = document.getElementById('suspensionDuration').value;
+            document.getElementById('customDateField').style.display = duration === 'custom' ? 'block' : 'none';
         }
 
         function togglePenaltyAmount() {
@@ -465,15 +888,39 @@ Admin Notes: ${report.admin_notes}`);
         document.getElementById('actionForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
-            const reportId = this.action.split('/').pop();
             const actionType = formData.get('action_type');
-            
-            const url = actionType === 'resolve' 
-                ? `/admin/reports/${reportId}/resolve`
-                : `/admin/reports/${reportId}/dismiss`;
-            
+
+            let url;
+            switch(actionType) {
+                case 'suspend':
+                    url = `/admin/reports/${currentReportId}/suspend-user`;
+                    break;
+                case 'warning':
+                    url = `/admin/reports/${currentReportId}/issue-warning`;
+                    break;
+                case 'hold_deposit':
+                    url = `/admin/reports/${currentReportId}/hold-deposit`;
+                    break;
+                case 'resolve':
+                    url = `/admin/reports/${currentReportId}/resolve`;
+                    break;
+                case 'dismiss':
+                    url = `/admin/reports/${currentReportId}/dismiss`;
+                    break;
+                default:
+                    alert('Please select an action type');
+                    return;
+            }
+
             this.action = url;
             this.submit();
         });
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
     </script>
 @endsection

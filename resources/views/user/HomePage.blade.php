@@ -17,14 +17,15 @@
     .search-bar {
         position: relative;
         display: flex;
-        gap: 10px;
+        align-items: center;
+        gap: 8px;
     }
 
     .search-input {
         flex: 1;
-        padding: 16px 20px 16px 50px;
+        padding: 10px 16px 10px 40px;
         border: 1.5px solid #E2E8F0;
-        border-radius: 50px;
+        border-radius: 8px;
         font-size: 0.95rem;
         transition: all 0.2s;
         background: white;
@@ -44,30 +45,35 @@
 
     .search-icon {
         position: absolute;
-        left: 20px;
+        left: 14px;
         top: 50%;
         transform: translateY(-50%);
         color: #A0AEC0;
-        font-size: 18px;
+        font-size: 14px;
     }
 
     .search-button {
-        padding: 16px 32px;
+        padding: 8px 12px;
         background: #4A5FDC;
         color: white;
         border: none;
-        border-radius: 50px;
-        font-size: 0.95rem;
+        border-radius: 6px;
+        font-size: 13px;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
         font-family: inherit;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        white-space: nowrap;
     }
 
     .search-button:hover {
         background: #3D4FC7;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(74, 95, 220, 0.3);
+        box-shadow: 0 2px 8px rgba(74, 95, 220, 0.3);
     }
 
     .search-button:active {
@@ -151,8 +157,8 @@
     }
 
     .item-details {
-        background: #1E3A5F;
-        color: white;
+        background: white;
+        color: #1f2937;
         padding: 20px;
     }
 
@@ -171,13 +177,13 @@
         overflow: hidden;
         text-overflow: ellipsis;
         padding-right: 10px;
-        color: white;
+        color: #1f2937;
     }
 
     .heart-btn {
         background: none;
         border: none;
-        color: white;
+        color: #6b7280;
         font-size: 20px;
         cursor: pointer;
         transition: color 0.2s;
@@ -198,14 +204,14 @@
         align-items: center;
         gap: 6px;
         font-size: 0.75rem;
-        color: #CBD5E0;
+        color: #6b7280;
         margin-bottom: 12px;
     }
 
     .item-price {
         font-size: 1.125rem;
         font-weight: 700;
-        color: white;
+        color: #1f2937;
     }
 
     .no-items {
@@ -248,15 +254,45 @@
 
     @media (max-width: 768px) {
         .categories {
-            overflow-x: scroll;
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            justify-content: flex-start;
+            gap: 12px;
+            padding-bottom: 10px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        .categories::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .categories::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .categories::-webkit-scrollbar-thumb {
+            background: #4A5FDC;
+            border-radius: 10px;
+        }
+
+        .category-card {
+            flex: 0 0 100px;
+            scroll-snap-align: start;
         }
 
         .search-bar {
-            flex-direction: column;
+            flex-direction: row;
         }
 
         .search-button {
-            width: 100%;
+            width: auto;
+            flex-shrink: 0;
+            padding: 6px 10px;
+            font-size: 12px;
         }
     }
 </style>

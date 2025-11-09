@@ -179,7 +179,7 @@
             border-radius: 8px;
             font-size: 14px;
             transition: border-color 0.2s;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
         }
 
         .form-input:focus {

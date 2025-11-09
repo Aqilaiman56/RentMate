@@ -15,7 +15,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
             background: linear-gradient(180deg, #E8EEFF 0%, #F5F7FF 100%);
             min-height: 100vh;
         }
@@ -59,16 +59,17 @@
         .header-search-bar {
             position: relative;
             display: flex;
-            gap: 10px;
+            align-items: center;
+            gap: 8px;
         }
 
         .header-search-input {
             flex: 1;
-            padding: 12px 20px 12px 45px;
-            border: 2px solid #e5e7eb;
-            border-radius: 50px;
+            padding: 10px 16px 10px 40px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
             font-size: 14px;
-            transition: all 0.3s;
+            transition: all 0.2s;
             background: white;
         }
 
@@ -80,29 +81,38 @@
 
         .header-search-icon {
             position: absolute;
-            left: 18px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: #9ca3af;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .header-search-button {
-            padding: 12px 24px;
+            padding: 8px 12px;
             background: #4461F2;
             color: white;
             border: none;
-            border-radius: 50px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
         }
 
         .header-search-button:hover {
             background: #3651E2;
             transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(68, 97, 242, 0.3);
+        }
+
+        .header-search-button:active {
+            transform: translateY(0);
         }
 
         .auth-buttons {
@@ -293,7 +303,7 @@
 
         .item-card {
             background: white;
-            border-radius: 15px;
+            border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s;
@@ -301,10 +311,12 @@
             cursor: pointer;
             text-decoration: none;
             color: inherit;
+            border: 1px solid #e5e7eb;
         }
 
         .item-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
         }
 
         .item-image {
@@ -315,8 +327,8 @@
         }
 
         .item-details {
-            background: #1E3A5F;
-            color: white;
+            background: white;
+            color: #1f2937;
             padding: 20px;
         }
 
@@ -327,6 +339,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: #1f2937;
         }
 
         .item-location {
@@ -334,13 +347,14 @@
             align-items: center;
             gap: 6px;
             font-size: 12px;
-            color: #9CA3AF;
+            color: #6b7280;
             margin-bottom: 12px;
         }
 
         .item-price {
             font-size: 18px;
             font-weight: 700;
+            color: #1f2937;
         }
 
         .item-category-badge {
@@ -502,11 +516,14 @@
             }
 
             .header-search-bar {
-                flex-direction: column;
+                flex-direction: row;
             }
 
             .header-search-button {
-                width: 100%;
+                width: auto;
+                flex-shrink: 0;
+                padding: 6px 10px;
+                font-size: 12px;
             }
 
             .auth-buttons {
@@ -530,8 +547,34 @@
             }
 
             .categories {
-                overflow-x: scroll;
+                display: flex;
+                overflow-x: auto;
+                overflow-y: hidden;
                 justify-content: flex-start;
+                gap: 12px;
+                padding-bottom: 10px;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+            }
+
+            .categories::-webkit-scrollbar {
+                height: 6px;
+            }
+
+            .categories::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 10px;
+            }
+
+            .categories::-webkit-scrollbar-thumb {
+                background: #4461F2;
+                border-radius: 10px;
+            }
+
+            .category-card {
+                flex: 0 0 100px;
+                scroll-snap-align: start;
             }
 
             .container {

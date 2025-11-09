@@ -18,7 +18,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
             background: linear-gradient(180deg, #E8EEFF 0%, #F5F7FF 100%);
             min-height: 100vh;
             display: flex;
@@ -67,16 +67,17 @@
         .header-search-bar {
             position: relative;
             display: flex;
-            gap: 10px;
+            align-items: center;
+            gap: 8px;
         }
 
         .header-search-input {
             flex: 1;
-            padding: 12px 20px 12px 45px;
-            border: 2px solid #e5e7eb;
-            border-radius: 50px;
+            padding: 10px 16px 10px 40px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
             font-size: 14px;
-            transition: all 0.3s;
+            transition: all 0.2s;
             background: white;
         }
 
@@ -88,29 +89,38 @@
 
         .header-search-icon {
             position: absolute;
-            left: 18px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: #9ca3af;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .header-search-button {
-            padding: 12px 24px;
+            padding: 8px 12px;
             background: #4461F2;
             color: white;
             border: none;
-            border-radius: 50px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
         }
 
         .header-search-button:hover {
             background: #3651E2;
             transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(68, 97, 242, 0.3);
+        }
+
+        .header-search-button:active {
+            transform: translateY(0);
         }
 
         .header-icons {
@@ -273,11 +283,14 @@
             }
 
             .header-search-bar {
-                flex-direction: column;
+                flex-direction: row;
             }
 
             .header-search-button {
-                width: 100%;
+                width: auto;
+                flex-shrink: 0;
+                padding: 6px 10px;
+                font-size: 12px;
             }
 
             .profile-name {

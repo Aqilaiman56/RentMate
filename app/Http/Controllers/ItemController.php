@@ -115,7 +115,7 @@ class ItemController extends Controller
     {
         $validated = $request->validate([
             'ItemName' => 'required|string|max:255',
-            'Description' => 'required|string',
+            'Description' => 'required|string|min:50',
             'CategoryID' => 'required|exists:category,CategoryID',
             'LocationID' => 'required|exists:location,LocationID',
             'DepositAmount' => 'required|numeric|min:0',
@@ -175,7 +175,7 @@ class ItemController extends Controller
 
         $validated = $request->validate([
             'ItemName' => 'required|string|max:255',
-            'Description' => 'required|string',
+            'Description' => 'required|string|min:50',
             'CategoryID' => 'required|exists:category,CategoryID',
             'LocationID' => 'required|exists:location,LocationID',
             'DepositAmount' => 'required|numeric|min:0',

@@ -8,20 +8,20 @@
         </div>
         <div class="header-actions">
             <a href="{{ route('admin.service-fees.export', ['year' => $year]) }}" class="btn btn-secondary">
-                Export {{ $year }} Data
+                <i class="fas fa-download"></i> Export {{ $year }} Data
             </a>
         </div>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-error">
-            {{ session('error') }}
+            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
         </div>
     @endif
 
@@ -44,7 +44,9 @@
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon blue"></div>
+            <div class="stat-icon blue">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
             <div class="stat-content">
                 <div class="stat-value">RM {{ number_format($totalServiceFees, 2) }}</div>
                 <div class="stat-label">Total Service Fee Collected ({{ $year }})</div>
@@ -52,7 +54,9 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon green"></div>
+            <div class="stat-icon green">
+                <i class="fas fa-receipt"></i>
+            </div>
             <div class="stat-content">
                 <div class="stat-value">{{ $totalTransactions }}</div>
                 <div class="stat-label">Total Transactions</div>
@@ -60,7 +64,9 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon purple"></div>
+            <div class="stat-icon purple">
+                <i class="fas fa-chart-line"></i>
+            </div>
             <div class="stat-content">
                 <div class="stat-value">RM {{ number_format($averagePerMonth, 2) }}</div>
                 <div class="stat-label">Average Per Month</div>
@@ -68,7 +74,9 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon orange"></div>
+            <div class="stat-icon orange">
+                <i class="fas fa-tag"></i>
+            </div>
             <div class="stat-content">
                 <div class="stat-value">RM 1.00</div>
                 <div class="stat-label">Service Fee Per Booking</div>
@@ -286,10 +294,22 @@
             font-size: 24px;
         }
 
-        .stat-icon.blue { background: #dbeafe; }
-        .stat-icon.green { background: #d1fae5; }
-        .stat-icon.purple { background: #e9d5ff; }
-        .stat-icon.orange { background: #fed7aa; }
+        .stat-icon.blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .stat-icon.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .stat-icon.purple {
+            background: #e9d5ff;
+            color: #7e22ce;
+        }
+        .stat-icon.orange {
+            background: #fed7aa;
+            color: #c2410c;
+        }
 
         .stat-content {
             flex: 1;

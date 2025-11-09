@@ -68,7 +68,7 @@
         border: 2px solid #e5e7eb;
         border-radius: 10px;
         font-size: 14px;
-        font-family: 'Inter', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
         transition: border-color 0.3s;
     }
 
@@ -363,14 +363,15 @@
                     <label class="form-label" for="Description">
                         Description <span class="required">*</span>
                     </label>
-                    <textarea 
-                        id="Description" 
-                        name="Description" 
-                        class="form-textarea" 
+                    <textarea
+                        id="Description"
+                        name="Description"
+                        class="form-textarea"
                         placeholder="Describe your item in detail... Include condition, features, and any important details."
                         required
+                        minlength="50"
                     >{{ old('Description') }}</textarea>
-                    <div class="form-help">Provide as much detail as possible to attract renters</div>
+                    <div class="form-help">Minimum 50 characters required. Provide as much detail as possible to attract renters.</div>
                     @error('Description')
                         <div class="error-message">{{ $message }}</div>
                     @enderror
