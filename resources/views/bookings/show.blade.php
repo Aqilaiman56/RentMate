@@ -431,6 +431,13 @@
         </div>
     @endif
 
+    @if($booking->Status === 'pending' && $booking->payment && $booking->payment->Status === 'successful')
+        <div class="alert" style="background: #fef3c7; color: #92400e; border: 1px solid #fbbf24;">
+            <i class="fas fa-hourglass-half"></i>
+            <strong>Waiting for Owner Approval</strong> - Your payment of RM {{ number_format($booking->payment->Amount, 2) }} has been successfully received. The owner will review and approve your booking request shortly. You will be notified once the owner makes a decision.
+        </div>
+    @endif
+
     <div class="booking-header">
         <h1 class="booking-title">Booking Details</h1>
         <span class="status-badge status-{{ strtolower($booking->Status) }}">

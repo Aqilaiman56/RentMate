@@ -119,10 +119,9 @@ class PaymentController extends Controller
                     'PaymentResponse' => json_encode($request->all())
                 ]);
 
-                // Update booking status
-                $booking->update([
-                    'Status' => 'confirmed'
-                ]);
+                // Keep booking as pending - owner needs to approve
+                // Note: Status remains 'pending' until owner approves the booking
+                // No status update here
 
                 // Update item availability automatically
                 $booking->item->updateAvailabilityStatus();
@@ -130,23 +129,23 @@ class PaymentController extends Controller
                 // Calculate rental amount to remind user
                 $rentalAmount = $booking->TotalAmount;
 
-                // Create notification for user (renter)
+                // Create notification for user (renter) - payment done, waiting for approval
                 Notification::create([
                     'UserID' => $booking->UserID,
                     'Type' => 'payment',
                     'Title' => '✅ Deposit Payment Successful',
-                    'Content' => 'Your deposit payment of RM ' . number_format($payment->Amount, 2) . ' for booking #' . $booking->BookingID . ' has been confirmed. Remember to pay the rental fee of RM ' . number_format($rentalAmount, 2) . ' to the owner.',
+                    'Content' => 'Your deposit payment of RM ' . number_format($payment->Amount, 2) . ' for booking #' . $booking->BookingID . ' has been received. Waiting for the owner to approve your booking request. Rental fee of RM ' . number_format($rentalAmount, 2) . ' to be paid directly to owner upon approval.',
                     'RelatedID' => $payment->PaymentID,
                     'RelatedType' => 'payment',
                     'CreatedAt' => now()
                 ]);
 
-                // Notify item owner
+                // Notify item owner - payment received, needs to approve
                 Notification::create([
                     'UserID' => $booking->item->UserID,
                     'Type' => 'booking',
-                    'Title' => '🎉 New Booking Confirmed',
-                    'Content' => 'Booking #' . $booking->BookingID . ' for ' . $booking->item->ItemName . ' has been confirmed. Deposit paid. Contact the renter for rental fee arrangement.',
+                    'Title' => '💰 Booking Payment Received - Action Required',
+                    'Content' => 'Booking #' . $booking->BookingID . ' for ' . $booking->item->ItemName . ' - Deposit has been paid by ' . $booking->user->UserName . '. Please review and approve or cancel this booking request.',
                     'RelatedID' => $booking->BookingID,
                     'RelatedType' => 'booking',
                     'CreatedAt' => now()
@@ -157,7 +156,7 @@ class PaymentController extends Controller
                 Log::info('Payment successful for booking: ' . $booking->BookingID);
 
                 return redirect()->route('booking.show', $booking->BookingID)
-                    ->with('success', 'Deposit payment successful! Your booking is confirmed. Please arrange to pay the rental fee directly to the owner.');
+                    ->with('success', 'Deposit payment successful! Your booking request is pending owner approval. You will be notified once the owner reviews your request.');
 
             } catch (\Exception $e) {
                 DB::rollBack();

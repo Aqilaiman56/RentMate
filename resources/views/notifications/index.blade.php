@@ -320,7 +320,7 @@
 
         @if($notifications->hasPages())
             <div class="pagination-wrapper">
-                {{ $notifications->links() }}
+                @include('components.pagination', ['paginator' => $notifications])
             </div>
         @endif
     @else

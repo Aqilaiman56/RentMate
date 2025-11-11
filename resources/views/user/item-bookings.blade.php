@@ -246,20 +246,87 @@
     .action-btn {
         background: #4461F2;
         color: white;
-        padding: 8px 16px;
-        border-radius: 8px;
+        padding: 6px 12px;
+        border-radius: 6px;
         text-decoration: none;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
         transition: all 0.2s;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
     }
 
     .action-btn:hover {
-        background: #3651E2;
         transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-btn i {
+        font-size: 11px;
+    }
+
+    .action-btn-success {
+        background: #10b981;
+    }
+
+    .action-btn-success:hover {
+        background: #059669;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .action-btn-danger {
+        background: #ef4444;
+    }
+
+    .action-btn-danger:hover {
+        background: #dc2626;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    .action-btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+
+    .action-btn-secondary:hover {
+        background: #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+    }
+
+    .action-row {
+        display: flex;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .payment-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        background: #d1fae5;
+        color: #065f46;
+        margin-bottom: 4px;
+        border: 1px solid #a7f3d0;
+    }
+
+    .payment-status i {
+        font-size: 10px;
     }
 
     .empty-state {
@@ -450,9 +517,55 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('booking.show', $booking->BookingID) }}" class="action-btn">
-                                    <i class="fas fa-eye"></i> View Details
-                                </a>
+                                <div class="action-buttons">
+                                    @if($booking->Status === 'pending' && $booking->payment && $booking->payment->Status === 'successful')
+                                        <!-- Payment completed, waiting for approval -->
+                                        <span class="payment-status">
+                                            <i class="fas fa-check-circle"></i> Payment Received
+                                        </span>
+                                        <div class="action-row">
+                                            <form action="{{ route('booking.approve', $booking->BookingID) }}" method="POST" style="margin: 0;">
+                                                @csrf
+                                                <button type="submit" class="action-btn action-btn-success" onclick="return confirm('Approve this booking? The renter will be notified.')">
+                                                    <i class="fas fa-check"></i> Approve
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('booking.reject', $booking->BookingID) }}" method="POST" style="margin: 0;">
+                                                @csrf
+                                                <button type="submit" class="action-btn action-btn-danger" onclick="return confirm('Cancel this booking? The deposit will be refunded to the renter.')">
+                                                    <i class="fas fa-times"></i> Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <a href="{{ route('booking.show', $booking->BookingID) }}" class="action-btn action-btn-secondary">
+                                            <i class="fas fa-eye"></i> View Details
+                                        </a>
+                                    @elseif($booking->Status === 'pending')
+                                        <!-- Pending without payment -->
+                                        <div class="action-row">
+                                            <form action="{{ route('booking.approve', $booking->BookingID) }}" method="POST" style="margin: 0;">
+                                                @csrf
+                                                <button type="submit" class="action-btn action-btn-success" onclick="return confirm('Approve this booking?')">
+                                                    <i class="fas fa-check"></i> Approve
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('booking.reject', $booking->BookingID) }}" method="POST" style="margin: 0;">
+                                                @csrf
+                                                <button type="submit" class="action-btn action-btn-danger" onclick="return confirm('Reject this booking?')">
+                                                    <i class="fas fa-times"></i> Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <a href="{{ route('booking.show', $booking->BookingID) }}" class="action-btn action-btn-secondary">
+                                            <i class="fas fa-eye"></i> View Details
+                                        </a>
+                                    @else
+                                        <!-- For confirmed, completed, cancelled, rejected bookings -->
+                                        <a href="{{ route('booking.show', $booking->BookingID) }}" class="action-btn action-btn-secondary">
+                                            <i class="fas fa-eye"></i> View Details
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @endforeach

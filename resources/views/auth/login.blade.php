@@ -71,7 +71,7 @@
 
                     <!-- Username/Email -->
                     <div class="gorent-form-group">
-                        <label for="email" class="gorent-label">Username</label>
+                        <label for="email" class="gorent-label">Email</label>
                         <input id="email" 
                                class="gorent-input" 
                                type="email" 

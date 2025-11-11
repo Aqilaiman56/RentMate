@@ -613,7 +613,7 @@ class BookingController extends Controller
      */
     public function reject($id)
     {
-        $booking = Booking::with(['item', 'user', 'deposit'])->findOrFail($id);
+        $booking = Booking::with(['item', 'user', 'deposit', 'payment'])->findOrFail($id);
 
         // Only item owner can reject
         if ($booking->item->UserID !== auth()->id()) {
@@ -637,6 +637,13 @@ class BookingController extends Controller
                     'DateRefunded' => now(),
                     'RefundMethod' => 'Booking Rejected',
                     'RefundReference' => 'REJ-' . $booking->BookingID . '-' . time()
+                ]);
+            }
+
+            // Refund payment if it was made
+            if ($booking->payment && $booking->payment->Status === 'successful') {
+                $booking->payment->update([
+                    'Status' => 'refunded'
                 ]);
             }
 

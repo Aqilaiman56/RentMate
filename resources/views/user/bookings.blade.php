@@ -248,6 +248,38 @@
         background: #059669;
     }
 
+    .waiting-approval {
+        background: #fef3c7;
+        border: 1px solid #fbbf24;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .waiting-approval i {
+        color: #f59e0b;
+        font-size: 18px;
+    }
+
+    .waiting-approval-text {
+        flex: 1;
+    }
+
+    .waiting-approval-title {
+        font-weight: 600;
+        color: #92400e;
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
+    .waiting-approval-desc {
+        font-size: 12px;
+        color: #78350f;
+    }
+
     .reviewed-badge {
         display: inline-flex;
         align-items: center;
@@ -509,6 +541,17 @@
                             <i class="fas fa-calendar"></i> {{ $booking->StartDate->format('d M Y') }} - {{ $booking->EndDate->format('d M Y') }}
                             <span style="color: #9ca3af;">({{ $booking->StartDate->diffInDays($booking->EndDate) }} days)</span>
                         </div>
+
+                        @if($booking->Status === 'pending' && $booking->payment && $booking->payment->Status === 'successful')
+                            <!-- Show waiting for approval message -->
+                            <div class="waiting-approval">
+                                <i class="fas fa-hourglass-half"></i>
+                                <div class="waiting-approval-text">
+                                    <div class="waiting-approval-title">Waiting for Owner Approval</div>
+                                    <div class="waiting-approval-desc">Your payment has been received. The owner will review your booking request shortly.</div>
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="booking-meta">
                             <div class="meta-item">
