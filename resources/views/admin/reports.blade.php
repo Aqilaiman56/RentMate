@@ -164,6 +164,11 @@
                                         <button class="btn-icon btn-action" title="Take Action" onclick="showActionModal({{ $report->ReportID }}, '{{ $report->Subject }}')">
                                             <i class="fas fa-bolt"></i>
                                         </button>
+                                        @if(!$report->hasPenalty())
+                                        <button class="btn-icon btn-penalty" title="Issue Penalty" onclick="showPenaltyModal({{ $report->ReportID }})">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </button>
+                                        @endif
                                     @endif
                                 </div>
                             </td>
@@ -376,6 +381,44 @@
                     <button type="submit" class="btn btn-primary">
                         Submit Action
                     </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Issue Penalty Modal -->
+    <div id="penaltyModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Issue Penalty</h2>
+                <span class="close" onclick="closePenaltyModal()">&times;</span>
+            </div>
+            <form id="penaltyForm" onsubmit="submitPenalty(event)">
+                @csrf
+                <div class="modal-body">
+                    <input type="hidden" id="penalty_report_id" name="ReportID">
+
+                    <div class="form-group">
+                        <label class="form-label">Penalty Amount (RM)</label>
+                        <input type="number" name="PenaltyAmount" class="form-control" step="0.01" min="0" max="999999.99" placeholder="0.00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Penalty Description</label>
+                        <textarea name="Description" class="form-control" rows="4" placeholder="Describe the reason for this penalty..." required></textarea>
+                    </div>
+
+                    <div class="alert-warning">
+                        <div>
+                            <strong>Note:</strong>
+                            <p>This penalty will be recorded in the user's account and they will be notified. The report will be automatically marked as resolved.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closePenaltyModal()">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Issue Penalty</button>
                 </div>
             </form>
         </div>
@@ -712,6 +755,8 @@
         .btn-view:hover { background: #bfdbfe; }
         .btn-action { background: #fef3c7; }
         .btn-action:hover { background: #fde68a; }
+        .btn-penalty { background: #fee2e2; color: #dc2626; }
+        .btn-penalty:hover { background: #fecaca; }
         .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; display: inline-block; }
         .btn-primary { background: #3b82f6; color: white; }
         .btn-primary:hover { background: #2563eb; }
@@ -915,6 +960,50 @@
             this.action = url;
             this.submit();
         });
+
+        // Penalty Modal Functions
+        function showPenaltyModal(reportId) {
+            document.getElementById('penalty_report_id').value = reportId;
+            document.getElementById('penaltyModal').style.display = 'flex';
+        }
+
+        function closePenaltyModal() {
+            document.getElementById('penaltyModal').style.display = 'none';
+            document.getElementById('penaltyForm').reset();
+        }
+
+        function submitPenalty(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = {
+                ReportID: formData.get('ReportID'),
+                PenaltyAmount: formData.get('PenaltyAmount'),
+                Description: formData.get('Description')
+            };
+
+            fetch('/admin/penalties/create-from-report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Penalty issued successfully!');
+                    closePenaltyModal();
+                    location.reload();
+                } else {
+                    alert(data.message || 'Failed to issue penalty');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while issuing the penalty');
+            });
+        }
 
         // Close modals when clicking outside
         window.onclick = function(event) {

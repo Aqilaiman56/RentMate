@@ -211,6 +211,9 @@ Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(fu
     // Report Submission
     Route::get('/report', [ProfileController::class, 'showReportForm'])->name('report');
     Route::post('/report', [ProfileController::class, 'submitReport'])->name('report.submit');
+
+    // Penalty History
+    Route::get('/penalties', [\App\Http\Controllers\PenaltyController::class, 'userHistory'])->name('penalties');
 });
 
 /*
@@ -469,7 +472,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new AdminPenaltiesController();
+        $controller = new \App\Http\Controllers\PenaltyController();
         return $controller->index($request);
     })->name('penalties');
 
@@ -477,24 +480,40 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new AdminPenaltiesController();
+        $controller = new \App\Http\Controllers\PenaltyController();
         return $controller->show($id);
     })->name('penalties.show');
 
-    Route::post('/penalties/{id}/resolve', function($id) {
+    Route::post('/penalties/create-from-report', function(Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new AdminPenaltiesController();
-        return $controller->resolve($id);
+        $controller = new \App\Http\Controllers\PenaltyController();
+        return $controller->createFromReport($request);
+    })->name('penalties.create');
+
+    Route::post('/penalties/{id}/resolve', function($id, Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403);
+        }
+        $controller = new \App\Http\Controllers\PenaltyController();
+        return $controller->resolve($request, $id);
     })->name('penalties.resolve');
 
-    Route::get('/penalties-export', function() {
+    Route::delete('/penalties/{id}', function($id) {
         if (!auth()->user()->IsAdmin) {
             abort(403);
         }
-        $controller = new AdminPenaltiesController();
-        return $controller->export();
+        $controller = new \App\Http\Controllers\PenaltyController();
+        return $controller->destroy($id);
+    })->name('penalties.destroy');
+
+    Route::get('/penalties-export', function(Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403);
+        }
+        $controller = new \App\Http\Controllers\PenaltyController();
+        return $controller->export($request);
     })->name('penalties.export');
 
     // Service Fees Management
