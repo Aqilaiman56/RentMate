@@ -89,12 +89,12 @@
         }
 
         .header-search-button {
-            padding: 8px 12px;
+            padding: 10px 20px;
             background: #4461F2;
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -103,6 +103,7 @@
             align-items: center;
             gap: 4px;
             flex-shrink: 0;
+            min-height: 42px;
         }
 
         .header-search-button:hover {
