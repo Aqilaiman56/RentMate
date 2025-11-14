@@ -5,6 +5,7 @@
 @php
     $hideSearch = true;
     $hideFooter = true;
+    $hideHeader = true;
 @endphp
 
 @push('styles')
@@ -15,7 +16,7 @@
 
     .chat-container {
         position: fixed;
-        top: 95px;
+        top: 0;
         left: 0;
         right: 0;
         bottom: 0;
@@ -23,7 +24,7 @@
         padding: 0;
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 95px);
+        height: 100vh;
         max-width: 100%;
     }
 
@@ -442,33 +443,18 @@
     }
 
     @media (max-width: 968px) {
-        .chat-container {
-            top: 85px;
-            height: calc(100vh - 85px);
-        }
-
         .chat-header {
             padding: 16px 20px;
         }
     }
 
     @media (max-width: 768px) {
-        .chat-container {
-            top: 75px;
-            height: calc(100vh - 75px);
-        }
-
         .chat-header {
             padding: 14px 16px;
         }
     }
 
     @media (max-width: 480px) {
-        .chat-container {
-            top: 70px;
-            height: calc(100vh - 70px);
-        }
-
         .chat-header {
             padding: 12px 14px;
         }

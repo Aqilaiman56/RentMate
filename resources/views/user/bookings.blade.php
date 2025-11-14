@@ -456,6 +456,11 @@
         cursor: not-allowed;
     }
 
+    /* Pagination Styles */
+    .pagination-wrapper {
+        margin-top: 30px;
+    }
+
     @media (max-width: 768px) {
         .bookings-container {
             padding: 20px 15px;
@@ -600,8 +605,8 @@
         </div>
 
         @if($bookings->hasPages())
-            <div style="margin-top: 30px; display: flex; justify-content: center;">
-                {{ $bookings->links() }}
+            <div class="pagination-wrapper">
+                @include('components.pagination', ['paginator' => $bookings])
             </div>
         @endif
     @else

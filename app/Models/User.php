@@ -54,6 +54,14 @@ class User extends Authenticatable
         return $this->PasswordHash;
     }
 
+    /**
+     * Get the email address for password reset.
+     */
+    public function getEmailForPasswordReset()
+    {
+        return $this->Email;
+    }
+
     // Relationships
     public function items()
     {

@@ -307,6 +307,7 @@
     @stack('styles')
 </head>
 <body>
+    @if(!isset($hideHeader) || !$hideHeader)
     <header class="header">
         <a href="{{ route('user.HomePage') }}" class="logo">
             <span class="logo-go">Go</span><span class="logo-rent">Rent</span><span class="logo-ums">UMS</span>
@@ -339,7 +340,7 @@
                 <i class="fas fa-envelope"></i>
                 <span class="notification-badge hidden" id="messageBadge">0</span>
             </a>
-            
+
             <div class="profile-section" id="profileSection">
                 @if(auth()->user()->ProfileImage)
                     <img src="{{ asset('storage/' . auth()->user()->ProfileImage) }}" alt="Profile" class="profile-pic">
@@ -347,7 +348,7 @@
                     <img src="https://via.placeholder.com/40" alt="Profile" class="profile-pic">
                 @endif
                 <span class="profile-name">{{ auth()->user()->UserName ?? 'User' }}</span>
-                
+
                 <!-- Dropdown Menu -->
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="{{ route('user.profile') }}" class="dropdown-item">
@@ -385,6 +386,7 @@
             </div>
         </div>
     </header>
+    @endif
 
     <div class="main-content">
         @yield('content')

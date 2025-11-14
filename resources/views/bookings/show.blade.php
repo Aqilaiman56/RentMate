@@ -517,9 +517,9 @@
 
                         <div class="owner-details">
                             <h3>{{ $booking->item->user->UserName }}</h3>
-                            <p><i class="fas fa-envelope"></i> {{ $booking->item->user->Email }}</p>
+                            <p><i class="fa-solid fa-envelope"></i> {{ $booking->item->user->Email }}</p>
                             @if($booking->item->user->PhoneNumber)
-                                <p><i class="fas fa-phone"></i> {{ $booking->item->user->PhoneNumber }}</p>
+                                <p><i class="fa-solid fa-mobile-screen-button"></i> {{ $booking->item->user->PhoneNumber }}</p>
                             @endif
                         </div>
                     </div>
@@ -546,9 +546,9 @@
 
                         <div class="owner-details">
                             <h3>{{ $booking->user->UserName }}</h3>
-                            <p><i class="fas fa-envelope"></i> {{ $booking->user->Email }}</p>
+                            <p><i class="fa-solid fa-envelope"></i> {{ $booking->user->Email }}</p>
                             @if($booking->user->PhoneNumber)
-                                <p><i class="fas fa-phone"></i> {{ $booking->user->PhoneNumber }}</p>
+                                <p><i class="fa-solid fa-mobile-screen-button"></i> {{ $booking->user->PhoneNumber }}</p>
                             @endif
                         </div>
                     </div>

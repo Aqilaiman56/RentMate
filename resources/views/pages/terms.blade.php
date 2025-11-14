@@ -539,7 +539,7 @@
     <div class="contact-section">
         <h3>Need Help or Have Questions?</h3>
         <p><i class="fa-solid fa-envelope"></i> Email: support@gorentums.com</p>
-        <p><i class="fa-solid fa-phone"></i> Phone: +60 12-345 6789</p>
+        <p><i class="fa-solid fa-mobile-screen-button"></i> Phone: +60 12-345 6789</p>
         <p style="margin-top: 20px; font-size: 14px;">
             Our support team is available Monday to Friday, 9:00 AM - 6:00 PM (MYT)
         </p>

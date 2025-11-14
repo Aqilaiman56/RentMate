@@ -976,13 +976,13 @@
                     <div class="detail-row">
                         <span class="detail-label">Availability</span>
                         <span class="detail-value">
-                            @if($item->Availability && $item->AvailableQuantity > 0)
+                            @if($item->Availability)
                                 <span class="availability-badge badge-available">
-                                    <i class="fa-solid fa-check"></i> {{ $item->AvailableQuantity }} {{ $item->AvailableQuantity > 1 ? 'units' : 'unit' }} available
+                                    <i class="fa-solid fa-check"></i> Available
                                 </span>
                             @else
                                 <span class="availability-badge badge-unavailable">
-                                    <i class="fa-solid fa-xmark"></i> Currently unavailable
+                                    <i class="fa-solid fa-xmark"></i> Not Available
                                 </span>
                             @endif
                         </span>
@@ -1013,7 +1013,7 @@
 
                 <div class="item-description">
                     <h2 class="section-title">Description</h2>
-                    <p class="description-text">{{ $item->Description }}</p>
+                    <div class="description-text">{!! nl2br(e($item->Description)) !!}</div>
                 </div>
             </div>
 
@@ -1083,8 +1083,11 @@
                                     </div>
                                     <div class="legend-item">
                                         <div class="legend-box" style="background: #fee2e2;"></div>
-                                        <span>Unavailable</span>
+                                        <span>Booked</span>
                                     </div>
+                                </div>
+                                <div style="text-align: center; margin-top: 10px; font-size: 0.75rem; color: #6b7280;">
+                                    <i class="fa-solid fa-info-circle"></i> Calendar shows all bookings including past dates for reference
                                 </div>
                             </div>
 

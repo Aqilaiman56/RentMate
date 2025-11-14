@@ -9,7 +9,9 @@
       "Bash(then echo \"exists\")",
       "Bash(else echo \"does not exist\")",
       "Bash(fi)",
-      "Bash(php -r:*)"
+      "Bash(php -r:*)",
+      "Bash(dir /s \"c:\\xampp\\htdocs\\RentMate\\app\\Http\\Controllers\")",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

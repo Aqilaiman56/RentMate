@@ -52,7 +52,7 @@
                     </div>
                     @if($user->PhoneNumber)
                         <div class="detail-item">
-                            <i class="fas fa-phone"></i>
+                            <i class="fa-solid fa-mobile-screen-button"></i>
                             <span>{{ $user->PhoneNumber }}</span>
                         </div>
                     @endif

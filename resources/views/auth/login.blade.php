@@ -92,7 +92,7 @@
                                    class="gorent-input gorent-input-password"
                                    type="password"
                                    name="password"
-                                   required 
+                                   required
                                    autocomplete="current-password"
                                    placeholder="8+ characters">
                             <button type="button" class="gorent-password-toggle" onclick="togglePassword()">
@@ -102,9 +102,17 @@
                         <x-input-error :messages="$errors->get('password')" class="gorent-error" />
                     </div>
 
-                    <!-- Terms Notice -->
-                    <div class="gorent-terms-notice">
-                        By signing up you agree to <a href="#" class="gorent-link">terms and conditions</a> of aloha.
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="gorent-remember-forgot">
+                        <label class="gorent-checkbox-label">
+                            <input type="checkbox" name="remember" id="remember_me" class="gorent-checkbox">
+                            <span class="gorent-checkbox-text">Remember me</span>
+                        </label>
+                        @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" class="gorent-forgot-link">
+                                Forgot Password?
+                            </a>
+                        @endif
                     </div>
 
                     <!-- Login Button -->
@@ -287,20 +295,57 @@
             font-size: 1.1rem;
         }
 
-        .gorent-terms-notice {
-            font-size: 0.875rem;
-            color: #718096;
-            line-height: 1.5;
+        .gorent-remember-forgot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: -0.5rem;
         }
 
-        .gorent-link {
+        .gorent-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .gorent-forgot-link {
             color: #4A5FDC;
             text-decoration: none;
+            font-size: 0.9rem;
             font-weight: 500;
+            transition: all 0.2s;
         }
 
-        .gorent-link:hover {
+        .gorent-forgot-link:hover {
+            color: #3D4FC7;
             text-decoration: underline;
+        }
+
+        .gorent-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #CBD5E0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            accent-color: #4A5FDC;
+        }
+
+        .gorent-checkbox:hover {
+            border-color: #4A5FDC;
+        }
+
+        .gorent-checkbox:checked {
+            background-color: #4A5FDC;
+            border-color: #4A5FDC;
+        }
+
+        .gorent-checkbox-text {
+            font-size: 0.9rem;
+            color: #2D3748;
+            font-weight: 500;
         }
 
         .gorent-btn-primary {

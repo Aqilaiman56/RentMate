@@ -258,6 +258,40 @@
             margin-top: 4px;
         }
 
+        /* Password Input Wrapper */
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-input-wrapper .form-input {
+            padding-right: 45px;
+            flex: 1;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: #6B7280;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle-btn:hover {
+            color: #4461F2;
+        }
+
+        .password-toggle-btn i {
+            font-size: 16px;
+        }
+
         @media (max-width: 768px) {
             .profile-header {
                 flex-direction: column;
@@ -294,12 +328,12 @@
 
             <div class="profile-info">
                 <h1>{{ $user->UserName }}</h1>
-                <p><i class="fas fa-envelope"></i> {{ $user->Email }}</p>
+                <p><i class="fa-solid fa-envelope"></i> {{ $user->Email }}</p>
                 @if($user->PhoneNumber)
-                    <p><i class="fas fa-phone"></i> {{ $user->PhoneNumber }}</p>
+                    <p><i class="fa-solid fa-mobile-screen-button"></i> {{ $user->PhoneNumber }}</p>
                 @endif
                 @if($user->Location)
-                    <p><i class="fas fa-map-marker-alt"></i> {{ $user->Location }}</p>
+                    <p><i class="fa-solid fa-location-dot"></i> {{ $user->Location }}</p>
                 @endif
                 <p><i class="fas fa-calendar"></i> Member since {{ $user->CreatedAt->format('M Y') }}</p>
             </div>
@@ -453,6 +487,95 @@
                 </button>
             </div>
         </form>
+
+        <!-- Change Password Section -->
+        <form method="POST" action="{{ route('user.profile.password') }}" class="profile-form" style="margin-top: 20px;">
+            @csrf
+
+            <h2 class="form-title"><i class="fas fa-lock"></i> Change Password</h2>
+
+            @if(session('password_success'))
+                <div class="success-message">
+                    <i class="fas fa-check"></i> {{ session('password_success') }}
+                </div>
+            @endif
+
+            @if(session('password_error'))
+                <div class="error-message">
+                    {{ session('password_error') }}
+                </div>
+            @endif
+
+            <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 0; font-size: 13px; color: #92400E; line-height: 1.6;">
+                    <i class="fas fa-shield-alt"></i> <strong>Security Tip:</strong> Use a strong password with at least 8 characters, including uppercase, lowercase, numbers, and special characters.
+                </p>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="current_password" class="form-label">
+                        <i class="fas fa-key"></i> Current Password *
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="current_password" name="current_password" class="form-input" required placeholder="Enter your current password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('current_password')">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password" class="form-label">
+                        <i class="fas fa-lock"></i> New Password *
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="new_password" name="new_password" class="form-input" required placeholder="Enter new password (min 8 characters)">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('new_password')">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password_confirmation" class="form-label">
+                        <i class="fas fa-check-circle"></i> Confirm New Password *
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="new_password_confirmation" name="new_password_confirmation" class="form-input" required placeholder="Re-enter new password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('new_password_confirmation')">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Update Password
+                </button>
+            </div>
+        </form>
     </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const button = input.parentElement.querySelector('.password-toggle-btn');
+        const icon = button.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
+@endpush
