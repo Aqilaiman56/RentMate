@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'My Wishlist - RentMate')
+@section('title', 'My Wishlist - GoRentUMS')
 
 @php
     $hideSearch = true;

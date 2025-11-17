@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Chat with ' . $otherUser->UserName . ' - RentMate')
+@section('title', 'Chat with ' . $otherUser->UserName . ' - GoRentUMS')
 
 @php
     $hideSearch = true;

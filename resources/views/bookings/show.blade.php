@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Booking Details - RentMate')
+@section('title', 'Booking Details - GoRentUMS')
 
 @php
     $hideSearch = true;

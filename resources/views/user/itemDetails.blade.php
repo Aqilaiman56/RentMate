@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $item->ItemName }} - RentMate</title>
+    <title>{{ $item->ItemName }} - GoRentUMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -549,7 +549,7 @@
 </head>
 <body>
     <header class="header">
-        <a href="{{ route('home') }}" class="logo">RentMate</a>
+        <a href="{{ route('home') }}" class="logo">GoRentUMS</a>
         
         <div class="search-bar">
             <input type="text" class="search-input" placeholder="Availability">

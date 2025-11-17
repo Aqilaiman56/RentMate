@@ -81,7 +81,7 @@
                     <button type="submit" class="newsletter-btn">Subscribe</button>
                 </form>
                 <div class="footer-contact">
-                    <p><strong>Email:</strong> support@rentmate.com</p>
+                    <p><strong>Email:</strong> support@gorentums.com</p>
                     <p><strong>Phone:</strong> +60 12-345 6789</p>
                 </div>
             </div>
@@ -90,7 +90,7 @@
         <!-- Footer Bottom -->
         <div class="footer-bottom">
             <div class="footer-bottom-content">
-                <p class="copyright">© {{ date('Y') }} RentMate. All rights reserved.</p>
+                <p class="copyright">© {{ date('Y') }} GoRentUMS. All rights reserved.</p>
                 <div class="footer-legal">
                     <a href="#">Privacy Policy</a>
                     <span class="divider">•</span>

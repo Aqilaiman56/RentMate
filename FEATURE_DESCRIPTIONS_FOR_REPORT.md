@@ -1,6 +1,6 @@
-# RentMate System - Feature Descriptions for Report Screenshots
+# GoRentUMS System - Feature Descriptions for Report Screenshots
 
-**Document Purpose:** This document provides detailed descriptions for every function/feature in the RentMate system. Use these descriptions as captions for screenshots in your project report.
+**Document Purpose:** This document provides detailed descriptions for every function/feature in the GoRentUMS system. Use these descriptions as captions for screenshots in your project report.
 
 ---
 
@@ -627,7 +627,7 @@ Provides rapid access to common administrative tasks."
 
 ## CONCLUSION
 
-This document provides comprehensive descriptions for all 100+ features and functions in the RentMate system. Each description is formatted to be used as a caption or explanation for screenshots in your project report.
+This document provides comprehensive descriptions for all 100+ features and functions in the GoRentUMS system. Each description is formatted to be used as a caption or explanation for screenshots in your project report.
 
 **Usage Instructions:**
 1. Take screenshots of each feature in the system

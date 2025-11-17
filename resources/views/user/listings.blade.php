@@ -1,7 +1,7 @@
 {{-- resources/views/user/listings.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'My Listings - RentMate')
+@section('title', 'My Listings - GoRentUMS')
 
 @php
     $hideSearch = true;
