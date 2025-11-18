@@ -576,8 +576,14 @@
                         </div>
 
                         <div class="booking-footer">
-                            <div class="booking-price">
-                                RM {{ number_format($booking->TotalAmount + $booking->DepositAmount + 1.00, 2) }}
+                            <div>
+                                <div class="booking-price">
+                                    RM {{ number_format($booking->TotalAmount + $booking->DepositAmount, 2) }}
+                                </div>
+                                <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                                    <span>Rental: RM {{ number_format($booking->TotalAmount, 2) }}</span> |
+                                    <span>Deposit: RM {{ number_format($booking->DepositAmount, 2) }}</span>
+                                </div>
                             </div>
                             <div style="display: flex; gap: 10px;">
                                 <a href="{{ route('booking.show', $booking->BookingID) }}" class="view-btn">

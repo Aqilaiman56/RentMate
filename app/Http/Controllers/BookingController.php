@@ -219,6 +219,8 @@ class BookingController extends Controller
                 'ItemID' => $item->ItemID,
                 'StartDate' => $startDate,
                 'EndDate' => $endDate,
+                'TotalAmount' => $totalAmount,
+                'DepositAmount' => $item->DepositAmount,
                 'TotalPaid' => 0, // Will be updated after payment
                 'ServiceFeeAmount' => 1.00,
                 'Status' => 'pending',
