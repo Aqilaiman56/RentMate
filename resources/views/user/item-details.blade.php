@@ -5,10 +5,6 @@
 
 @push('styles')
 <style>
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-    }
-
     .item-details-container {
         max-width: 1200px;
         margin: 0 auto;
@@ -17,18 +13,17 @@
     .back-button {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        color: #4A5FDC;
+        gap: 0.5rem;
+        color: var(--color-primary);
         text-decoration: none;
-        font-weight: 600;
-        margin-bottom: 20px;
-        transition: all 0.2s;
-        font-family: inherit;
+        font-weight: var(--font-semibold);
+        margin-bottom: 1.25rem;
+        transition: var(--transition-base);
     }
 
     .back-button:hover {
-        gap: 12px;
-        color: #3D4FC7;
+        gap: 0.75rem;
+        color: var(--color-primary-hover);
     }
 
     .item-content {
@@ -46,17 +41,17 @@
         width: 100%;
         height: 500px;
         object-fit: cover;
-        border-radius: 8px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
     }
 
     /* Image Grid Layouts */
     .images-grid {
         display: grid;
-        gap: 10px;
-        border-radius: 8px;
+        gap: 0.625rem;
+        border-radius: var(--radius-lg);
         overflow: hidden;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-lg);
         position: relative;
     }
 
@@ -124,17 +119,17 @@
 
     .wishlist-btn {
         position: absolute;
-        top: 20px;
-        right: 20px;
-        background: white;
+        top: 1.25rem;
+        right: 1.25rem;
+        background: var(--color-white);
         border: none;
         width: 50px;
         height: 50px;
-        border-radius: 50%;
-        font-size: 24px;
+        border-radius: var(--radius-full);
+        font-size: var(--text-2xl);
         cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        transition: all 0.2s;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition-base);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -145,54 +140,54 @@
     }
 
     .item-header {
-        margin-bottom: 20px;
+        margin-bottom: 1.25rem;
     }
 
     .item-category {
         display: inline-block;
-        background: #EEF2FF;
-        color: #4A5FDC;
-        padding: 6px 16px;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        margin-bottom: 12px;
+        background: var(--color-primary-lighter);
+        color: var(--color-primary);
+        padding: 0.375rem 1rem;
+        border-radius: var(--radius-lg);
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        margin-bottom: 0.75rem;
     }
 
     .item-title {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1A202C;
-        margin-bottom: 12px;
+        font-size: var(--text-4xl);
+        font-weight: var(--font-bold);
+        color: var(--color-gray-900);
+        margin-bottom: 0.75rem;
     }
 
     .item-meta {
         display: flex;
-        gap: 20px;
+        gap: 1.25rem;
         align-items: center;
-        color: #718096;
-        font-size: 0.875rem;
+        color: var(--color-gray-600);
+        font-size: var(--text-sm);
     }
 
     .meta-item {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 0.375rem;
     }
 
     .rating-stars {
         display: flex;
-        gap: 2px;
+        gap: 0.125rem;
         color: #fbbf24;
     }
 
     .item-owner {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        margin-bottom: 20px;
-        border: 1px solid #E2E8F0;
+        background: var(--color-white);
+        padding: 1.25rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1.25rem;
+        border: 1px solid var(--color-gray-200);
     }
 
     .owner-header {
@@ -223,21 +218,20 @@
 
     .contact-owner-btn {
         width: 100%;
-        background: #EEF2FF;
-        color: #4A5FDC;
+        background: var(--color-primary-lighter);
+        color: var(--color-primary);
         border: none;
         padding: 0.875rem 1rem;
-        border-radius: 8px;
-        font-weight: 600;
+        border-radius: var(--radius-lg);
+        font-weight: var(--font-semibold);
         cursor: pointer;
-        transition: all 0.2s;
-        font-family: inherit;
+        transition: var(--transition-base);
     }
 
     .contact-owner-btn:hover {
-        background: #E0E7FF;
+        background: var(--color-primary-light);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(74, 95, 220, 0.2);
+        box-shadow: var(--shadow-md);
     }
 
     .contact-owner-btn:active {
@@ -245,34 +239,21 @@
     }
 
     .item-description {
-        background: white;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        margin-bottom: 20px;
-        border: 1px solid #E2E8F0;
-    }
-
-    .section-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #1A202C;
-        margin-bottom: 15px;
-    }
-
-    .description-text {
-        color: #4A5568;
-        line-height: 1.6;
-        font-size: 0.95rem;
+        background: var(--color-white);
+        padding: 1.5625rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1.25rem;
+        border: 1px solid var(--color-gray-200);
     }
 
     .item-details-list {
-        background: white;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        margin-bottom: 20px;
-        border: 1px solid #E2E8F0;
+        background: var(--color-white);
+        padding: 1.5625rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1.25rem;
+        border: 1px solid var(--color-gray-200);
     }
 
     .detail-row {
@@ -298,26 +279,26 @@
     }
 
     .booking-card {
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        background: var(--color-white);
+        padding: 1.875rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
         position: sticky;
         top: 100px;
-        border: 1px solid #E2E8F0;
+        border: 1px solid var(--color-gray-200);
     }
 
     .price-display {
-        font-size: 2.25rem;
-        font-weight: 700;
-        color: #4A5FDC;
-        margin-bottom: 8px;
+        font-size: var(--text-4xl);
+        font-weight: var(--font-bold);
+        color: var(--color-primary);
+        margin-bottom: 0.5rem;
     }
 
     .price-unit {
-        font-size: 1rem;
-        color: #718096;
-        font-weight: 400;
+        font-size: var(--text-base);
+        color: var(--color-gray-600);
+        font-weight: var(--font-normal);
     }
 
     .deposit-info {
@@ -389,24 +370,23 @@
 
     .book-now-btn {
         width: 30%;
-        background: #4A5FDC;
-        color: white;
+        background: var(--color-primary);
+        color: var(--color-white);
         border: none;
         padding: 1rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
+        border-radius: var(--radius-lg);
+        font-size: var(--text-base);
+        font-weight: var(--font-semibold);
         cursor: pointer;
-        transition: all 0.2s;
-        font-family: inherit;
+        transition: var(--transition-base);
         display: block;
         margin: 0 auto;
     }
 
     .book-now-btn:hover {
-        background: #3D4FC7;
+        background: var(--color-primary-hover);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(74, 95, 220, 0.3);
+        box-shadow: var(--shadow-md);
     }
 
     .book-now-btn:active {
@@ -414,18 +394,18 @@
     }
 
     .book-now-btn:disabled {
-        background: #A0AEC0;
+        background: var(--color-gray-400);
         cursor: not-allowed;
         transform: none;
     }
 
     .reviews-section {
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        margin-top: 40px;
-        border: 1px solid #E2E8F0;
+        background: var(--color-white);
+        padding: 1.875rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        margin-top: 2.5rem;
+        border: 1px solid var(--color-gray-200);
     }
 
     .reviews-header {
@@ -651,20 +631,20 @@
     }
 
     .calendar-nav-btn {
-        background: #EEF2FF;
+        background: var(--color-primary-lighter);
         border: none;
-        color: #4A5FDC;
+        color: var(--color-primary);
         width: 32px;
         height: 32px;
-        border-radius: 6px;
+        border-radius: var(--radius-md);
         cursor: pointer;
-        font-size: 14px;
-        transition: all 0.2s;
+        font-size: var(--text-sm);
+        transition: var(--transition-base);
     }
 
     .calendar-nav-btn:hover {
-        background: #4A5FDC;
-        color: white;
+        background: var(--color-primary);
+        color: var(--color-white);
     }
 
     .calendar-month-year {
@@ -714,32 +694,32 @@
     }
 
     .calendar-day.today {
-        font-weight: 700;
-        border: 2px solid #4A5FDC;
+        font-weight: var(--font-bold);
+        border: 2px solid var(--color-primary);
     }
 
     .calendar-day.available {
-        background: #d1fae5;
-        color: #065f46;
-        font-weight: 600;
+        background: var(--color-success-light);
+        color: var(--color-success-hover);
+        font-weight: var(--font-semibold);
     }
 
     .calendar-day.unavailable {
-        background: #fee2e2;
-        color: #991b1b;
+        background: var(--color-danger-light);
+        color: var(--color-danger-hover);
         cursor: not-allowed;
-        font-weight: 600;
+        font-weight: var(--font-semibold);
     }
 
     .calendar-day.selected {
-        background: #4A5FDC;
-        color: white;
-        font-weight: 700;
+        background: var(--color-primary);
+        color: var(--color-white);
+        font-weight: var(--font-bold);
     }
 
     .calendar-day.in-range {
-        background: #C7D2FE;
-        color: #3730A3;
+        background: var(--color-primary-light);
+        color: var(--color-primary);
     }
 
     .calendar-legend {

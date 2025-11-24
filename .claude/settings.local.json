@@ -11,7 +11,8 @@
       "Bash(fi)",
       "Bash(php -r:*)",
       "Bash(dir /s \"c:\\xampp\\htdocs\\RentMate\\app\\Http\\Controllers\")",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
