@@ -12,7 +12,10 @@
       "Bash(php -r:*)",
       "Bash(dir /s \"c:\\xampp\\htdocs\\RentMate\\app\\Http\\Controllers\")",
       "Bash(findstr:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(dir /b c:xampphtdocsRentMate)",
+      "Bash(dir:*)",
+      "Bash(timeout 30 php:*)"
     ],
     "deny": [],
     "ask": []
