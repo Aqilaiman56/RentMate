@@ -15,7 +15,11 @@
       "Bash(npm run build:*)",
       "Bash(dir /b c:xampphtdocsRentMate)",
       "Bash(dir:*)",
-      "Bash(timeout 30 php:*)"
+      "Bash(timeout 30 php:*)",
+      "Bash(php check_db_structure.php:*)",
+      "Bash(php check_actual_db.php:*)",
+      "Bash(php check_migration_status.php:*)",
+      "Bash(php mark_migrations_as_run.php:*)"
     ],
     "deny": [],
     "ask": []

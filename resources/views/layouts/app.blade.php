@@ -44,6 +44,7 @@
         .header-search-container {
             flex: 1;
             max-width: 600px;
+            position: relative;
         }
 
         .header-search-bar {
@@ -51,6 +52,13 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        /* Hide mobile search toggle on desktop */
+        @media (min-width: 769px) {
+            .mobile-search-toggle {
+                display: none !important;
+            }
         }
 
         .header-search-input {
@@ -161,47 +169,213 @@
         }
 
         /* Profile dropdown specific overrides */
+        .profile-section {
+            position: relative;
+        }
+
         .profile-section .dropdown-menu {
-            min-width: 200px !important;
-            max-width: none !important;
-            width: max-content !important;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 220px;
+            max-width: 280px;
+            width: max-content;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+            z-index: 1000;
+            display: none;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        .profile-section .dropdown-menu.show {
+            display: block;
         }
 
         .profile-section .dropdown-item {
-            white-space: nowrap !important;
-            overflow: visible !important;
-            text-overflow: clip !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 0.75rem !important;
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: clip;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: #374151;
+            transition: all 0.15s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .profile-section .dropdown-item:hover {
+            background-color: #F3F4F6;
+            color: #1F2937;
+        }
+
+        .profile-section .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.125rem;
         }
 
         .profile-section .dropdown-item span {
             display: inline-block;
+            flex: 1;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Search Styles */
+        .mobile-search-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: var(--radius-lg);
+            transition: var(--transition-base);
+            color: var(--color-gray-700);
+        }
+
+        .mobile-search-toggle:hover {
+            background-color: var(--color-gray-100);
+        }
+
+        /* Search Recommendations */
+        .search-recommendations {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            right: 0;
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            border: 1px solid var(--color-gray-200);
+        }
+
+        .search-recommendations.show {
+            display: block;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        .recommendation-item {
+            padding: 0.875rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition-base);
+            border-bottom: 1px solid var(--color-gray-100);
+            color: var(--color-gray-700);
+            font-size: var(--text-sm);
+        }
+
+        .recommendation-item:last-child {
+            border-bottom: none;
+        }
+
+        .recommendation-item:hover {
+            background: var(--color-gray-50);
+            color: var(--color-primary);
+        }
+
+        .recommendation-item i {
+            color: var(--color-gray-400);
+            font-size: var(--text-base);
+        }
+
+        .recommendation-item:hover i {
+            color: var(--color-primary);
+        }
+
+        .recommendation-category {
+            padding: 0.5rem 1rem;
+            font-size: var(--text-xs);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-500);
+            background: var(--color-gray-50);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         @media (max-width: 768px) {
             .app-header {
                 padding: 0.9375rem 1.25rem;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
             }
 
-            .header-search-container {
-                order: 3;
+            /* Desktop search container - hide on mobile when collapsed */
+            .header-search-container.collapsed {
+                display: none;
+            }
+
+            /* Show mobile search toggle button */
+            .mobile-search-toggle {
+                display: block !important;
+            }
+
+            /* When expanded, show search bar as overlay */
+            .header-search-container.expanded {
+                display: block;
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
                 width: 100%;
-                margin-top: 0.9375rem;
-                max-width: 100%;
+                padding: 0 1.25rem;
+                z-index: 999;
+                background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-primary-lighter) 100%);
+                padding-bottom: 1rem;
             }
 
-            .header-search-bar {
+            .header-search-container.expanded .header-search-bar {
+                display: flex;
                 flex-direction: row;
+                align-items: center;
+                gap: 0.5rem;
+                width: 100%;
+                animation: slideDown 0.3s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .header-search-input {
+                flex: 1;
+                min-width: 0;
             }
 
             .btn-primary {
                 width: auto;
                 flex-shrink: 0;
-                padding: 0.375rem 0.625rem;
-                font-size: var(--text-xs);
+                padding: 0.625rem 1rem;
+                font-size: var(--text-sm);
+                white-space: nowrap;
             }
 
             .profile-name {
@@ -210,6 +384,14 @@
 
             .main-content {
                 padding: 1.25rem;
+            }
+
+            .search-recommendations {
+                position: fixed;
+                top: auto;
+                left: 1.25rem;
+                right: 1.25rem;
+                max-height: 60vh;
             }
         }
     </style>
@@ -223,25 +405,37 @@
             <span class="logo-go">Go</span><span class="logo-rent">Rent</span><span class="logo-ums">UMS</span>
         </a>
 
-        <!-- Search Bar in Header -->
-        <div class="header-search-container">
-            <form action="{{ route('user.HomePage') }}" method="GET" class="header-search-bar">
+        <!-- Search Bar in Header (Desktop) -->
+        <div class="header-search-container collapsed" id="headerSearchContainer">
+            <!-- Search Form -->
+            <form action="{{ route('user.HomePage') }}" method="GET" class="header-search-bar" id="headerSearchBar">
                 <span class="header-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
                 <input
                     type="text"
                     name="search"
                     class="header-search-input"
+                    id="headerSearchInput"
                     placeholder="Search items, categories, or locations..."
                     value="{{ request('search') }}"
+                    autocomplete="off"
                 >
                 @if(request('category'))
                     <input type="hidden" name="category" value="{{ request('category') }}">
                 @endif
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
+
+            <!-- Search Recommendations -->
+            <div class="search-recommendations" id="searchRecommendations">
+                <!-- Recommendations will be populated here -->
+            </div>
         </div>
 
         <div class="header-icons">
+            <!-- Mobile Search Toggle Button -->
+            <button type="button" class="mobile-search-toggle icon-btn" id="mobileSearchToggle">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
             <a href="{{ route('notifications.index') }}" class="icon-btn" id="notificationIcon">
                 <i class="fas fa-bell"></i>
                 <span class="notification-badge hidden" id="notificationBadge">0</span>
@@ -258,6 +452,7 @@
                     <img src="{{ asset('images/default-avatar.png') }}" alt="Profile" class="profile-pic" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2240%22 height=%2240%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%236b7280%22%3E{{ substr(auth()->user()->UserName ?? 'U', 0, 1) }}%3C/text%3E%3C/svg%3E'">
                 @endif
                 <span class="profile-name">{{ auth()->user()->UserName ?? 'User' }}</span>
+                <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: #6B7280; transition: transform 0.2s;" id="dropdownCaret"></i>
 
                 <!-- Dropdown Menu -->
                 <div class="dropdown-menu" id="profileDropdown">
@@ -286,9 +481,9 @@
                         <span>Report Issue</span>
                     </a>
                     <div class="dropdown-divider"></div>
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                         @csrf
-                        <button type="submit" class="dropdown-item text-red-600 hover:bg-red-50" onclick="return confirmLogout(event)">
+                        <button type="submit" class="dropdown-item" style="color: #DC2626;" onclick="return confirmLogout(event)">
                             <i class="fas fa-sign-out-alt"></i>
                             <span>Logout</span>
                         </button>
@@ -307,22 +502,204 @@
     @include('components.footer')
 
     <script>
+        // Mobile Search Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchContainer = document.getElementById('headerSearchContainer');
+            const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+            const searchInput = document.getElementById('headerSearchInput');
+            const searchRecommendations = document.getElementById('searchRecommendations');
+
+            // Toggle search bar on mobile
+            if (mobileSearchToggle) {
+                mobileSearchToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    searchContainer.classList.remove('collapsed');
+                    searchContainer.classList.add('expanded');
+
+                    // Focus on search input after animation
+                    setTimeout(() => {
+                        searchInput.focus();
+                    }, 300);
+                });
+            }
+
+            // Close search bar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    if (!searchContainer.contains(e.target) && !mobileSearchToggle.contains(e.target)) {
+                        searchContainer.classList.remove('expanded');
+                        searchContainer.classList.add('collapsed');
+                        searchRecommendations.classList.remove('show');
+                    }
+                }
+            });
+
+            // Search input functionality with recommendations
+            if (searchInput) {
+                let debounceTimer;
+
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    const query = this.value.trim();
+
+                    if (query.length >= 2) {
+                        debounceTimer = setTimeout(() => {
+                            fetchSearchRecommendations(query);
+                        }, 300);
+                    } else {
+                        searchRecommendations.classList.remove('show');
+                    }
+                });
+
+                // Show recommendations on focus if there's existing text
+                searchInput.addEventListener('focus', function() {
+                    const query = this.value.trim();
+                    if (query.length >= 2) {
+                        fetchSearchRecommendations(query);
+                    }
+                });
+            }
+
+            // Fetch search recommendations
+            function fetchSearchRecommendations(query) {
+                // Sample recommendations - replace with actual API call
+                const sampleRecommendations = {
+                    popular: [
+                        { icon: 'fa-laptop', text: 'Laptop', type: 'item' },
+                        { icon: 'fa-camera', text: 'Camera', type: 'item' },
+                        { icon: 'fa-gamepad', text: 'Gaming Console', type: 'item' }
+                    ],
+                    categories: [
+                        { icon: 'fa-tag', text: 'Electronics', type: 'category' },
+                        { icon: 'fa-tag', text: 'Sports Equipment', type: 'category' },
+                        { icon: 'fa-tag', text: 'Tools', type: 'category' }
+                    ],
+                    locations: [
+                        { icon: 'fa-location-dot', text: 'Kuala Lumpur', type: 'location' },
+                        { icon: 'fa-location-dot', text: 'Selangor', type: 'location' },
+                        { icon: 'fa-location-dot', text: 'Penang', type: 'location' }
+                    ]
+                };
+
+                // Filter recommendations based on query
+                const filteredItems = sampleRecommendations.popular.filter(item =>
+                    item.text.toLowerCase().includes(query.toLowerCase())
+                );
+                const filteredCategories = sampleRecommendations.categories.filter(item =>
+                    item.text.toLowerCase().includes(query.toLowerCase())
+                );
+                const filteredLocations = sampleRecommendations.locations.filter(item =>
+                    item.text.toLowerCase().includes(query.toLowerCase())
+                );
+
+                // Build recommendations HTML
+                let html = '';
+
+                if (filteredItems.length > 0) {
+                    html += '<div class="recommendation-category">Items</div>';
+                    filteredItems.forEach(item => {
+                        html += `
+                            <div class="recommendation-item" onclick="selectRecommendation('${item.text}')">
+                                <i class="fa-solid ${item.icon}"></i>
+                                <span>${item.text}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                if (filteredCategories.length > 0) {
+                    html += '<div class="recommendation-category">Categories</div>';
+                    filteredCategories.forEach(item => {
+                        html += `
+                            <div class="recommendation-item" onclick="selectRecommendation('${item.text}')">
+                                <i class="fa-solid ${item.icon}"></i>
+                                <span>${item.text}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                if (filteredLocations.length > 0) {
+                    html += '<div class="recommendation-category">Locations</div>';
+                    filteredLocations.forEach(item => {
+                        html += `
+                            <div class="recommendation-item" onclick="selectRecommendation('${item.text}')">
+                                <i class="fa-solid ${item.icon}"></i>
+                                <span>${item.text}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                if (html) {
+                    searchRecommendations.innerHTML = html;
+                    searchRecommendations.classList.add('show');
+                } else {
+                    searchRecommendations.classList.remove('show');
+                }
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    // Desktop mode - remove mobile classes
+                    searchContainer.classList.remove('collapsed', 'expanded');
+                    searchRecommendations.classList.remove('show');
+                } else {
+                    // Mobile mode - ensure collapsed state
+                    if (!searchContainer.classList.contains('expanded')) {
+                        searchContainer.classList.add('collapsed');
+                    }
+                }
+            });
+
+            // Initialize on load
+            if (window.innerWidth <= 768) {
+                searchContainer.classList.add('collapsed');
+            } else {
+                searchContainer.classList.remove('collapsed', 'expanded');
+            }
+        });
+
+        // Select recommendation
+        function selectRecommendation(text) {
+            const searchInput = document.getElementById('headerSearchInput');
+            const searchRecommendations = document.getElementById('searchRecommendations');
+
+            if (searchInput) {
+                searchInput.value = text;
+                searchRecommendations.classList.remove('show');
+                searchInput.focus();
+            }
+        }
+
         // Profile Dropdown Toggle
         document.addEventListener('DOMContentLoaded', function() {
             const profileSection = document.getElementById('profileSection');
             const profileDropdown = document.getElementById('profileDropdown');
+            const dropdownCaret = document.getElementById('dropdownCaret');
 
             if (profileSection && profileDropdown) {
                 // Toggle dropdown on click
                 profileSection.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    profileDropdown.classList.toggle('show');
+                    const isShowing = profileDropdown.classList.toggle('show');
+
+                    // Rotate caret icon
+                    if (dropdownCaret) {
+                        dropdownCaret.style.transform = isShowing ? 'rotate(180deg)' : 'rotate(0deg)';
+                    }
                 });
 
                 // Close dropdown when clicking outside
                 document.addEventListener('click', function(e) {
                     if (!profileSection.contains(e.target)) {
                         profileDropdown.classList.remove('show');
+
+                        // Reset caret rotation
+                        if (dropdownCaret) {
+                            dropdownCaret.style.transform = 'rotate(0deg)';
+                        }
                     }
                 });
 

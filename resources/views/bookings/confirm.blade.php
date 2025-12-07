@@ -7,110 +7,145 @@
 @push('styles')
 <style>
     .confirmation-container {
-        max-width: 900px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 30px 20px;
+        padding: 2rem 1.5rem;
     }
 
     .back-link {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        color: #4461F2;
+        gap: 0.5rem;
+        color: var(--color-primary);
         text-decoration: none;
-        font-weight: 600;
-        margin-bottom: 20px;
-        transition: gap 0.3s;
+        font-weight: var(--font-semibold);
+        margin-bottom: 2rem;
+        transition: var(--transition-base);
+        font-size: var(--text-sm);
     }
 
     .back-link:hover {
-        gap: 12px;
+        gap: 0.75rem;
+        color: var(--color-primary-hover);
     }
 
     .confirmation-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 2.5rem;
     }
 
     .confirmation-icon {
-        font-size: 64px;
-        margin-bottom: 15px;
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: var(--color-primary);
+        animation: fadeInScale 0.6s ease-out;
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
 
     .confirmation-title {
-        font-size: 28px;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 8px;
+        font-size: 2rem;
+        font-weight: var(--font-bold);
+        color: var(--color-gray-900);
+        margin-bottom: 0.5rem;
+        line-height: var(--line-height-tight);
     }
 
     .confirmation-subtitle {
-        font-size: 16px;
-        color: #6b7280;
+        font-size: var(--text-base);
+        color: var(--color-gray-600);
     }
 
     .confirmation-grid {
         display: grid;
-        grid-template-columns: 1fr 400px;
-        gap: 20px;
-        margin-bottom: 20px;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
     }
 
     .confirmation-card {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        background: var(--color-white);
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-gray-200);
+        transition: var(--transition-base);
+    }
+
+    .confirmation-card:hover {
+        box-shadow: var(--shadow-lg);
     }
 
     .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 20px;
+        font-size: var(--text-xl);
+        font-weight: var(--font-semibold);
+        color: var(--color-gray-900);
+        margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 0.75rem;
+    }
+
+    .section-title i {
+        color: var(--color-primary);
+        font-size: 1.25rem;
     }
 
     .item-preview {
         display: flex;
-        gap: 15px;
-        padding: 15px;
-        background: #f9fafb;
-        border-radius: 12px;
-        margin-bottom: 20px;
+        gap: 1.25rem;
+        padding: 1.25rem;
+        background: var(--color-gray-50);
+        border-radius: var(--radius-xl);
+        margin-bottom: 2rem;
+        border: 1px solid var(--color-gray-200);
     }
 
     .item-image {
-        width: 120px;
-        height: 120px;
-        border-radius: 10px;
+        width: 140px;
+        height: 140px;
+        border-radius: var(--radius-lg);
         object-fit: cover;
         flex-shrink: 0;
+        box-shadow: var(--shadow-sm);
     }
 
     .item-details h3 {
-        font-size: 18px;
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 8px;
+        font-size: var(--text-lg);
+        font-weight: var(--font-semibold);
+        color: var(--color-gray-900);
+        margin-bottom: 0.75rem;
     }
 
     .item-details p {
-        font-size: 13px;
-        color: #6b7280;
-        margin-bottom: 5px;
+        font-size: var(--text-sm);
+        color: var(--color-gray-600);
+        margin-bottom: 0.5rem;
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 0.5rem;
+    }
+
+    .item-details p i {
+        width: 16px;
+        color: var(--color-gray-400);
     }
 
     .detail-row {
         display: flex;
         justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #e5e7eb;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--color-gray-200);
     }
 
     .detail-row:last-child {
@@ -118,59 +153,77 @@
     }
 
     .detail-label {
-        color: #6b7280;
-        font-size: 14px;
+        color: var(--color-gray-600);
+        font-size: var(--text-sm);
+        font-weight: var(--font-medium);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .detail-value {
-        color: #1f2937;
-        font-weight: 600;
-        font-size: 14px;
+        color: var(--color-gray-900);
+        font-weight: var(--font-semibold);
+        font-size: var(--text-sm);
     }
 
     .owner-section {
-        padding: 15px;
-        background: #f9fafb;
-        border-radius: 12px;
-        margin-top: 20px;
+        padding: 1.25rem;
+        background: var(--color-gray-50);
+        border-radius: var(--radius-lg);
+        margin-top: 1.5rem;
+        border: 1px solid var(--color-gray-200);
+    }
+
+    .owner-section h4 {
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        margin-bottom: 0.75rem;
+        color: var(--color-gray-900);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .owner-info {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 1rem;
     }
 
     .owner-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-full);
         object-fit: cover;
+        border: 2px solid var(--color-gray-200);
     }
 
     .avatar-placeholder {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: #4461F2;
-        color: white;
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-full);
+        background: var(--color-primary);
+        color: var(--color-white);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
-        font-weight: 600;
+        font-size: var(--text-xl);
+        font-weight: var(--font-bold);
+        border: 2px solid var(--color-gray-200);
     }
 
     .owner-details h4 {
-        font-size: 14px;
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 3px;
+        font-size: var(--text-base);
+        font-weight: var(--font-semibold);
+        color: var(--color-gray-900);
+        margin-bottom: 0.25rem;
     }
 
     .owner-details p {
-        font-size: 12px;
-        color: #6b7280;
+        font-size: var(--text-sm);
+        color: var(--color-gray-600);
+        margin: 0;
     }
 
     .payment-summary {
@@ -179,187 +232,209 @@
     }
 
     .rental-payment-info {
-        background: #fef3c7;
-        border: 2px solid #f59e0b;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 15px;
+        background: var(--color-warning-light);
+        border: 2px solid var(--color-warning);
+        padding: 1.25rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.25rem;
     }
 
     .rental-payment-info h4 {
-        font-size: 14px;
-        font-weight: 600;
-        color: #92400e;
-        margin-bottom: 8px;
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        color: var(--color-warning-hover);
+        margin-bottom: 0.5rem;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 0.5rem;
     }
 
     .rental-payment-info p {
-        font-size: 13px;
-        color: #92400e;
+        font-size: var(--text-sm);
+        color: var(--color-warning-hover);
         margin: 0;
-        line-height: 1.6;
+        line-height: var(--line-height-relaxed);
     }
 
     .summary-breakdown {
-        background: #f9fafb;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 15px;
+        background: var(--color-gray-50);
+        padding: 1.25rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.25rem;
+        border: 1px solid var(--color-gray-200);
     }
 
     .summary-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 10px;
-        font-size: 14px;
-        color: #6b7280;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        font-size: var(--text-sm);
+        color: var(--color-gray-700);
+    }
+
+    .summary-row:last-child {
+        margin-bottom: 0;
     }
 
     .summary-row.total {
-        font-size: 20px;
-        font-weight: 700;
-        color: #1f2937;
-        padding-top: 12px;
-        border-top: 2px solid #e5e7eb;
-        margin-top: 12px;
+        font-size: var(--text-xl);
+        font-weight: var(--font-bold);
+        color: var(--color-gray-900);
+        padding-top: 1rem;
+        border-top: 2px solid var(--color-gray-300);
+        margin-top: 1rem;
     }
 
     .price-highlight {
-        color: #4461F2;
+        color: var(--color-primary);
     }
 
     .payment-note {
-        background: #eff6ff;
-        border-left: 4px solid #3b82f6;
-        padding: 12px 15px;
-        border-radius: 8px;
-        margin-top: 10px;
+        background: var(--color-info-light);
+        border-left: 4px solid var(--color-info);
+        padding: 1rem;
+        border-radius: var(--radius-lg);
+        margin-top: 1rem;
     }
 
     .payment-note p {
-        font-size: 13px;
-        color: #1e40af;
+        font-size: var(--text-sm);
+        color: var(--color-info-hover);
         margin: 0;
-        line-height: 1.6;
+        line-height: var(--line-height-relaxed);
+    }
+
+    .payment-note p + p {
+        margin-top: 0.5rem;
     }
 
     .info-box {
-        background: #eff6ff;
-        border-left: 4px solid #3b82f6;
-        padding: 12px 15px;
-        border-radius: 8px;
-        margin-bottom: 15px;
+        background: var(--color-info-light);
+        border-left: 4px solid var(--color-info);
+        padding: 1rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.25rem;
     }
 
     .info-box p {
-        font-size: 13px;
-        color: #1e40af;
+        font-size: var(--text-sm);
+        color: var(--color-info-hover);
         margin: 0;
-        line-height: 1.6;
+        line-height: var(--line-height-relaxed);
     }
 
     .warning-box {
-        background: #fef3c7;
-        border-left: 4px solid #f59e0b;
-        padding: 12px 15px;
-        border-radius: 8px;
-        margin-bottom: 15px;
+        background: var(--color-warning-light);
+        border-left: 4px solid var(--color-warning);
+        padding: 1rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.25rem;
     }
 
     .warning-box p {
-        font-size: 13px;
-        color: #92400e;
+        font-size: var(--text-sm);
+        color: var(--color-warning-hover);
         margin: 0;
-        line-height: 1.6;
+        line-height: var(--line-height-relaxed);
     }
 
     .confirm-btn {
         width: 100%;
-        background: #4461F2;
-        color: white;
-        padding: 16px;
-        border-radius: 10px;
+        background: var(--color-primary);
+        color: var(--color-white);
+        padding: 1.125rem 1.5rem;
+        border-radius: var(--radius-lg);
         border: none;
-        font-size: 16px;
-        font-weight: 600;
+        font-size: var(--text-base);
+        font-weight: var(--font-semibold);
         cursor: pointer;
-        transition: all 0.3s;
-        margin-bottom: 10px;
+        transition: var(--transition-base);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
-    .confirm-btn:hover {
-        background: #3651E2;
+    .confirm-btn:hover:not(:disabled) {
+        background: var(--color-primary-hover);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(68, 97, 242, 0.3);
+        box-shadow: var(--shadow-lg);
     }
 
     .confirm-btn:disabled {
-        background: #9ca3af;
+        background: var(--color-gray-300);
         cursor: not-allowed;
         transform: none;
-        opacity: 0.5;
+        opacity: 0.6;
     }
 
     .cancel-btn {
         width: 100%;
-        background: white;
-        color: #6b7280;
-        padding: 12px;
-        border-radius: 8px;
-        border: 2px solid #e5e7eb;
-        font-size: 14px;
-        font-weight: 600;
+        background: var(--color-white);
+        color: var(--color-gray-700);
+        padding: 0.875rem 1rem;
+        border-radius: var(--radius-lg);
+        border: 2px solid var(--color-gray-300);
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
         cursor: pointer;
-        transition: all 0.2s;
+        transition: var(--transition-base);
         text-align: center;
         text-decoration: none;
         display: block;
     }
 
     .cancel-btn:hover {
-        background: #f9fafb;
-        border-color: #d1d5db;
+        background: var(--color-gray-50);
+        border-color: var(--color-gray-400);
     }
 
     .terms-checkbox {
         display: flex;
         align-items: start;
-        gap: 10px;
-        margin-bottom: 15px;
-        padding: 12px;
-        background: #f9fafb;
-        border-radius: 8px;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+        padding: 1rem;
+        background: var(--color-gray-50);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-gray-200);
     }
 
     .terms-checkbox input[type="checkbox"] {
-        margin-top: 3px;
-        width: 18px;
-        height: 18px;
+        margin-top: 0.25rem;
+        width: 20px;
+        height: 20px;
         cursor: pointer;
+        accent-color: var(--color-primary);
     }
 
     .terms-checkbox label {
-        font-size: 13px;
-        color: #4b5563;
+        font-size: var(--text-sm);
+        color: var(--color-gray-700);
         cursor: pointer;
-        line-height: 1.6;
+        line-height: var(--line-height-relaxed);
     }
 
     .terms-link {
-        color: #4461F2;
+        color: var(--color-primary);
         text-decoration: underline;
+        font-weight: var(--font-medium);
     }
 
     .terms-link:hover {
-        color: #3651E2;
+        color: var(--color-primary-hover);
     }
 
     @media (max-width: 968px) {
+        .confirmation-container {
+            padding: 1.5rem 1rem;
+        }
+
         .confirmation-grid {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
 
         .payment-summary {
@@ -372,7 +447,15 @@
 
         .item-image {
             width: 100%;
-            height: 200px;
+            height: 220px;
+        }
+
+        .confirmation-title {
+            font-size: var(--text-3xl);
+        }
+
+        .confirmation-icon {
+            font-size: 3rem;
         }
     }
 </style>
@@ -381,7 +464,7 @@
 @section('content')
 <div class="confirmation-container">
     <a href="{{ route('item.details', $item->ItemID) }}" class="back-link">
-        ← Back to Item Details
+        <i class="fa-solid fa-arrow-left"></i> Back to Item Details
     </a>
 
     <div class="confirmation-header">
@@ -395,19 +478,19 @@
         <div>
             <div class="confirmation-card">
                 <h2 class="section-title"><i class="fas fa-box"></i> Item Details</h2>
-                
+
                 <div class="item-preview">
                     @if($item->images?->first())
                         <img src="{{ asset('storage/' . $item->images->first()->ImagePath) }}"
                              alt="{{ $item->ItemName }}"
                              class="item-image"
-                             onerror="this.src='https://via.placeholder.com/120'">
+                             onerror="this.src='https://via.placeholder.com/140?text={{ urlencode($item->ItemName) }}'">
                     @else
-                        <img src="https://via.placeholder.com/120"
+                        <img src="https://via.placeholder.com/140?text={{ urlencode($item->ItemName) }}"
                              alt="{{ $item->ItemName }}"
                              class="item-image">
                     @endif
-                    
+
                     <div class="item-details">
                         <h3>{{ $item->ItemName }}</h3>
                         <p><i class="fas fa-map-marker-alt"></i> {{ $item->location->LocationName ?? 'N/A' }}</p>
@@ -417,37 +500,49 @@
                 </div>
 
                 <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Rental Period</h2>
-                
+
                 <div class="detail-row">
-                    <span class="detail-label">Start Date</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        Start Date
+                    </span>
                     <span class="detail-value">{{ $start_date->format('D, d M Y') }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">End Date</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        End Date
+                    </span>
                     <span class="detail-value">{{ $end_date->format('D, d M Y') }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Duration</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-clock"></i>
+                        Duration
+                    </span>
                     <span class="detail-value">{{ $days }} day(s)</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Total Booking Cost</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-calculator"></i>
+                        Total Rental Cost
+                    </span>
                     <span class="detail-value">RM {{ number_format($rental_amount, 2) }}</span>
                 </div>
 
                 <div class="owner-section">
-                    <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #1f2937;">Item Owner</h4>
+                    <h4><i class="fas fa-user"></i> Item Owner</h4>
                     <div class="owner-info">
                         @if($item->user->ProfileImage)
-                            <img src="{{ asset('storage/' . $item->user->ProfileImage) }}" 
-                                 alt="{{ $item->user->UserName }}" 
+                            <img src="{{ asset('storage/' . $item->user->ProfileImage) }}"
+                                 alt="{{ $item->user->UserName }}"
                                  class="owner-avatar">
                         @else
                             <div class="avatar-placeholder">
                                 {{ strtoupper(substr($item->user->UserName, 0, 1)) }}
                             </div>
                         @endif
-                        
+
                         <div class="owner-details">
                             <h4>{{ $item->user->UserName }}</h4>
                             <p>{{ $item->user->Email }}</p>
@@ -480,7 +575,7 @@
                         <span>RM {{ number_format($service_fee_amount, 2) }}</span>
                     </div>
                     <div class="summary-row total">
-                        <span>Pay Now (Deposit + Service Fee)</span>
+                        <span>Pay Now</span>
                         <span class="price-highlight">RM {{ number_format($total_amount, 2) }}</span>
                     </div>
                 </div>
@@ -488,7 +583,7 @@
                 <div class="payment-note">
                     <p><strong><i class="fas fa-file-invoice-dollar"></i> Payment Breakdown:</strong></p>
                     <p>• <strong>Deposit:</strong> RM {{ number_format($deposit_amount, 2) }} - Held as security</p>
-                    <p>• <strong>Service Fee:</strong> RM {{ number_format($service_fee_amount, 2) }} - Platform service fee</p>
+                    <p>• <strong>Service Fee:</strong> RM {{ number_format($service_fee_amount, 2) }} - Platform fee</p>
                     <p>• <strong>Rental:</strong> RM {{ number_format($rental_amount, 2) }} - Pay to owner</p>
                 </div>
 
@@ -509,17 +604,17 @@
                     <div class="terms-checkbox">
                         <input type="checkbox" id="terms" name="terms" required>
                         <label for="terms">
-                            I understand that I need to pay the rental fee (RM {{ number_format($rental_amount, 2) }}) directly to the owner, and I agree to the <a href="#" class="terms-link">terms and conditions</a>.
+                            I understand that I need to pay the rental fee (RM {{ number_format($rental_amount, 2) }}) directly to the owner, and I agree to the <a href="{{ route('terms') }}" class="terms-link" target="_blank">terms and conditions</a>.
                         </label>
                     </div>
 
                     <button type="submit" class="confirm-btn" id="confirmBtn">
-                        <i class="fas fa-check"></i> Pay Deposit (RM {{ number_format($total_amount, 2) }})
+                        <i class="fas fa-check-circle"></i> Pay Deposit & Confirm (RM {{ number_format($total_amount, 2) }})
                     </button>
                 </form>
 
                 <a href="{{ route('item.details', $item->ItemID) }}" class="cancel-btn">
-                    Cancel Booking
+                    <i class="fas fa-times"></i> Cancel Booking
                 </a>
             </div>
         </div>
@@ -541,17 +636,18 @@
         }
 
         confirmBtn.disabled = true;
-        confirmBtn.textContent = 'Processing...';
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     });
 
     termsCheckbox.addEventListener('change', function() {
         confirmBtn.disabled = !this.checked;
-        confirmBtn.style.opacity = this.checked ? '1' : '0.5';
+        confirmBtn.style.opacity = this.checked ? '1' : '0.6';
         confirmBtn.style.cursor = this.checked ? 'pointer' : 'not-allowed';
     });
 
+    // Initialize button state
     confirmBtn.disabled = !termsCheckbox.checked;
-    confirmBtn.style.opacity = termsCheckbox.checked ? '1' : '0.5';
+    confirmBtn.style.opacity = termsCheckbox.checked ? '1' : '0.6';
     confirmBtn.style.cursor = termsCheckbox.checked ? 'pointer' : 'not-allowed';
 </script>
 @endpush

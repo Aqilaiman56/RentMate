@@ -43,8 +43,10 @@ class NotificationController extends Controller
             }
         } elseif ($notification->RelatedType === 'booking') {
             return redirect()->route('booking.show', $notification->RelatedID);
+        } elseif ($notification->RelatedType === 'payment') {
+            return redirect()->route('payment.show', $notification->RelatedID);
         }
-        
+
         return redirect()->route('notifications.index');
     }
 

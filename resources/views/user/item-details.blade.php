@@ -6,7 +6,7 @@
 @push('styles')
 <style>
     .item-details-container {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
     }
 
@@ -17,8 +17,9 @@
         color: var(--color-primary);
         text-decoration: none;
         font-weight: var(--font-semibold);
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
         transition: var(--transition-base);
+        font-size: var(--text-sm);
     }
 
     .back-button:hover {
@@ -28,9 +29,9 @@
 
     .item-content {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
-        margin-bottom: 40px;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 2.5rem;
+        margin-bottom: 2.5rem;
     }
 
     .item-image-section {
@@ -39,19 +40,19 @@
 
     .item-main-image {
         width: 100%;
-        height: 500px;
+        height: 550px;
         object-fit: cover;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
     }
 
     /* Image Grid Layouts */
     .images-grid {
         display: grid;
-        gap: 0.625rem;
-        border-radius: var(--radius-lg);
+        gap: 0.75rem;
+        border-radius: var(--radius-xl);
         overflow: hidden;
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--shadow-xl);
         position: relative;
     }
 
@@ -94,27 +95,27 @@
     }
 
     .images-grid.count-1 .grid-image {
-        height: 500px;
+        height: 550px;
     }
 
     .images-grid.count-2 .grid-image {
-        height: 500px;
+        height: 550px;
     }
 
     .images-grid.count-3 .grid-image {
-        height: 245px;
+        height: 268px;
     }
 
     .images-grid.count-3 .grid-image:first-child {
-        height: 500px;
+        height: 550px;
     }
 
     .images-grid.count-4 .grid-image {
-        height: 160px;
+        height: 176px;
     }
 
     .images-grid.count-4 .grid-image:first-child {
-        height: 500px;
+        height: 550px;
     }
 
     .wishlist-btn {
@@ -140,25 +141,28 @@
     }
 
     .item-header {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
     }
 
     .item-category {
         display: inline-block;
         background: var(--color-primary-lighter);
         color: var(--color-primary);
-        padding: 0.375rem 1rem;
-        border-radius: var(--radius-lg);
-        font-size: var(--text-sm);
+        padding: 0.5rem 1.25rem;
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
         font-weight: var(--font-semibold);
-        margin-bottom: 0.75rem;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .item-title {
-        font-size: var(--text-4xl);
+        font-size: 2rem;
         font-weight: var(--font-bold);
         color: var(--color-gray-900);
-        margin-bottom: 0.75rem;
+        margin-bottom: 1rem;
+        line-height: var(--line-height-tight);
     }
 
     .item-meta {
@@ -183,54 +187,68 @@
 
     .item-owner {
         background: var(--color-white);
-        padding: 1.25rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 1.25rem;
+        padding: 1.5rem;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
         border: 1px solid var(--color-gray-200);
+        transition: var(--transition-base);
+    }
+
+    .item-owner:hover {
+        box-shadow: var(--shadow-lg);
     }
 
     .owner-header {
         display: flex;
         align-items: center;
-        gap: 15px;
-        margin-bottom: 15px;
+        gap: 1rem;
+        margin-bottom: 1rem;
     }
 
     .owner-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-full);
         object-fit: cover;
+        border: 2px solid var(--color-gray-200);
     }
 
     .owner-info h3 {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1A202C;
-        margin-bottom: 4px;
+        font-size: var(--text-base);
+        font-weight: var(--font-semibold);
+        color: var(--color-gray-900);
+        margin-bottom: 0.25rem;
     }
 
     .owner-info p {
-        font-size: 0.875rem;
-        color: #718096;
+        font-size: var(--text-sm);
+        color: var(--color-gray-500);
     }
 
     .contact-owner-btn {
         width: 100%;
         background: var(--color-primary-lighter);
         color: var(--color-primary);
-        border: none;
+        border: 2px solid var(--color-primary-light);
         padding: 0.875rem 1rem;
         border-radius: var(--radius-lg);
         font-weight: var(--font-semibold);
         cursor: pointer;
         transition: var(--transition-base);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm);
     }
 
     .contact-owner-btn:hover {
-        background: var(--color-primary-light);
-        transform: translateY(-1px);
+        background: var(--color-primary);
+        color: var(--color-white);
+        border-color: var(--color-primary);
+        transform: translateY(-2px);
         box-shadow: var(--shadow-md);
     }
 
@@ -240,27 +258,44 @@
 
     .item-description {
         background: var(--color-white);
-        padding: 1.5625rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 1.25rem;
+        padding: 1.75rem;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 1.5rem;
         border: 1px solid var(--color-gray-200);
+        transition: var(--transition-base);
+    }
+
+    .item-description:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    .description-text {
+        color: var(--color-gray-700);
+        line-height: var(--line-height-relaxed);
+        font-size: var(--text-base);
     }
 
     .item-details-list {
         background: var(--color-white);
-        padding: 1.5625rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 1.25rem;
+        padding: 1.75rem;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 1.5rem;
         border: 1px solid var(--color-gray-200);
+        transition: var(--transition-base);
+    }
+
+    .item-details-list:hover {
+        box-shadow: var(--shadow-lg);
     }
 
     .detail-row {
         display: flex;
         justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #e5e7eb;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--color-gray-200);
     }
 
     .detail-row:last-child {
@@ -268,46 +303,52 @@
     }
 
     .detail-label {
-        color: #718096;
-        font-size: 0.875rem;
+        color: var(--color-gray-600);
+        font-size: var(--text-sm);
+        font-weight: var(--font-medium);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .detail-value {
-        color: #2D3748;
-        font-weight: 600;
-        font-size: 0.875rem;
+        color: var(--color-gray-900);
+        font-weight: var(--font-semibold);
+        font-size: var(--text-sm);
     }
 
     .booking-card {
         background: var(--color-white);
-        padding: 1.875rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
+        padding: 2rem;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
         position: sticky;
         top: 100px;
-        border: 1px solid var(--color-gray-200);
+        border: 2px solid var(--color-gray-200);
     }
 
     .price-display {
-        font-size: var(--text-4xl);
+        font-size: 2.5rem;
         font-weight: var(--font-bold);
-        color: var(--color-primary);
+        color: var(--color-gray-900);
         margin-bottom: 0.5rem;
+        line-height: 1;
     }
 
     .price-unit {
-        font-size: var(--text-base);
-        color: var(--color-gray-600);
+        font-size: var(--text-lg);
+        color: var(--color-gray-500);
         font-weight: var(--font-normal);
     }
 
     .deposit-info {
-        background: #f9fafb;
-        padding: 12px;
-        border-radius: 8px;
-        margin: 15px 0;
-        font-size: 13px;
-        color: #6b7280;
+        background: var(--color-info-light);
+        padding: 1rem;
+        border-radius: var(--radius-lg);
+        margin: 1.25rem 0;
+        font-size: var(--text-sm);
+        color: var(--color-info-hover);
+        border-left: 4px solid var(--color-info);
     }
 
     .booking-form {
@@ -320,73 +361,89 @@
 
     .form-label {
         display: block;
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #2D3748;
-        margin-bottom: 8px;
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        color: var(--color-gray-900);
+        margin-bottom: 0.5rem;
     }
 
     .form-input {
         width: 100%;
         padding: 0.875rem 1rem;
-        border: 1.5px solid #E2E8F0;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        transition: all 0.2s;
-        background: white;
+        border: 1.5px solid var(--color-gray-300);
+        border-radius: var(--radius-lg);
+        font-size: var(--text-sm);
+        transition: var(--transition-base);
+        background: var(--color-white);
         font-family: inherit;
-        color: #2D3748;
+        color: var(--color-gray-900);
     }
 
     .form-input:focus {
         outline: none;
-        border-color: #4A5FDC;
-        box-shadow: 0 0 0 3px rgba(74, 95, 220, 0.1);
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(68, 97, 242, 0.1);
+    }
+
+    .form-input:disabled,
+    .form-input:read-only {
+        background: var(--color-gray-50);
+        color: var(--color-gray-600);
+        cursor: not-allowed;
     }
 
     .total-calculation {
-        background: #f9fafb;
-        padding: 15px;
-        border-radius: 10px;
-        margin: 15px 0;
+        background: var(--color-gray-50);
+        padding: 1.25rem;
+        border-radius: var(--radius-lg);
+        margin: 1.25rem 0;
+        border: 1px solid var(--color-gray-200);
     }
 
     .calc-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 8px;
-        font-size: 0.875rem;
-        color: #718096;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        font-size: var(--text-sm);
+        color: var(--color-gray-700);
+    }
+
+    .calc-row:last-child {
+        margin-bottom: 0;
     }
 
     .calc-row.total {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #1A202C;
-        padding-top: 8px;
-        border-top: 2px solid #E2E8F0;
-        margin-top: 8px;
+        font-size: var(--text-lg);
+        font-weight: var(--font-bold);
+        color: var(--color-gray-900);
+        padding-top: 0.75rem;
+        border-top: 2px solid var(--color-gray-300);
+        margin-top: 0.75rem;
     }
 
     .book-now-btn {
-        width: 30%;
+        width: 100%;
         background: var(--color-primary);
         color: var(--color-white);
         border: none;
-        padding: 1rem;
+        padding: 1.125rem 1.5rem;
         border-radius: var(--radius-lg);
         font-size: var(--text-base);
         font-weight: var(--font-semibold);
         cursor: pointer;
         transition: var(--transition-base);
-        display: block;
-        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
     }
 
-    .book-now-btn:hover {
+    .book-now-btn:hover:not(:disabled) {
         background: var(--color-primary-hover);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
     }
 
     .book-now-btn:active {
@@ -394,17 +451,18 @@
     }
 
     .book-now-btn:disabled {
-        background: var(--color-gray-400);
+        background: var(--color-gray-300);
         cursor: not-allowed;
         transform: none;
+        opacity: 0.6;
     }
 
     .reviews-section {
         background: var(--color-white);
-        padding: 1.875rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
-        margin-top: 2.5rem;
+        padding: 2rem;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        margin-top: 3rem;
         border: 1px solid var(--color-gray-200);
     }
 
@@ -412,23 +470,25 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 25px;
+        margin-bottom: 1.5rem;
     }
 
     .reviews-summary {
         display: flex;
         align-items: center;
-        gap: 20px;
-        margin-bottom: 25px;
-        padding: 20px;
-        background: #f9fafb;
-        border-radius: 10px;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--color-gray-50);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-gray-200);
     }
 
     .rating-large {
-        font-size: 3rem;
-        font-weight: 700;
-        color: #1A202C;
+        font-size: 3.5rem;
+        font-weight: var(--font-bold);
+        color: var(--color-gray-900);
+        line-height: 1;
     }
 
     .rating-breakdown {
@@ -597,60 +657,69 @@
     .availability-badge {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        font-weight: 600;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--font-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .badge-available {
-        background: #d1fae5;
-        color: #065f46;
+        background: var(--color-success-light);
+        color: var(--color-success-hover);
+        border: 1px solid var(--color-success);
     }
 
     .badge-unavailable {
-        background: #fee2e2;
-        color: #991b1b;
+        background: var(--color-danger-light);
+        color: var(--color-danger-hover);
+        border: 1px solid var(--color-danger);
     }
 
     /* Calendar Styles */
     .availability-calendar {
-        margin-bottom: 20px;
-        padding: 20px;
-        background: white;
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        background: var(--color-gray-50);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-gray-200);
     }
 
     .calendar-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 15px;
+        margin-bottom: 1.25rem;
     }
 
     .calendar-nav-btn {
-        background: var(--color-primary-lighter);
-        border: none;
+        background: var(--color-white);
+        border: 1px solid var(--color-gray-300);
         color: var(--color-primary);
-        width: 32px;
-        height: 32px;
-        border-radius: var(--radius-md);
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-lg);
         cursor: pointer;
         font-size: var(--text-sm);
         transition: var(--transition-base);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .calendar-nav-btn:hover {
         background: var(--color-primary);
         color: var(--color-white);
+        border-color: var(--color-primary);
+        transform: scale(1.05);
     }
 
     .calendar-month-year {
-        font-weight: 600;
-        color: #1A202C;
-        font-size: 1rem;
+        font-weight: var(--font-semibold);
+        color: var(--color-gray-900);
+        font-size: var(--text-lg);
     }
 
     .calendar-grid {
@@ -672,30 +741,38 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.875rem;
-        border-radius: 6px;
+        font-size: var(--text-sm);
+        border-radius: var(--radius-lg);
         cursor: pointer;
         transition: all 0.2s;
         position: relative;
+        font-weight: var(--font-medium);
+        background: var(--color-white);
+        border: 1px solid transparent;
     }
 
     .calendar-day:not(.empty):not(.past):not(.unavailable):hover {
-        background: #EEF2FF;
-        transform: scale(1.05);
+        background: var(--color-primary-lighter);
+        transform: scale(1.1);
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-sm);
     }
 
     .calendar-day.empty {
         cursor: default;
+        background: transparent;
     }
 
     .calendar-day.past {
-        color: #CBD5E0;
+        color: var(--color-gray-300);
         cursor: not-allowed;
+        background: var(--color-gray-50);
     }
 
     .calendar-day.today {
         font-weight: var(--font-bold);
         border: 2px solid var(--color-primary);
+        box-shadow: var(--shadow-sm);
     }
 
     .calendar-day.available {
@@ -709,57 +786,78 @@
         color: var(--color-danger-hover);
         cursor: not-allowed;
         font-weight: var(--font-semibold);
+        text-decoration: line-through;
     }
 
     .calendar-day.selected {
         background: var(--color-primary);
         color: var(--color-white);
         font-weight: var(--font-bold);
+        box-shadow: var(--shadow-md);
+        transform: scale(1.05);
     }
 
     .calendar-day.in-range {
         background: var(--color-primary-light);
         color: var(--color-primary);
+        border-color: var(--color-primary-light);
     }
 
     .calendar-legend {
         display: flex;
-        gap: 15px;
+        gap: 1.25rem;
         justify-content: center;
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid #E2E8F0;
-        font-size: 0.75rem;
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--color-gray-300);
+        font-size: var(--text-xs);
+        flex-wrap: wrap;
     }
 
     .legend-item {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 0.5rem;
+        font-weight: var(--font-medium);
+        color: var(--color-gray-700);
     }
 
     .legend-box {
-        width: 16px;
-        height: 16px;
-        border-radius: 4px;
+        width: 18px;
+        height: 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-gray-300);
     }
 
     @media (max-width: 968px) {
+        .item-details-container {
+            padding: 0 1rem;
+        }
+
         .item-content {
             grid-template-columns: 1fr;
-            gap: 30px;
+            gap: 2rem;
         }
 
         .booking-card {
             position: static;
+            margin-top: 2rem;
         }
 
-        .item-main-image {
+        .item-main-image,
+        .images-grid.count-1 .grid-image,
+        .images-grid.count-2 .grid-image,
+        .images-grid.count-3 .grid-image:first-child,
+        .images-grid.count-4 .grid-image:first-child {
             height: 400px;
         }
 
         .item-title {
-            font-size: 24px;
+            font-size: var(--text-3xl);
+        }
+
+        .price-display {
+            font-size: 2rem;
         }
     }
 </style>
@@ -819,21 +917,33 @@
             </div>
 
             <div class="item-details-list">
-                <h2 class="section-title">Item Details</h2>
+                <h2 class="section-title" style="margin-bottom: 1.25rem;">Item Details</h2>
                 <div class="detail-row">
-                    <span class="detail-label">Category</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-tag"></i>
+                        Category
+                    </span>
                     <span class="detail-value">{{ $item->category->CategoryName ?? 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Location</span>
-                    <span class="detail-value"><i class="fa-solid fa-location-dot"></i> {{ $item->location->LocationName ?? 'N/A' }}</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-location-dot"></i>
+                        Location
+                    </span>
+                    <span class="detail-value">{{ $item->location->LocationName ?? 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Deposit Amount</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Deposit Amount
+                    </span>
                     <span class="detail-value">RM {{ number_format($item->DepositAmount, 2) }}</span>
                 </div>
                  <div class="detail-row">
-                    <span class="detail-label">Availability</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        Availability
+                    </span>
                     <span class="detail-value">
                         @if($item->Availability)
                             <span class="availability-badge badge-available">
@@ -847,17 +957,26 @@
                     </span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Total Quantity</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        Total Quantity
+                    </span>
                     <span class="detail-value">{{ $item->Quantity }} {{ $item->Quantity > 1 ? 'units' : 'unit' }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Listed</span>
+                    <span class="detail-label">
+                        <i class="fa-solid fa-clock"></i>
+                        Listed
+                    </span>
                     <span class="detail-value">{{ $item->DateAdded ? $item->DateAdded->format('M d, Y') : 'N/A' }}</span>
                 </div>
             </div>
 
             <div class="item-description">
-                <h2 class="section-title">Description</h2>
+                <h2 class="section-title" style="margin-bottom: 1rem;">
+                    <i class="fa-solid fa-align-left" style="font-size: 1.25rem; color: var(--color-primary);"></i>
+                    Description
+                </h2>
                 <div class="description-text">{!! nl2br(e($item->Description)) !!}</div>
             </div>
 
@@ -985,7 +1104,10 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="book-now-btn">Book Now</button>
+                        <button type="submit" class="book-now-btn">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            Book Now
+                        </button>
                     </form>
                 @endif
             </div>
@@ -995,7 +1117,10 @@
     <!-- Reviews Section -->
     <div class="reviews-section">
         <div class="reviews-header">
-            <h2 class="section-title" style="margin: 0;">Reviews ({{ $totalReviews }})</h2>
+            <h2 class="section-title" style="margin: 0;">
+                <i class="fa-solid fa-star" style="color: #fbbf24; margin-right: 0.5rem;"></i>
+                Reviews ({{ $totalReviews }})
+            </h2>
         </div>
 
         @if($totalReviews > 0)
