@@ -313,25 +313,26 @@
         /* Mobile Menu Toggle */
         .mobile-menu-toggle {
             display: none;
-            background: var(--color-primary);
-            color: var(--color-white);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
             border: none;
             padding: 0.625rem 0.875rem;
-            border-radius: var(--radius-lg);
+            border-radius: 10px;
             font-size: 1.125rem;
             cursor: pointer;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition-base);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s;
             flex-shrink: 0;
         }
 
         .mobile-menu-toggle:hover {
-            background: var(--color-primary-hover);
-            transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
         .mobile-menu-toggle:active {
-            transform: scale(0.95);
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
 
         .header-with-menu {

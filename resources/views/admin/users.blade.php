@@ -6,12 +6,11 @@
             <button class="mobile-menu-toggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="header-content">
-                <h1 class="header-title">Users Management</h1>
-                <p class="header-description">Manage all registered users, account actions, view profiles</p>
-            </div>
+            <h1 class="header-title">Users Management</h1>
         </div>
     </div>
+
+    <p class="page-description">Manage all registered users, account actions, view profiles</p>
 
 <!-- Stats Cards -->
 <div class="stats-grid">
@@ -338,13 +337,23 @@
 </div>
 
     <style>
-        /* Header with mobile menu */
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 0 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
         .header-with-menu {
             display: flex;
             align-items: center;
             gap: 16px;
-            margin-bottom: 24px;
-            padding: 0 20px;
+            flex: 1;
+            min-width: 0;
         }
 
         .header-with-menu .mobile-menu-toggle {
@@ -369,32 +378,22 @@
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 32px;
-            padding: 0 20px;
-            flex-wrap: wrap;
-            gap: 20px;
-            flex: 1;
-        }
-
-        .header-content {
-            flex: 1;
-        }
-
         .header-title {
             font-size: 32px;
             font-weight: 700;
             color: #1f2937;
-            margin: 0 0 8px 0;
+            margin: 0;
+            line-height: 1.2;
+            flex: 1;
+            min-width: 0;
         }
 
-        .header-description {
+        .page-description {
             font-size: 16px;
             color: #6b7280;
-            margin: 0;
+            margin: 0 0 32px 0;
+            padding: 0 20px;
+            line-height: 1.5;
         }
 
         .header-actions {
@@ -869,7 +868,7 @@
                 font-size: 28px;
             }
 
-            .header-description {
+            .page-description {
                 font-size: 15px;
             }
 
@@ -914,7 +913,7 @@
                 font-size: 24px;
             }
 
-            .header-description {
+            .page-description {
                 font-size: 14px;
             }
 
@@ -1151,7 +1150,7 @@
                 font-size: 20px;
             }
 
-            .header-description {
+            .page-description {
                 font-size: 12px;
             }
 

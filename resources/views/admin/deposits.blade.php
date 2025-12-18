@@ -6,10 +6,7 @@
             <button class="mobile-menu-toggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="header-content">
-                <h1 class="header-title">Deposits Overview</h1>
-                <p class="header-description">Review and manage all deposit transactions from users</p>
-            </div>
+            <h1 class="header-title">Deposits Overview</h1>
         </div>
         <div class="header-actions">
             <a href="{{ route('admin.deposits.export') }}" class="btn btn-secondary">
@@ -20,6 +17,8 @@
             </button>
         </div>
     </div>
+
+    <p class="page-description">Review and manage all deposit transactions from users</p>
 
     @if(session('success'))
         <div class="alert alert-success">
@@ -251,8 +250,8 @@
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 32px;
+            align-items: center;
+            margin-bottom: 12px;
             padding: 0 20px;
             flex-wrap: wrap;
             gap: 20px;
@@ -260,7 +259,7 @@
 
         .header-with-menu {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 16px;
             flex: 1;
             min-width: 0;
@@ -268,42 +267,41 @@
 
         .header-with-menu .mobile-menu-toggle {
             display: none;
-            background: white;
-            border: 2px solid #e5e7eb;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
             border-radius: 10px;
             width: 44px;
             height: 44px;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            color: #1f2937;
+            color: white;
             font-size: 18px;
             transition: all 0.3s;
             flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
 
         .header-with-menu .mobile-menu-toggle:hover {
-            background: #f9fafb;
-            border-color: #d1d5db;
-        }
-
-        .header-content {
-            flex: 1;
-            min-width: 0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
         .header-title {
             font-size: 32px;
             font-weight: 700;
             color: #1f2937;
-            margin: 0 0 8px 0;
+            margin: 0;
             line-height: 1.2;
+            flex: 1;
+            min-width: 0;
         }
 
-        .header-description {
+        .page-description {
             font-size: 16px;
             color: #6b7280;
-            margin: 0;
+            margin: 0 0 32px 0;
+            padding: 0 20px;
             line-height: 1.5;
         }
 
@@ -960,7 +958,7 @@
             .header-with-menu {
                 order: -1;
                 width: 100%;
-                align-items: flex-start;
+                align-items: center;
             }
 
             .header-with-menu .mobile-menu-toggle {
@@ -976,7 +974,7 @@
                 font-size: 28px;
             }
 
-            .header-description {
+            .page-description {
                 font-size: 15px;
             }
 
@@ -1026,7 +1024,7 @@
                 font-size: 24px;
             }
 
-            .header-description {
+            .page-description {
                 font-size: 14px;
             }
 
@@ -1135,7 +1133,7 @@
                 margin: 0 0 4px 0;
             }
 
-            .header-description {
+            .page-description {
                 font-size: 12px;
             }
 

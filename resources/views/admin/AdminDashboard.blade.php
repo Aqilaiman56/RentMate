@@ -28,6 +28,29 @@
             margin-left: auto;
         }
 
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .mobile-menu-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
         /* Profile Section */
         .profile-section {
             position: relative;
@@ -409,6 +432,10 @@
                 display: flex;
                 align-items: center;
                 gap: 0.75rem;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
             }
         }
 

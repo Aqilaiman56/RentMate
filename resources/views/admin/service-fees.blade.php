@@ -2,9 +2,11 @@
 
 @section('main-content')
     <div class="header">
-        <div class="header-content">
+        <div class="header-with-menu">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
             <h1 class="header-title">Service Fee Management</h1>
-            <p class="header-description">View service fee collection summary and monthly breakdown</p>
         </div>
         <div class="header-actions">
             <a href="{{ route('admin.service-fees.export', ['year' => $year]) }}" class="btn btn-secondary">
@@ -12,6 +14,8 @@
             </a>
         </div>
     </div>
+
+    <p class="page-description">View service fee collection summary and monthly breakdown</p>
 
     @if(session('success'))
         <div class="alert alert-success">
@@ -232,27 +236,58 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
+            margin-bottom: 12px;
             padding: 0 20px;
             flex-wrap: wrap;
             gap: 20px;
         }
 
-        .header-content {
+        .header-with-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
             flex: 1;
+            min-width: 0;
+        }
+
+        .header-with-menu .mobile-menu-toggle {
+            display: none;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .header-with-menu .mobile-menu-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
         .header-title {
             font-size: 32px;
             font-weight: 700;
             color: #1f2937;
-            margin: 0 0 8px 0;
+            margin: 0;
+            line-height: 1.2;
+            flex: 1;
+            min-width: 0;
         }
 
-        .header-description {
+        .page-description {
             font-size: 16px;
             color: #6b7280;
-            margin: 0;
+            margin: 0 0 32px 0;
+            padding: 0 20px;
+            line-height: 1.5;
         }
 
         .header-actions {
@@ -508,6 +543,29 @@
 
         .btn-secondary:hover {
             background: #e5e7eb;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 968px) {
+            .header { align-items: flex-start; gap: 16px; }
+            .header-with-menu { order: -1; width: 100%; align-items: center; }
+            .header-with-menu .mobile-menu-toggle { display: flex; }
+            .header-actions { width: auto; padding-top: 0; }
+            .header-title { font-size: 28px; }
+            .page-description { font-size: 15px; }
+        }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; align-items: stretch; gap: 12px; }
+            .header-actions { align-self: flex-start; }
+            .header-title { font-size: 24px; }
+            .page-description { font-size: 14px; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .header-title { font-size: 20px; }
+            .page-description { font-size: 12px; }
         }
     </style>
 @endsection
