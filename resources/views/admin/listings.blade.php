@@ -2,13 +2,18 @@
 
 @section('main-content')
     <div class="header">
-        <div class="header-content">
-            <h1 class="header-title">Listings Management</h1>
-            <p class="header-description">View and manage all property and item listings on the platform</p>
+        <div class="header-with-menu">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-content">
+                <h1 class="header-title">Listings Management</h1>
+                <p class="header-description">View and manage all property and item listings</p>
+            </div>
         </div>
         <div class="header-actions">
             <button class="btn btn-secondary" onclick="exportListings()">
-                <i class="fas fa-download"></i> Export Data
+                <i class="fas fa-download"></i> <span class="btn-text">Export Data</span>
             </button>
         </div>
     </div>
@@ -189,15 +194,24 @@
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 32px;
             padding: 0 20px;
             flex-wrap: wrap;
             gap: 20px;
         }
 
+        .header-with-menu {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            flex: 1;
+            min-width: 0;
+        }
+
         .header-content {
             flex: 1;
+            min-width: 0;
         }
 
         .header-title {
@@ -205,23 +219,28 @@
             font-weight: 700;
             color: #1f2937;
             margin: 0 0 8px 0;
+            line-height: 1.2;
         }
 
         .header-description {
             font-size: 16px;
             color: #6b7280;
             margin: 0;
+            line-height: 1.5;
         }
 
         .header-actions {
             display: flex;
             gap: 12px;
+            flex-shrink: 0;
+            align-items: flex-start;
+            padding-top: 4px;
         }
 
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
             gap: 20px;
             margin-bottom: 32px;
             padding: 0 20px;
@@ -236,6 +255,7 @@
             gap: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 0;
         }
 
         .stat-card:hover {
@@ -252,6 +272,7 @@
             justify-content: center;
             font-size: 24px;
             color: white;
+            flex-shrink: 0;
         }
 
         .stat-icon.blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
@@ -260,6 +281,7 @@
 
         .stat-content {
             flex: 1;
+            min-width: 0;
         }
 
         .stat-value {
@@ -341,7 +363,7 @@
         /* Listings Grid */
         .listings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
             gap: 24px;
             padding: 0 20px;
         }
@@ -352,6 +374,9 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
 
         .listing-card:hover {
@@ -401,6 +426,9 @@
 
         .listing-content {
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
         .listing-category {
@@ -408,6 +436,8 @@
             font-weight: 600;
             color: #6b7280;
             margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .listing-title {
@@ -416,6 +446,8 @@
             color: #1f2937;
             margin: 0 0 12px 0;
             line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .listing-owner {
@@ -425,6 +457,13 @@
             margin-bottom: 16px;
             font-size: 14px;
             color: #6b7280;
+            min-width: 0;
+        }
+
+        .listing-owner span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .owner-avatar {
@@ -476,6 +515,7 @@
         .listing-actions {
             display: flex;
             gap: 8px;
+            margin-top: auto;
         }
 
         .btn-action {
@@ -491,6 +531,7 @@
             align-items: center;
             justify-content: center;
             gap: 4px;
+            text-decoration: none;
         }
 
         .btn-view {
@@ -552,13 +593,370 @@
             background: #e5e7eb;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
+        /* Responsive Styles */
+        @media (max-width: 968px) {
+            .header {
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .header-with-menu {
+                order: -1;
+                width: 100%;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: auto;
+                padding-top: 0;
+            }
+
+            .header-title {
+                font-size: 28px;
+            }
+
+            .header-description {
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .stat-label {
+                font-size: 13px;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .filter-buttons {
+                width: 100%;
+            }
+
+            .filter-select {
+                flex: 1;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
             .listings-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
             }
         }
-        
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 16px;
+                margin-bottom: 24px;
+                gap: 12px;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .header-with-menu {
+                gap: 0.625rem;
+                flex: 1;
+            }
+
+            .header-actions {
+                align-self: flex-start;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .header-description {
+                font-size: 13px;
+            }
+
+            .btn {
+                padding: 7px 14px;
+                font-size: 12px;
+            }
+
+            .btn-text {
+                display: none;
+            }
+
+            .stats-grid {
+                padding: 0 16px;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 14px;
+            }
+
+            .stat-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+
+            .table-controls {
+                padding: 0 16px;
+                gap: 12px;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .filter-select, .btn {
+                width: 100%;
+            }
+
+            .listings-grid {
+                padding: 0 16px;
+                gap: 16px;
+            }
+
+            .listing-content {
+                padding: 16px;
+            }
+
+            .listing-title {
+                font-size: 16px;
+            }
+
+            .listing-details {
+                padding: 10px;
+            }
+
+            .detail-item {
+                font-size: 12px;
+            }
+
+            .pagination-container {
+                padding: 32px 16px;
+            }
+
+            .alert {
+                margin: 0 16px 16px;
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 12px;
+                margin-bottom: 20px;
+                gap: 10px;
+            }
+
+            .header-with-menu {
+                gap: 0.5rem;
+            }
+
+            .header-actions {
+                padding-top: 2px;
+            }
+
+            .header-title {
+                font-size: 18px;
+                margin: 0 0 4px 0;
+            }
+
+            .header-description {
+                font-size: 11px;
+            }
+
+            .btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            .btn i {
+                font-size: 12px;
+            }
+
+            .stats-grid {
+                padding: 0 12px;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .stat-value {
+                font-size: 18px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            .table-controls {
+                padding: 0 12px;
+                gap: 10px;
+            }
+
+            .search-input {
+                padding: 8px 12px 8px 36px;
+                font-size: 13px;
+            }
+
+            .filter-select {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .listings-grid {
+                padding: 0 12px;
+                gap: 12px;
+            }
+
+            .listing-image {
+                height: 180px;
+            }
+
+            .listing-badge {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+
+            .listing-content {
+                padding: 14px;
+            }
+
+            .listing-category {
+                font-size: 11px;
+            }
+
+            .listing-title {
+                font-size: 15px;
+            }
+
+            .listing-owner {
+                font-size: 13px;
+            }
+
+            .owner-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+
+            .listing-details {
+                padding: 8px;
+                gap: 6px;
+            }
+
+            .detail-item {
+                font-size: 11px;
+            }
+
+            .btn-action {
+                padding: 6px 10px;
+                font-size: 12px;
+                gap: 3px;
+            }
+
+            .btn-more {
+                width: 36px;
+            }
+
+            .pagination-container {
+                padding: 24px 12px;
+            }
+
+            .alert {
+                margin: 0 12px 12px;
+                padding: 12px 14px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header {
+                gap: 8px;
+            }
+
+            .header-title {
+                font-size: 16px;
+            }
+
+            .header-description {
+                font-size: 10px;
+            }
+
+            .btn {
+                padding: 5px 8px;
+                font-size: 10px;
+            }
+
+            .btn i {
+                font-size: 11px;
+            }
+
+            .stat-value {
+                font-size: 16px;
+            }
+
+            .stat-label {
+                font-size: 10px;
+            }
+
+            .listing-image {
+                height: 160px;
+            }
+
+            .listing-title {
+                font-size: 14px;
+            }
+
+            .detail-item {
+                font-size: 10px;
+            }
+        }
 
     </style>
 

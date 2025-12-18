@@ -4,6 +4,30 @@
     <div class="header">
 
     <style>
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.9375rem;
+            align-items: center;
+            margin-left: auto;
+        }
+
         /* Profile Section */
         .profile-section {
             position: relative;
@@ -14,15 +38,19 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.2s;
+            background: white;
+            border: 2px solid #E5E7EB;
         }
 
         .profile-section:hover {
-            background-color: rgba(0, 0, 0, 0.05);
+            background-color: #F5F7FF;
+            border-color: #4461F2;
         }
 
         .profile-name {
             font-weight: 500;
             font-size: 14px;
+            color: #374151;
         }
 
         /* Dropdown Menu */
@@ -149,9 +177,9 @@
 
         /* Notification Dropdown */
         .notification-dropdown {
-            position: fixed;
-            top: 80px;
-            right: 50px;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
             background: white;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -361,11 +389,58 @@
             color: #d97706;
         }
 
-        /* Responsive Notification */
+        /* Responsive Styles */
+        @media (max-width: 968px) {
+            .header {
+                align-items: center;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .header-actions {
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .header-with-menu {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+        }
+
         @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .header-with-menu {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 0.625rem;
+                width: 100%;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+                text-align: left;
+                flex: 1;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
             .notification-dropdown {
                 position: fixed;
-                top: 70px;
+                top: auto;
                 right: 10px;
                 left: 10px;
                 width: auto;
@@ -375,6 +450,79 @@
             .notification-btn {
                 padding: 8px 12px;
                 font-size: 18px;
+            }
+
+            .profile-section {
+                padding: 6px 10px;
+            }
+
+            .profile-name {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-with-menu {
+                gap: 0.5rem;
+            }
+
+            .header-title {
+                font-size: 1.125rem;
+                text-align: left;
+            }
+
+            .header-actions {
+                gap: 0.5rem;
+            }
+
+            .notification-btn {
+                padding: 6px 10px;
+                font-size: 16px;
+            }
+
+            .profile-section {
+                padding: 5px 8px;
+            }
+
+            .profile-name {
+                display: none;
+            }
+
+            .profile-section .fa-chevron-down {
+                display: none !important;
+            }
+
+            .profile-section::before {
+                content: '\f007';
+                font-family: 'Font Awesome 6 Free';
+                font-weight: 900;
+                font-size: 16px;
+            }
+
+            .notification-dropdown {
+                max-height: 400px;
+            }
+
+            .notification-header h3 {
+                font-size: 14px;
+            }
+
+            .notification-item {
+                padding: 10px 14px;
+            }
+
+            .notification-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            .notification-title {
+                font-size: 13px;
+            }
+
+            .notification-message {
+                font-size: 12px;
             }
         }
 
@@ -397,17 +545,23 @@
         }
     </style>
 
-        <h1 class="header-title">Dashboard Overview</h1>
-        <div class="header-actions">
-            <button class="notification-btn" id="notificationBtn" type="button">
-                <i class="fas fa-bell"></i>
-                @if(($notifications['total_count'] ?? 0) > 0)
-                    <span class="notification-badge">{{ $notifications['total_count'] }}</span>
-                @endif
+        <div class="header-with-menu">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
             </button>
+            <h1 class="header-title">Dashboard Overview</h1>
+        </div>
+        <div class="header-actions">
+            <div style="position: relative;">
+                <button class="notification-btn" id="notificationBtn" type="button">
+                    <i class="fas fa-bell"></i>
+                    @if(($notifications['total_count'] ?? 0) > 0)
+                        <span class="notification-badge">{{ $notifications['total_count'] }}</span>
+                    @endif
+                </button>
 
-            <!-- Notification Dropdown -->
-            <div class="notification-dropdown" id="notificationDropdown">
+                <!-- Notification Dropdown -->
+                <div class="notification-dropdown" id="notificationDropdown">
                 <div class="notification-header">
                     <h3>Notifications</h3>
                     <span class="notification-count">{{ $notifications['total_count'] ?? 0 }} new</span>
@@ -452,6 +606,7 @@
                         </div>
                     </div>
                 @endif
+                </div>
             </div>
 
             <div class="profile-section" id="profileSection">

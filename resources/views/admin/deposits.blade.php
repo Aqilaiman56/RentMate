@@ -2,16 +2,21 @@
 
 @section('main-content')
     <div class="header">
-        <div class="header-content">
-            <h1 class="header-title">Deposits Overview</h1>
-            <p class="header-description">Review and manage all deposit transactions from users</p>
+        <div class="header-with-menu">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-content">
+                <h1 class="header-title">Deposits Overview</h1>
+                <p class="header-description">Review and manage all deposit transactions from users</p>
+            </div>
         </div>
         <div class="header-actions">
             <a href="{{ route('admin.deposits.export') }}" class="btn btn-secondary">
-                📥 Export Data
+                <i class="fas fa-download"></i> <span class="btn-text">Export Data</span>
             </a>
             <button class="btn btn-primary" onclick="generateReport()">
-                📊 Generate Report
+                <i class="fas fa-chart-bar"></i> <span class="btn-text">Generate Report</span>
             </button>
         </div>
     </div>
@@ -242,18 +247,49 @@
             flex-shrink: 0;
         }
 
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 32px;
             padding: 0 20px;
             flex-wrap: wrap;
             gap: 20px;
         }
 
+        .header-with-menu {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .header-with-menu .mobile-menu-toggle {
+            display: none;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #1f2937;
+            font-size: 18px;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .header-with-menu .mobile-menu-toggle:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
         .header-content {
             flex: 1;
+            min-width: 0;
         }
 
         .header-title {
@@ -261,23 +297,28 @@
             font-weight: 700;
             color: #1f2937;
             margin: 0 0 8px 0;
+            line-height: 1.2;
         }
 
         .header-description {
             font-size: 16px;
             color: #6b7280;
             margin: 0;
+            line-height: 1.5;
         }
 
         .header-actions {
             display: flex;
             gap: 12px;
+            flex-shrink: 0;
+            align-items: flex-start;
+            padding-top: 4px;
         }
 
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
             gap: 20px;
             margin-bottom: 32px;
             padding: 0 20px;
@@ -288,10 +329,12 @@
             border-radius: 12px;
             padding: 20px;
             display: flex;
+            flex-direction: row;
             align-items: center;
             gap: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 0;
         }
 
         .stat-card:hover {
@@ -307,6 +350,7 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            flex-shrink: 0;
         }
 
         .stat-icon.blue { background: #dbeafe; }
@@ -316,6 +360,8 @@
 
         .stat-content {
             flex: 1;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .stat-value {
@@ -323,11 +369,17 @@
             font-weight: 700;
             color: #1f2937;
             margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .stat-label {
             font-size: 14px;
             color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         /* Table Controls */
@@ -896,6 +948,412 @@
             background: #d1d5db;
             cursor: not-allowed;
             transform: none;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 968px) {
+            .header {
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .header-with-menu {
+                order: -1;
+                width: 100%;
+                align-items: flex-start;
+            }
+
+            .header-with-menu .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .header-actions {
+                width: auto;
+                padding-top: 0;
+            }
+
+            .header-title {
+                font-size: 28px;
+            }
+
+            .header-description {
+                font-size: 15px;
+            }
+
+            .btn {
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+
+            .stat-icon {
+                width: 52px;
+                height: 52px;
+                font-size: 22px;
+            }
+
+            .stat-value {
+                font-size: 26px;
+            }
+
+            .stat-label {
+                font-size: 13px;
+            }
+
+            .btn-text {
+                display: inline;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 16px;
+                margin-bottom: 24px;
+                gap: 12px;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .header-with-menu {
+                gap: 12px;
+                flex: 1;
+            }
+
+            .header-actions {
+                align-self: flex-start;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .header-description {
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 9px 16px;
+                font-size: 13px;
+            }
+
+            .btn-text {
+                display: none;
+            }
+
+            .stats-grid {
+                padding: 0 16px;
+                gap: 16px;
+                grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+            }
+
+            .stat-card {
+                padding: 16px;
+                gap: 14px;
+            }
+
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0 16px;
+                gap: 16px;
+            }
+
+            .search-box {
+                max-width: 100%;
+                min-width: 100%;
+            }
+
+            .filter-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .filter-select, .filter-buttons .btn {
+                width: 100%;
+            }
+
+            .table-card {
+                margin: 0 16px;
+            }
+
+            .table-header {
+                padding: 20px;
+            }
+
+            .table-title {
+                font-size: 18px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 14px 16px;
+            }
+
+            .alert {
+                margin: 0 16px 16px;
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 12px;
+                margin-bottom: 20px;
+                gap: 10px;
+            }
+
+            .header-with-menu {
+                gap: 8px;
+            }
+
+            .header-with-menu .mobile-menu-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .header-actions {
+                padding-top: 2px;
+            }
+
+            .header-title {
+                font-size: 20px;
+                margin: 0 0 4px 0;
+            }
+
+            .header-description {
+                font-size: 12px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .btn i {
+                font-size: 13px;
+            }
+
+            .stats-grid {
+                padding: 0 12px;
+                gap: 12px;
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 14px;
+                gap: 12px;
+            }
+
+            .stat-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            .table-controls {
+                padding: 0 12px;
+                gap: 12px;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .search-input {
+                padding: 10px 38px 10px 38px;
+                font-size: 13px;
+            }
+
+            .filter-select {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .table-card {
+                margin: 0 12px;
+            }
+
+            .table-header {
+                padding: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .table-title {
+                font-size: 16px;
+            }
+
+            .table-count {
+                font-size: 13px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 12px 14px;
+                font-size: 12px;
+            }
+
+            .data-table th {
+                font-size: 11px;
+            }
+
+            .btn-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+
+            .alert {
+                margin: 0 12px 12px;
+                padding: 12px 14px;
+                font-size: 12px;
+            }
+
+            .pagination-container {
+                padding: 24px 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header {
+                padding: 0 10px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+
+            .header-with-menu {
+                gap: 6px;
+            }
+
+            .header-with-menu .mobile-menu-toggle {
+                width: 36px;
+                height: 36px;
+                font-size: 15px;
+            }
+
+            .header-title {
+                font-size: 18px;
+            }
+
+            .header-description {
+                font-size: 11px;
+            }
+
+            .btn {
+                padding: 7px 10px;
+                font-size: 11px;
+            }
+
+            .btn i {
+                font-size: 12px;
+            }
+
+            .stats-grid {
+                padding: 0 10px;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+                border-radius: 10px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 10px;
+            }
+
+            .table-controls {
+                padding: 0 10px;
+                gap: 10px;
+            }
+
+            .search-input {
+                padding: 9px 36px 9px 36px;
+                font-size: 12px;
+            }
+
+            .filter-select {
+                padding: 9px 12px;
+                font-size: 12px;
+            }
+
+            .table-card {
+                margin: 0 10px;
+                border-radius: 10px;
+            }
+
+            .table-header {
+                padding: 14px;
+            }
+
+            .table-title {
+                font-size: 15px;
+            }
+
+            .table-count {
+                font-size: 12px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+
+            .data-table th {
+                font-size: 10px;
+            }
+
+            .btn-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+
+            .alert {
+                margin: 0 10px 10px;
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+
+            .pagination-container {
+                padding: 20px 10px;
+            }
         }
     </style>
 
