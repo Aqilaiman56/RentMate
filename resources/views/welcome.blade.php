@@ -89,27 +89,27 @@
         }
 
         .header-search-button {
-            padding: 10px 20px;
+            padding: 8px 12px;
             background: #4461F2;
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            font-family: inherit;
             white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 4px;
             flex-shrink: 0;
-            min-height: 42px;
         }
 
         .header-search-button:hover {
             background: #3651E2;
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(68, 97, 242, 0.3);
+            box-shadow: 0 4px 8px rgba(68, 97, 242, 0.3);
         }
 
         .header-search-button:active {
@@ -252,18 +252,18 @@
             background: #dc2626;
         }
 
-       .categories {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: 15px;
-        justify-items: center;
-        margin-bottom: 40px;
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            justify-items: center;
+            margin-bottom: 40px;
         }
 
         .category-card {
             background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 15px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 10px;
             padding: 18px 10px;
             width: 100%;
             max-width: 110px;
@@ -272,16 +272,18 @@
             align-items: center;
             text-align: center;
             text-decoration: none;
-            color: #1f2937;
-            transition: all 0.3s ease;
+            color: #2D3748;
+            transition: all 0.2s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        .category-card:hover, 
+        .category-card:hover,
         .category-card.active {
             background: #4461F2;
             color: white;
-            transform: translateY(-3px);
+            border-color: #4461F2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(68, 97, 242, 0.2);
         }
 
         .category-icon {
@@ -291,7 +293,7 @@
         }
 
         .category-name {
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
             color: inherit;
         }
@@ -306,25 +308,25 @@
             background: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
             position: relative;
-            cursor: pointer;
             text-decoration: none;
             color: inherit;
-            border: 1px solid #e5e7eb;
+            display: block;
+            border: 1px solid #E2E8F0;
         }
 
         .item-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
         }
 
         .item-image {
             width: 100%;
             height: 200px;
             object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #F7FAFC;
         }
 
         .item-details {
@@ -334,7 +336,7 @@
         }
 
         .item-title {
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 600;
             margin-bottom: 12px;
             white-space: nowrap;
@@ -347,13 +349,13 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #6b7280;
             margin-bottom: 12px;
         }
 
         .item-price {
-            font-size: 18px;
+            font-size: 1.125rem;
             font-weight: 700;
             color: #1f2937;
         }

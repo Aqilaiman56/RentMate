@@ -131,15 +131,16 @@ class Item extends Model
 
     /**
      * Update available quantity based on active bookings
+     * NOTE: Availability is now manually controlled by owner, not automatically set
      */
     public function updateAvailableQuantity()
     {
         $bookedQuantity = $this->getBookedQuantity();
         $availableQuantity = max(0, $this->Quantity - $bookedQuantity);
-        
+
+        // Only update AvailableQuantity, NOT Availability (manual control)
         $this->update([
-            'AvailableQuantity' => $availableQuantity,
-            'Availability' => $availableQuantity > 0
+            'AvailableQuantity' => $availableQuantity
         ]);
 
         return $availableQuantity;

@@ -328,7 +328,7 @@
             padding: 20px;
             display: flex;
             flex-direction: row;
-            align-items: center;
+            align-items: flex-start;
             gap: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
@@ -351,10 +351,10 @@
             flex-shrink: 0;
         }
 
-        .stat-icon.blue { background: #dbeafe; }
-        .stat-icon.green { background: #d1fae5; }
-        .stat-icon.orange { background: #fed7aa; }
-        .stat-icon.red { background: #fee2e2; }
+        .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+        .stat-icon.green { background: #d1fae5; color: #059669; }
+        .stat-icon.orange { background: #fed7aa; color: #ea580c; }
+        .stat-icon.red { background: #fee2e2; color: #dc2626; }
 
         .stat-content {
             flex: 1;

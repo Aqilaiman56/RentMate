@@ -48,7 +48,7 @@
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon blue">💰</div>
+            <div class="stat-icon blue"><i class="fas fa-coins"></i></div>
             <div class="stat-content">
                 <div class="stat-value">RM {{ number_format($totalTaxes, 2) }}</div>
                 <div class="stat-label">Total Tax Collected ({{ $year }})</div>
@@ -56,7 +56,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon green">📊</div>
+            <div class="stat-icon green"><i class="fas fa-chart-bar"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $totalTransactions }}</div>
                 <div class="stat-label">Total Transactions</div>
@@ -64,7 +64,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon purple">📅</div>
+            <div class="stat-icon purple"><i class="fas fa-calendar-alt"></i></div>
             <div class="stat-content">
                 <div class="stat-value">RM {{ number_format($averagePerMonth, 2) }}</div>
                 <div class="stat-label">Average Per Month</div>
@@ -72,7 +72,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon orange">🏷️</div>
+            <div class="stat-icon orange"><i class="fas fa-tag"></i></div>
             <div class="stat-content">
                 <div class="stat-value">RM 1.00</div>
                 <div class="stat-label">Tax Per Booking</div>
@@ -300,7 +300,7 @@
             border-radius: 12px;
             padding: 20px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
@@ -319,12 +319,13 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            flex-shrink: 0;
         }
 
-        .stat-icon.blue { background: #dbeafe; }
-        .stat-icon.green { background: #d1fae5; }
-        .stat-icon.purple { background: #e9d5ff; }
-        .stat-icon.orange { background: #fed7aa; }
+        .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+        .stat-icon.green { background: #d1fae5; color: #059669; }
+        .stat-icon.purple { background: #e9d5ff; color: #9333ea; }
+        .stat-icon.orange { background: #fed7aa; color: #ea580c; }
 
         .stat-content {
             flex: 1;

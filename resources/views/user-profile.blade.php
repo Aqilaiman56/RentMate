@@ -144,7 +144,7 @@
                             </div>
                             <div class="listing-info">
                                 <h3 class="listing-title">{{ $item->ItemName }}</h3>
-                                <p class="listing-description">{{ Str::limit($item->Description, 80) }}</p>
+                                <p class="listing-description">{{ Str::limit($item->Description, 200) }}</p>
                                 <div class="listing-meta">
                                     <span class="price">RM {{ number_format($item->RentalPrice, 2) }}/day</span>
                                     <span class="category">{{ $item->Category }}</span>

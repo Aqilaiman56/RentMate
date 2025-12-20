@@ -27,7 +27,7 @@
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon orange">⏳</div>
+            <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $stats['pending'] }}</div>
                 <div class="stat-label">Pending Refunds</div>
@@ -36,7 +36,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon blue">⚙️</div>
+            <div class="stat-icon blue"><i class="fas fa-spinner"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $stats['processing'] }}</div>
                 <div class="stat-label">Processing</div>
@@ -44,7 +44,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon green">✓</div>
+            <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $stats['completed'] }}</div>
                 <div class="stat-label">Completed</div>
@@ -53,7 +53,7 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon red">✗</div>
+            <div class="stat-icon red"><i class="fas fa-times-circle"></i></div>
             <div class="stat-content">
                 <div class="stat-value">{{ $stats['failed'] }}</div>
                 <div class="stat-label">Failed</div>
@@ -327,7 +327,7 @@
             border-radius: 12px;
             padding: 20px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
@@ -346,12 +346,13 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            flex-shrink: 0;
         }
 
-        .stat-icon.blue { background: #dbeafe; }
-        .stat-icon.green { background: #d1fae5; }
-        .stat-icon.orange { background: #fed7aa; }
-        .stat-icon.red { background: #fee2e2; }
+        .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+        .stat-icon.green { background: #d1fae5; color: #059669; }
+        .stat-icon.orange { background: #fed7aa; color: #ea580c; }
+        .stat-icon.red { background: #fee2e2; color: #dc2626; }
 
         .stat-content {
             flex: 1;

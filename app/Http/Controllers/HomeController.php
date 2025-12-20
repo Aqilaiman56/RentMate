@@ -29,9 +29,10 @@ class HomeController extends Controller
         // Debug: Check what we have
         // dd($categories, $locations); // Uncomment this line to debug
         
-        // Start building the query - Show all items regardless of availability
-        // Users can still book unavailable items for future dates
-        $query = Item::with(['location', 'category', 'user', 'images']);
+        // Start building the query - Only show items marked as available by owner
+        // Unavailable items will still appear in search results
+        $query = Item::with(['location', 'category', 'user', 'images'])
+            ->where('Availability', true);
         
         // Filter by category if selected
         if ($request->has('category') && $request->category != '') {

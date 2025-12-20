@@ -276,6 +276,50 @@
         font-size: var(--text-base);
     }
 
+    .description-text.collapsed {
+        max-height: 150px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .description-text.collapsed::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background: linear-gradient(to bottom, transparent, white);
+    }
+
+    .read-more-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-primary);
+        background: none;
+        border: none;
+        font-weight: var(--font-semibold);
+        cursor: pointer;
+        padding: 0.5rem 0;
+        margin-top: 0.75rem;
+        font-size: var(--text-sm);
+        transition: var(--transition-base);
+    }
+
+    .read-more-btn:hover {
+        color: var(--color-primary-hover);
+        gap: 0.75rem;
+    }
+
+    .read-more-btn i {
+        transition: transform 0.3s;
+    }
+
+    .read-more-btn.expanded i {
+        transform: rotate(180deg);
+    }
+
     .item-details-list {
         background: var(--color-white);
         padding: 1.75rem;
@@ -977,7 +1021,11 @@
                     <i class="fa-solid fa-align-left" style="font-size: 1.25rem; color: var(--color-primary);"></i>
                     Description
                 </h2>
-                <div class="description-text">{!! nl2br(e($item->Description)) !!}</div>
+                <div class="description-text" id="descriptionText">{!! nl2br(e($item->Description)) !!}</div>
+                <button type="button" class="read-more-btn" id="readMoreBtn" style="display: none;" onclick="toggleDescription()">
+                    <span id="readMoreText">Read more</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
             </div>
 
 
@@ -1359,7 +1407,39 @@
     // Initialize calendar on page load
     document.addEventListener('DOMContentLoaded', function() {
         fetchUnavailableDates();
+        initializeDescriptionToggle();
     });
+
+    // Description toggle functionality
+    function initializeDescriptionToggle() {
+        const descriptionText = document.getElementById('descriptionText');
+        const readMoreBtn = document.getElementById('readMoreBtn');
+
+        // Check if description is long enough to need truncation
+        if (descriptionText && descriptionText.scrollHeight > 150) {
+            descriptionText.classList.add('collapsed');
+            readMoreBtn.style.display = 'inline-flex';
+        }
+    }
+
+    function toggleDescription() {
+        const descriptionText = document.getElementById('descriptionText');
+        const readMoreBtn = document.getElementById('readMoreBtn');
+        const readMoreText = document.getElementById('readMoreText');
+
+        if (descriptionText.classList.contains('collapsed')) {
+            descriptionText.classList.remove('collapsed');
+            readMoreText.textContent = 'Read less';
+            readMoreBtn.classList.add('expanded');
+        } else {
+            descriptionText.classList.add('collapsed');
+            readMoreText.textContent = 'Read more';
+            readMoreBtn.classList.remove('expanded');
+
+            // Scroll back to description section
+            document.querySelector('.item-description').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
 
     function toggleWishlist(itemId) {
         fetch(`/wishlist/toggle/${itemId}`, {

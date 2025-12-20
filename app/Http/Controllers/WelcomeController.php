@@ -17,8 +17,8 @@ class WelcomeController extends Controller
         $categories = Category::all();
         $selectedCategory = null;
         
-        // Start building the query - Show all items regardless of availability
-        // Users can still book unavailable items for future dates
+        // Start building the query - Show all items when searching (including unavailable)
+        // Search results display all items so users can see unavailable items
         $query = Item::with(['category', 'location', 'images']);
         
         // Handle category filter

@@ -144,8 +144,8 @@ class BookingController extends Controller
                 'DateCollected' => now()
             ]);
 
-            // Update item availability automatically
-            $item->updateAvailabilityStatus();
+            // Availability is now manually controlled by owner
+            // $item->updateAvailabilityStatus();
 
             // Create notification for item owner
             Notification::create([
@@ -243,8 +243,8 @@ class BookingController extends Controller
                 'DateCollected' => now()
             ]);
 
-            // Update item availability automatically
-            $item->updateAvailabilityStatus();
+            // Availability is now manually controlled by owner
+            // $item->updateAvailabilityStatus();
 
             // Create notification for item owner
             Notification::create([
@@ -371,8 +371,8 @@ class BookingController extends Controller
                 $booking->deposit->update(['Status' => 'refunded']);
             }
 
-            // Update item availability
-            $booking->item->updateAvailabilityStatus();
+            // Availability is now manually controlled by owner
+            // $booking->item->updateAvailabilityStatus();
 
             // Notify item owner
             Notification::create([
@@ -433,8 +433,8 @@ class BookingController extends Controller
                 ]);
             }
 
-            // Update item availability
-            $booking->item->updateAvailabilityStatus();
+            // Availability is now manually controlled by owner
+            // $booking->item->updateAvailabilityStatus();
 
             // Notify renter about completion and refund
             Notification::create([
@@ -498,8 +498,8 @@ class BookingController extends Controller
                     ]);
                 }
 
-                // Update item availability
-                $booking->item->updateAvailabilityStatus();
+                // Availability is now manually controlled by owner
+                // $booking->item->updateAvailabilityStatus();
 
                 // Notify user
                 Notification::create([
@@ -584,8 +584,8 @@ class BookingController extends Controller
             // Update booking status to confirmed
             $booking->update(['Status' => 'confirmed']);
 
-            // Update item availability
-            $booking->item->updateAvailabilityStatus();
+            // Availability is now manually controlled by owner
+            // $booking->item->updateAvailabilityStatus();
 
             // Notify the renter
             Notification::create([
@@ -649,8 +649,8 @@ class BookingController extends Controller
                 ]);
             }
 
-            // Update item availability
-            $booking->item->updateAvailabilityStatus();
+            // Availability is now manually controlled by owner
+            // $booking->item->updateAvailabilityStatus();
 
             // Notify the renter
             Notification::create([
