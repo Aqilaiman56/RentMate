@@ -54,62 +54,69 @@
         .header-search-container {
             flex: 1;
             max-width: 600px;
+            position: relative;
         }
 
         .header-search-bar {
             position: relative;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
         .header-search-input {
             flex: 1;
-            padding: 10px 16px 10px 40px;
-            border: 1.5px solid #e5e7eb;
+            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            border: 1.5px solid #E2E8F0;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 0.875rem;
             transition: all 0.2s;
             background: white;
+            font-family: inherit;
+            color: #2D3748;
         }
 
         .header-search-input:focus {
             outline: none;
-            border-color: #4461F2;
-            box-shadow: 0 0 0 3px rgba(68, 97, 242, 0.1);
+            border-color: #4A5FDC;
+            box-shadow: 0 0 0 3px rgba(74, 95, 220, 0.1);
+        }
+
+        .header-search-input::placeholder {
+            color: #A0AEC0;
         }
 
         .header-search-icon {
             position: absolute;
-            left: 14px;
+            left: 0.875rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #9ca3af;
-            font-size: 14px;
+            color: #A0AEC0;
+            font-size: 0.875rem;
         }
 
         .header-search-button {
-            padding: 8px 12px;
-            background: #4461F2;
+            padding: 0.625rem 1rem;
+            background: #4A5FDC;
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 0.875rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             font-family: inherit;
-            white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 0.25rem;
             flex-shrink: 0;
+            white-space: nowrap;
         }
 
         .header-search-button:hover {
-            background: #3651E2;
+            background: #3D4FC7;
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(68, 97, 242, 0.3);
+            box-shadow: 0 2px 8px rgba(74, 95, 220, 0.3);
         }
 
         .header-search-button:active {
@@ -448,6 +455,30 @@
             font-size: 16px;
         }
 
+        /* Mobile Search Toggle */
+        .mobile-search-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            color: #4B5563;
+        }
+
+        .mobile-search-toggle:hover {
+            background-color: #F3F4F6;
+        }
+
+        /* Hide mobile search toggle on desktop */
+        @media (min-width: 769px) {
+            .mobile-search-toggle {
+                display: none !important;
+            }
+        }
+
         .footer {
             background: white;
             padding: 60px 40px 30px;
@@ -508,25 +539,64 @@
         @media (max-width: 768px) {
             .header {
                 padding: 15px 20px;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
             }
 
-            .header-search-container {
-                order: 3;
+            /* Desktop search container - hide on mobile when collapsed */
+            .header-search-container.collapsed {
+                display: none;
+            }
+
+            /* Show mobile search toggle button */
+            .mobile-search-toggle {
+                display: block !important;
+            }
+
+            /* When expanded, show search bar as overlay */
+            .header-search-container.expanded {
+                display: block;
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
                 width: 100%;
-                margin-top: 15px;
-                max-width: 100%;
+                padding: 0 1.25rem;
+                z-index: 999;
+                background: linear-gradient(180deg, #E8EEFF 0%, #F5F7FF 100%);
+                padding-bottom: 1rem;
             }
 
-            .header-search-bar {
+            .header-search-container.expanded .header-search-bar {
+                display: flex;
                 flex-direction: row;
+                align-items: center;
+                gap: 0.5rem;
+                width: 100%;
+                animation: slideDown 0.3s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .header-search-input {
+                flex: 1;
+                min-width: 0;
             }
 
             .header-search-button {
                 width: auto;
                 flex-shrink: 0;
-                padding: 6px 10px;
-                font-size: 12px;
+                padding: 0.625rem 1rem;
+                font-size: 0.875rem;
+                white-space: nowrap;
             }
 
             .auth-buttons {
@@ -605,15 +675,16 @@
         <a href="/" class="logo">
             <span class="logo-go">Go</span><span class="logo-rent">Rent</span><span class="logo-ums">UMS</span>
         </a>
-        
-        <!-- Search Bar in Header -->
-        <div class="header-search-container">
+
+        <!-- Search Bar in Header (Desktop) -->
+        <div class="header-search-container collapsed" id="headerSearchContainer">
             <form action="{{ route('welcome') }}" method="GET" class="header-search-bar">
                 <span class="header-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
-                <input 
-                    type="text" 
-                    name="search" 
-                    class="header-search-input" 
+                <input
+                    type="text"
+                    name="search"
+                    class="header-search-input"
+                    id="headerSearchInput"
                     placeholder="Search items, categories, or locations..."
                     value="{{ request('search') }}"
                 >
@@ -623,9 +694,14 @@
                 <button type="submit" class="header-search-button">Search</button>
             </form>
         </div>
-        
+
         @if (Route::has('login'))
             <div class="auth-buttons">
+                <!-- Mobile Search Toggle Button -->
+                <button type="button" class="mobile-search-toggle" id="mobileSearchToggle">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+
                 @auth
                     <a href="{{ route('user.HomePage') }}" class="btn btn-primary">Dashboard</a>
                 @else
@@ -824,5 +900,65 @@
             <p>&copy; {{ date('Y') }} GoRentUMS. All rights reserved. Made with <i class="fa-solid fa-heart" style="color: #ef4444;"></i> for the community.</p>
         </div>
     </footer>
+
+    <script>
+        // Mobile Search Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchContainer = document.getElementById('headerSearchContainer');
+            const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+            const searchInput = document.getElementById('headerSearchInput');
+
+            // Toggle search bar on mobile
+            if (mobileSearchToggle) {
+                mobileSearchToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+
+                    // Toggle between collapsed and expanded
+                    if (searchContainer.classList.contains('expanded')) {
+                        searchContainer.classList.remove('expanded');
+                        searchContainer.classList.add('collapsed');
+                    } else {
+                        searchContainer.classList.remove('collapsed');
+                        searchContainer.classList.add('expanded');
+
+                        // Focus on search input after animation
+                        setTimeout(() => {
+                            searchInput.focus();
+                        }, 300);
+                    }
+                });
+            }
+
+            // Close search bar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    if (!searchContainer.contains(e.target) && !mobileSearchToggle.contains(e.target)) {
+                        searchContainer.classList.remove('expanded');
+                        searchContainer.classList.add('collapsed');
+                    }
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    // Desktop mode - remove mobile classes
+                    searchContainer.classList.remove('collapsed', 'expanded');
+                } else {
+                    // Mobile mode - ensure collapsed state
+                    if (!searchContainer.classList.contains('expanded')) {
+                        searchContainer.classList.add('collapsed');
+                    }
+                }
+            });
+
+            // Initialize on load
+            if (window.innerWidth <= 768) {
+                searchContainer.classList.add('collapsed');
+            } else {
+                searchContainer.classList.remove('collapsed', 'expanded');
+            }
+        });
+    </script>
 </body>
 </html>

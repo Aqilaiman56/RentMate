@@ -513,13 +513,21 @@
             if (mobileSearchToggle) {
                 mobileSearchToggle.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    searchContainer.classList.remove('collapsed');
-                    searchContainer.classList.add('expanded');
 
-                    // Focus on search input after animation
-                    setTimeout(() => {
-                        searchInput.focus();
-                    }, 300);
+                    // Toggle between collapsed and expanded
+                    if (searchContainer.classList.contains('expanded')) {
+                        searchContainer.classList.remove('expanded');
+                        searchContainer.classList.add('collapsed');
+                        searchRecommendations.classList.remove('show');
+                    } else {
+                        searchContainer.classList.remove('collapsed');
+                        searchContainer.classList.add('expanded');
+
+                        // Focus on search input after animation
+                        setTimeout(() => {
+                            searchInput.focus();
+                        }, 300);
+                    }
                 });
             }
 
