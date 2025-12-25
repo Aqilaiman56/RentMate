@@ -16,8 +16,8 @@ class ReportFactory extends Factory
             'ReportedUserID' => User::factory(),
             'BookingID' => Booking::factory(),
             'ItemID' => Item::factory(),
-            'ReportType' => fake()->randomElement(['Damage', 'Misconduct', 'Fraud', 'Late Return', 'Other']),
-            'Priority' => fake()->randomElement(['Low', 'Medium', 'High', 'Critical']),
+            'ReportType' => fake()->randomElement(['item-damage', 'late-return', 'dispute', 'fraud', 'harassment', 'other']),
+            'Priority' => fake()->randomElement(['low', 'medium', 'high']),
             'Subject' => fake()->sentence(),
             'Description' => fake()->paragraph(),
             'EvidencePath' => null,
@@ -33,7 +33,7 @@ class ReportFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'Status' => 'resolved',
-            'ReviewedByAdminID' => User::factory()->create(['IsAdmin' => true])->UserID,
+            'ReviewedByAdminID' => User::factory()->create()->UserID,
             'DateResolved' => now(),
             'AdminNotes' => 'Report has been resolved',
         ]);
@@ -43,7 +43,7 @@ class ReportFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'Status' => 'dismissed',
-            'ReviewedByAdminID' => User::factory()->create(['IsAdmin' => true])->UserID,
+            'ReviewedByAdminID' => User::factory()->create()->UserID,
             'DateResolved' => now(),
             'AdminNotes' => 'Report dismissed after review',
         ]);

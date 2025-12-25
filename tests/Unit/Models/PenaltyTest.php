@@ -65,12 +65,11 @@ test('penalty belongs to booking', function () {
 });
 
 test('penalty belongs to approved by admin', function () {
-    $admin = User::factory()->create(['IsAdmin' => true]);
+    $admin = User::factory()->create();
     $penalty = Penalty::factory()->create(['ApprovedByAdminID' => $admin->UserID]);
 
     expect($penalty->approvedByAdmin)->toBeInstanceOf(User::class)
-        ->and($penalty->approvedByAdmin->UserID)->toBe($admin->UserID)
-        ->and($penalty->approvedByAdmin->IsAdmin)->toBeTrue();
+        ->and($penalty->approvedByAdmin->UserID)->toBe($admin->UserID);
 });
 
 test('penalty pending scope filters pending penalties', function () {

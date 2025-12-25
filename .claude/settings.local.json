@@ -21,7 +21,14 @@
       "Bash(php check_migration_status.php:*)",
       "Bash(php mark_migrations_as_run.php:*)",
       "Bash(xampp-control.exe)",
-      "Bash(timeout 10 php artisan tinker:*)"
+      "Bash(timeout 10 php artisan tinker:*)",
+      "Bash(cat:*)",
+      "Bash(php recreate_test_db.php:*)",
+      "Bash(DB_DATABASE=rentmate_test php artisan migrate:fresh:*)",
+      "Bash(ls:*)",
+      "Bash(DB_DATABASE=rentmate_test php artisan migrate:*)",
+      "Bash(DB_DATABASE=rentmate_test php artisan test:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

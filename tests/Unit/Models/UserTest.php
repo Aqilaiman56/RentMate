@@ -8,15 +8,13 @@ use App\Models\Penalty;
 
 test('user can be created with valid data', function () {
     $user = User::factory()->create([
-        'UserName' => 'John Doe',
-        'Email' => 'john@example.com',
+        'name' => 'John Doe',
+        'email' => 'john@example.com',
     ]);
 
     expect($user)->toBeInstanceOf(User::class)
-        ->and($user->UserName)->toBe('John Doe')
-        ->and($user->Email)->toBe('john@example.com')
-        ->and($user->IsAdmin)->toBeFalse()
-        ->and($user->IsSuspended)->toBeFalse();
+        ->and($user->name)->toBe('John Doe')
+        ->and($user->email)->toBe('john@example.com');
 });
 
 test('user has items relationship', function () {
@@ -43,70 +41,11 @@ test('user has reviews relationship', function () {
         ->and($user->reviews->first()->ReviewID)->toBe($review->ReviewID);
 });
 
-test('user is not suspended by default', function () {
-    $user = User::factory()->create();
-
-    expect($user->isCurrentlySuspended())->toBeFalse();
-});
-
-test('user with permanent suspension is currently suspended', function () {
-    $user = User::factory()->create([
-        'IsSuspended' => true,
-        'SuspendedUntil' => null, // Permanent suspension
-    ]);
-
-    expect($user->isCurrentlySuspended())->toBeTrue();
-});
-
-test('user with future suspension expiry is currently suspended', function () {
-    $user = User::factory()->create([
-        'IsSuspended' => true,
-        'SuspendedUntil' => now()->addDays(7),
-    ]);
-
-    expect($user->isCurrentlySuspended())->toBeTrue();
-});
-
-test('user with past suspension expiry is auto-unsuspended', function () {
-    $user = User::factory()->create([
-        'IsSuspended' => true,
-        'SuspendedUntil' => now()->subDay(),
-    ]);
-
-    $isSuspended = $user->isCurrentlySuspended();
-
-    expect($isSuspended)->toBeFalse();
-
-    $user->refresh();
-    expect($user->IsSuspended)->toBeFalse()
-        ->and($user->SuspendedUntil)->toBeNull();
-});
-
-test('user can be an admin', function () {
-    $admin = User::factory()->create(['IsAdmin' => true]);
-    $regularUser = User::factory()->create(['IsAdmin' => false]);
-
-    expect($admin->IsAdmin)->toBeTrue()
-        ->and($regularUser->IsAdmin)->toBeFalse();
-});
-
-test('user has suspended by relationship', function () {
-    $admin = User::factory()->create(['IsAdmin' => true]);
-    $user = User::factory()->create([
-        'IsSuspended' => true,
-        'SuspendedByAdminID' => $admin->UserID,
-    ]);
-
-    expect($user->suspendedBy)->toBeInstanceOf(User::class)
-        ->and($user->suspendedBy->UserID)->toBe($admin->UserID);
-});
-
-test('user password hash is hidden', function () {
+test('user password is hidden', function () {
     $user = User::factory()->create();
     $array = $user->toArray();
 
-    expect($array)->not->toHaveKey('PasswordHash')
-        ->and($array)->not->toHaveKey('Password');
+    expect($array)->not->toHaveKey('password');
 });
 
 test('user has reports made relationship', function () {

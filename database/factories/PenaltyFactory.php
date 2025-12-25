@@ -18,7 +18,7 @@ class PenaltyFactory extends Factory
             'ReportedUserID' => User::factory(),
             'BookingID' => Booking::factory(),
             'ItemID' => Item::factory(),
-            'ApprovedByAdminID' => User::factory()->create(['IsAdmin' => true])->UserID,
+            'ApprovedByAdminID' => User::factory()->create()->UserID,
             'Description' => fake()->paragraph(),
             'EvidencePath' => null,
             'PenaltyAmount' => fake()->randomFloat(2, 10, 500),

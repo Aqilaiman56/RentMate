@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('IsSuspended')->default(false)->after('IsAdmin');
-            $table->timestamp('SuspendedUntil')->nullable()->after('IsSuspended');
-            $table->text('SuspensionReason')->nullable()->after('SuspendedUntil');
-            $table->unsignedBigInteger('SuspendedByAdminID')->nullable()->after('SuspensionReason');
+            $table->boolean('IsSuspended')->default(false);
+            $table->timestamp('SuspendedUntil')->nullable();
+            $table->text('SuspensionReason')->nullable();
+            $table->unsignedBigInteger('SuspendedByAdminID')->nullable();
         });
     }
 

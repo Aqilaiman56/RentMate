@@ -221,7 +221,7 @@ test('item can get average rating from reviews', function () {
 
     $averageRating = $item->getAverageRatingAttribute();
 
-    expect($averageRating)->toBe(4.0);
+    expect((float) $averageRating)->toBe(4.0);
 });
 
 test('item returns zero average rating when no reviews', function () {

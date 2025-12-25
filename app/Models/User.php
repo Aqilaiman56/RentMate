@@ -2,34 +2,28 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasFactory, Notifiable;
 
     protected $table = 'users';
     protected $primaryKey = 'UserID';
-    
-    // Only use CreatedAt, disable UpdatedAt
+
     public $timestamps = true;
-    const CREATED_AT = 'CreatedAt';
-    const UPDATED_AT = null; // Disable UpdatedAt
 
     protected $fillable = [
-        'UserName',
-        'Email',
-        'PasswordHash',
-        'Password',
-        'ProfileImage',
+        'name',
+        'email',
+        'password',
         'PhoneNumber',
+        'Location',
         'BankName',
         'BankAccountNumber',
         'BankAccountHolderName',
-        'Location',
-        'UserType',
-        'IsAdmin',
         'IsSuspended',
         'SuspendedUntil',
         'SuspensionReason',
@@ -37,29 +31,18 @@ class User extends Authenticatable
     ];
 
     protected $hidden = [
-        'PasswordHash',
-        'Password',
+        'password',
         'remember_token'
     ];
 
     protected $casts = [
-        'CreatedAt' => 'datetime',
-        'IsAdmin' => 'boolean',
-        'IsSuspended' => 'boolean',
-        'SuspendedUntil' => 'datetime',
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     public function getAuthPassword()
     {
-        return $this->PasswordHash;
-    }
-
-    /**
-     * Get the email address for password reset.
-     */
-    public function getEmailForPasswordReset()
-    {
-        return $this->Email;
+        return $this->password;
     }
 
     // Relationships

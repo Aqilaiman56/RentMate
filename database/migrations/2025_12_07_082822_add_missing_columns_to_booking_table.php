@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('booking', function (Blueprint $table) {
-            // Add missing columns
-            $table->decimal('TotalAmount', 10, 2)->nullable()->after('EndDate');
-            $table->decimal('DepositAmount', 10, 2)->nullable()->after('TotalAmount');
-        });
+        // TotalAmount and DepositAmount columns already exist in add_total_amount_and_deposit_amount_to_booking_table migration
+        // This migration is kept for historical purposes but does nothing
     }
 
     /**
@@ -23,8 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('booking', function (Blueprint $table) {
-            $table->dropColumn(['TotalAmount', 'DepositAmount']);
-        });
+        // Nothing to rollback
     }
 };

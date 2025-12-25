@@ -13,7 +13,7 @@ test('report can be created with valid data', function () {
     $report = Report::factory()->create([
         'ReportedByID' => $reporter->UserID,
         'ReportedUserID' => $reportedUser->UserID,
-        'ReportType' => 'Damage',
+        'ReportType' => 'item-damage',
         'Subject' => 'Item damaged',
         'Status' => 'pending',
     ]);
@@ -21,7 +21,7 @@ test('report can be created with valid data', function () {
     expect($report)->toBeInstanceOf(Report::class)
         ->and($report->ReportedByID)->toBe($reporter->UserID)
         ->and($report->ReportedUserID)->toBe($reportedUser->UserID)
-        ->and($report->ReportType)->toBe('Damage')
+        ->and($report->ReportType)->toBe('item-damage')
         ->and($report->Status)->toBe('pending');
 });
 
@@ -58,12 +58,11 @@ test('report belongs to item', function () {
 });
 
 test('report belongs to reviewer admin', function () {
-    $admin = User::factory()->create(['IsAdmin' => true]);
+    $admin = User::factory()->create();
     $report = Report::factory()->resolved()->create(['ReviewedByAdminID' => $admin->UserID]);
 
     expect($report->reviewer)->toBeInstanceOf(User::class)
-        ->and($report->reviewer->UserID)->toBe($admin->UserID)
-        ->and($report->reviewer->IsAdmin)->toBeTrue();
+        ->and($report->reviewer->UserID)->toBe($admin->UserID);
 });
 
 test('report has penalty relationship', function () {

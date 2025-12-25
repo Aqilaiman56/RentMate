@@ -20,11 +20,6 @@ return new class extends Migration
             $table->renameColumn('TaxAmount', 'ServiceFeeAmount');
             $table->renameColumn('TaxType', 'ServiceFeeType');
         });
-
-        // Also rename the column in the booking table
-        Schema::table('booking', function (Blueprint $table) {
-            $table->renameColumn('TaxAmount', 'ServiceFeeAmount');
-        });
     }
 
     /**
@@ -32,11 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Rename columns back in the booking table
-        Schema::table('booking', function (Blueprint $table) {
-            $table->renameColumn('ServiceFeeAmount', 'TaxAmount');
-        });
-
         // Rename columns back in the service_fees table
         Schema::table('service_fees', function (Blueprint $table) {
             $table->renameColumn('ServiceFeeID', 'TaxID');

@@ -483,7 +483,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Bank Details
+                    <i class="fas fa-save" style="margin-right: 8px;"></i>Save Bank Details
                 </button>
             </div>
         </form>
@@ -552,7 +552,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Update Password
+                    <i class="fas fa-save" style="margin-right: 8px;"></i>Update Password
                 </button>
             </div>
         </form>
