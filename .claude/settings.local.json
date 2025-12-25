@@ -19,7 +19,9 @@
       "Bash(php check_db_structure.php:*)",
       "Bash(php check_actual_db.php:*)",
       "Bash(php check_migration_status.php:*)",
-      "Bash(php mark_migrations_as_run.php:*)"
+      "Bash(php mark_migrations_as_run.php:*)",
+      "Bash(xampp-control.exe)",
+      "Bash(timeout 10 php artisan tinker:*)"
     ],
     "deny": [],
     "ask": []
