@@ -15,15 +15,22 @@ class User extends Authenticatable
 
     public $timestamps = true;
 
+    // Custom timestamp column names to match database
+    const CREATED_AT = 'CreatedAt';
+    const UPDATED_AT = 'UpdatedAt';
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'UserName',
+        'Email',
+        'PasswordHash',
         'PhoneNumber',
         'Location',
         'BankName',
         'BankAccountNumber',
         'BankAccountHolderName',
+        'ProfileImage',
+        'UserType',
+        'IsAdmin',
         'IsSuspended',
         'SuspendedUntil',
         'SuspensionReason',
@@ -40,9 +47,40 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    // Map Laravel's expected attribute names to database column names
+    public function getNameAttribute($value)
+    {
+        return $this->attributes['UserName'] ?? null;
+    }
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['UserName'] = $value;
+    }
+
+    public function getEmailAttribute($value)
+    {
+        return $this->attributes['Email'] ?? null;
+    }
+
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['Email'] = $value;
+    }
+
+    public function getPasswordAttribute($value)
+    {
+        return $this->attributes['PasswordHash'] ?? null;
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['PasswordHash'] = $value;
+    }
+
     public function getAuthPassword()
     {
-        return $this->password;
+        return $this->PasswordHash;
     }
 
     // Relationships

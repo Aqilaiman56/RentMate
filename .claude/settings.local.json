@@ -28,7 +28,9 @@
       "Bash(ls:*)",
       "Bash(DB_DATABASE=rentmate_test php artisan migrate:*)",
       "Bash(DB_DATABASE=rentmate_test php artisan test:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(php check_users.php:*)",
+      "Bash(php check_users_structure.php:*)"
     ],
     "deny": [],
     "ask": []
