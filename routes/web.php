@@ -54,26 +54,28 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Custom Registration Route
-Route::post('/register', function (Request $request) {
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,Email',
-        'password' => 'required|string|min:6|confirmed',
-    ]);
+// Custom Registration Route (if needed, but prefer using RegisteredUserController)
+// Route::post('/register', function (Request $request) {
+//     $validated = $request->validate([
+//         'name' => 'required|string|max:255',
+//         'email' => 'required|email|unique:users,Email',
+//         'password' => 'required|string|min:6|confirmed',
+//     ]);
 
-    $user = User::create([
-        'UserName' => $request->name,
-        'Email' => $request->email,
-        'PasswordHash' => Hash::make($request->password),
-        'UserType' => 'Student',
-        'IsAdmin' => false,
-    ]);
+//     $user = User::create([
+//         'UserName' => $request->name,
+//         'Email' => $request->email,
+//         'PasswordHash' => Hash::make($request->password),
+//         'UserType' => 'Student',
+//         'IsAdmin' => false,
+//     ]);
 
-    Auth::login($user);
+//     event(new Illuminate\Auth\Events\Registered($user));
 
-    return redirect()->route('user.HomePage');
-});
+//     Auth::login($user);
+
+//     return redirect()->route('verification.notice');
+// });
 
 /*
 |--------------------------------------------------------------------------

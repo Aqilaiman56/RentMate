@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Notifications\CustomVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -45,6 +47,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'SuspendedUntil' => 'datetime',
     ];
 
     // Map Laravel's expected attribute names to database column names
@@ -81,6 +84,24 @@ class User extends Authenticatable
     public function getAuthPassword()
     {
         return $this->PasswordHash;
+    }
+
+    public function getEmailVerifiedAtAttribute()
+    {
+        return $this->attributes['email_verified_at'] ?? null;
+    }
+
+    public function setEmailVerifiedAtAttribute($value)
+    {
+        $this->attributes['email_verified_at'] = $value;
+    }
+
+    /**
+     * Send the email verification notification.
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new CustomVerifyEmail);
     }
 
     // Relationships

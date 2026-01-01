@@ -27,7 +27,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|View
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -55,10 +55,8 @@ class RegisteredUserController extends Controller
                 return redirect(route('admin.AdminDashboard', absolute: false));
             }
 
-               // Log out any existing user before redirecting to login
-            Auth::logout();
-
-            // For normal users, redirect to login page after registration
-            return redirect()->route('login')->with('status', 'Registration successful. Please log in.');
+            // For normal users, show registration success page (do NOT log them in)
+            // They must verify email before they can login
+            return view('auth.registration-success', ['email' => $user->Email]);
     }
 }

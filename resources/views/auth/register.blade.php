@@ -143,7 +143,7 @@
 
                     <!-- Terms Notice -->
                     <div class="gorent-terms-notice">
-                        By creating an account you agree to <a href="#" class="gorent-link">terms and conditions</a> of aloha.
+                        By creating an account you agree to <a href="#" class="gorent-link">terms and conditions</a> of GoRentUMS.
                     </div>
 
                     <!-- Register Button -->
@@ -418,7 +418,8 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                padding: 2rem 1rem !important;
+                padding: 1rem !important;
+                margin: 0 !important;
             }
 
             /* Make left section a background overlay on mobile */
@@ -499,7 +500,8 @@
 
         @media (max-width: 480px) {
             .gorent-register-container {
-                margin: -1rem;
+                margin: 0 !important;
+                padding: 0.5rem !important;
             }
 
             .gorent-form-header h2 {
@@ -507,7 +509,17 @@
             }
 
             .gorent-right-section {
-                padding: 1.5rem 1rem;
+                padding: 1.5rem 1rem !important;
+                width: calc(100% - 1rem) !important;
+                max-width: 380px !important;
+            }
+
+            .gorent-form {
+                gap: 0.875rem !important;
+            }
+
+            .gorent-form-header {
+                margin-bottom: 1.5rem !important;
             }
         }
     </style>

@@ -1,118 +1,103 @@
-{{-- resources/views/auth/verify-email.blade.php --}}
+{{-- resources/views/auth/registration-success.blade.php --}}
 <x-guest-layout>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <div class="gorent-verify-container">
+    <div class="gorent-success-container">
         <!-- Left Section with Illustration -->
         <div class="gorent-left-section">
             <div class="gorent-illustration">
                 <div class="gorent-brand-logo">
                     <h1>GO<span class="rent-blue">Rent</span>UMS</h1>
-                    <p class="gorent-subtitle">Verify Your Email</p>
+                    <p class="gorent-subtitle">Welcome to Our Community</p>
                 </div>
-                <!-- Email Verification Illustration SVG -->
+                <!-- Success Illustration SVG -->
                 <div class="illustration-wrapper">
                     <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Large Email Envelope -->
-                        <rect x="80" y="120" width="240" height="160" fill="#4A5FDC" rx="12"/>
-                        <path d="M 80 120 L 200 220 L 320 120" fill="#3D4FC7"/>
-                        <line x1="80" y1="120" x2="200" y2="220" stroke="#667eea" stroke-width="4"/>
-                        <line x1="320" y1="120" x2="200" y2="220" stroke="#667eea" stroke-width="4"/>
+                        <!-- Success checkmark circle -->
+                        <circle cx="200" cy="200" r="120" fill="#B5EAD7" opacity="0.3"/>
+                        <circle cx="200" cy="200" r="100" fill="#4A5FDC" opacity="0.2"/>
+                        <circle cx="200" cy="200" r="80" fill="#4A5FDC"/>
 
-                        <!-- Email letter inside -->
-                        <rect x="140" y="180" width="120" height="80" fill="white" rx="4"/>
-                        <line x1="155" y1="200" x2="245" y2="200" stroke="#4A5FDC" stroke-width="3"/>
-                        <line x1="155" y1="220" x2="230" y2="220" stroke="#4A5FDC" stroke-width="2"/>
-                        <line x1="155" y1="235" x2="220" y2="235" stroke="#4A5FDC" stroke-width="2"/>
-
-                        <!-- Lock/Security badge -->
-                        <circle cx="200" cy="100" r="35" fill="#48BB78"/>
-                        <path d="M 190 90 L 195 95 L 210 80"
+                        <!-- Checkmark -->
+                        <path d="M 160 200 L 185 225 L 245 165"
                               stroke="white"
-                              stroke-width="4"
+                              stroke-width="12"
                               stroke-linecap="round"
                               stroke-linejoin="round"
                               fill="none"/>
 
+                        <!-- Email envelope -->
+                        <rect x="100" y="280" width="200" height="100" fill="#FFB7B2" rx="8"/>
+                        <path d="M 100 280 L 200 340 L 300 280"
+                              fill="#FF9AA2"/>
+                        <line x1="100" y1="280" x2="200" y2="340" stroke="#FFDAC1" stroke-width="3"/>
+                        <line x1="300" y1="280" x2="200" y2="340" stroke="#FFDAC1" stroke-width="3"/>
+
                         <!-- Decorative elements -->
-                        <circle cx="60" cy="80" r="12" fill="#FFB7B2" opacity="0.6"/>
-                        <circle cx="340" cy="100" r="15" fill="#B5EAD7" opacity="0.6"/>
-                        <circle cx="350" cy="260" r="10" fill="#FFD3E0" opacity="0.6"/>
-                        <circle cx="50" cy="240" r="14" fill="#C7CEEA" opacity="0.6"/>
-                        <circle cx="70" cy="320" r="18" fill="#FFDAC1" opacity="0.6"/>
-                        <circle cx="330" cy="340" r="16" fill="#E2F0CB" opacity="0.6"/>
+                        <circle cx="80" cy="100" r="15" fill="#C7CEEA" opacity="0.6"/>
+                        <circle cx="320" cy="120" r="20" fill="#FFD3E0" opacity="0.6"/>
+                        <circle cx="350" cy="280" r="12" fill="#E2F0CB" opacity="0.6"/>
+                        <circle cx="60" cy="350" r="18" fill="#FFDAC1" opacity="0.6"/>
                     </svg>
                 </div>
             </div>
         </div>
 
-        <!-- Right Section with Verification Form -->
+        <!-- Right Section with Success Message -->
         <div class="gorent-right-section">
-            <div class="gorent-verify-card">
-                <div class="gorent-icon-header">
-                    <i class="fas fa-envelope-circle-check"></i>
+            <div class="gorent-success-card">
+                <div class="gorent-success-icon">
+                    <i class="fas fa-check-circle"></i>
                 </div>
 
-                <div class="gorent-form-header">
-                    <h2>Email Verification Required</h2>
-                    <p>We've sent a verification link to your email</p>
+                <div class="gorent-success-header">
+                    <h2>Thank You for Registering!</h2>
+                    <p>Your account has been created successfully</p>
                 </div>
 
-                @if (session('status') == 'verification-link-sent')
-                    <div class="gorent-success-alert">
-                        <i class="fas fa-check-circle"></i>
-                        <div>
-                            <strong>Email Sent!</strong>
-                            <p>A new verification link has been sent to your email address.</p>
-                        </div>
-                    </div>
-                @endif
-
-                <div class="gorent-email-info">
-                    <p class="info-text">
-                        We sent a verification email to:
-                    </p>
-                    <div class="email-display">
+                <div class="gorent-verification-notice">
+                    <div class="notice-icon">
                         <i class="fas fa-envelope"></i>
-                        <strong>{{ auth()->user()->Email }}</strong>
                     </div>
-                    <p class="info-subtext">
-                        Please check your inbox and click the verification link to activate your account.
-                    </p>
+                    <div class="notice-content">
+                        <h3>Verify Your Email Address</h3>
+                        <p>We've sent a verification email to:</p>
+                        <div class="email-display">
+                            <strong>{{ $email }}</strong>
+                        </div>
+                        <p class="notice-subtext">
+                            Please check your inbox and click the verification link to activate your account.
+                            You won't be able to login until your email is verified.
+                        </p>
+                    </div>
                 </div>
 
                 <div class="gorent-info-box">
-                    <h3><i class="fas fa-circle-info"></i> Didn't receive the email?</h3>
-                    <ul>
-                        <li>Check your spam or junk folder</li>
-                        <li>Make sure you entered the correct email address</li>
-                        <li>Click the button below to resend the verification email</li>
-                    </ul>
+                    <div class="info-item">
+                        <i class="fas fa-circle-info"></i>
+                        <span>Check your spam folder if you don't see the email</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span>The verification link will expire in 60 minutes</span>
+                    </div>
                 </div>
 
                 <div class="gorent-actions">
-                    <form method="POST" action="{{ route('verification.send') }}">
-                        @csrf
-                        <button type="submit" class="gorent-btn-primary">
-                            <i class="fas fa-paper-plane"></i>
-                            Resend Verification Email
-                        </button>
-                    </form>
-
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="gorent-btn-secondary">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Log Out
-                        </button>
-                    </form>
+                    <a href="{{ route('login') }}" class="gorent-btn-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Proceed to Login
+                    </a>
+                    <a href="{{ route('welcome') }}" class="gorent-btn-secondary">
+                        <i class="fas fa-home"></i>
+                        Back to Home
+                    </a>
                 </div>
 
                 <div class="gorent-help-section">
-                    <p>Need help?</p>
-                    <a href="mailto:support@gorentums.com" class="gorent-link">
-                        <i class="fas fa-headset"></i>
-                        Contact Support
+                    <p>Didn't receive the email?</p>
+                    <a href="{{ route('login') }}" class="gorent-link">
+                        Go to login and resend verification email
                     </a>
                 </div>
             </div>
@@ -130,7 +115,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
         }
 
-        .gorent-verify-container {
+        .gorent-success-container {
             display: flex;
             min-height: 100vh;
             width: 100vw;
@@ -140,7 +125,7 @@
         /* Left Section - Illustration */
         .gorent-left-section {
             flex: 1;
-            background: linear-gradient(135deg, #EBF4FF 0%, #F0F4FF 100%);
+            background: linear-gradient(135deg, #F0F9FF 0%, #F0F4FF 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -192,7 +177,7 @@
             filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.1));
         }
 
-        /* Right Section - Verification Card */
+        /* Right Section - Success Card */
         .gorent-right-section {
             flex: 1;
             background: white;
@@ -203,95 +188,90 @@
             overflow-y: auto;
         }
 
-        .gorent-verify-card {
+        .gorent-success-card {
             width: 100%;
-            max-width: 500px;
+            max-width: 520px;
             padding: 2rem 0;
         }
 
-        .gorent-icon-header {
+        .gorent-success-icon {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .gorent-icon-header i {
-            font-size: 3.5rem;
-            color: #4A5FDC;
+        .gorent-success-icon i {
+            font-size: 4rem;
+            color: #48BB78;
+            animation: scaleIn 0.5s ease-out;
         }
 
-        .gorent-form-header {
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .gorent-success-header {
             text-align: center;
             margin-bottom: 2rem;
         }
 
-        .gorent-form-header h2 {
+        .gorent-success-header h2 {
             font-size: 2rem;
             font-weight: 700;
             color: #1A202C;
             margin-bottom: 0.5rem;
         }
 
-        .gorent-form-header p {
-            font-size: 0.95rem;
+        .gorent-success-header p {
+            font-size: 1rem;
             color: #718096;
         }
 
-        .gorent-success-alert {
-            background: linear-gradient(135deg, #E6FFFA 0%, #F0FFF4 100%);
-            border: 2px solid #48BB78;
-            border-radius: 10px;
-            padding: 1rem;
+        .gorent-verification-notice {
+            background: linear-gradient(135deg, #EBF4FF 0%, #F0F4FF 100%);
+            border: 2px solid #4A5FDC;
+            border-radius: 12px;
+            padding: 1.5rem;
             margin-bottom: 1.5rem;
             display: flex;
-            align-items: start;
-            gap: 0.75rem;
+            gap: 1rem;
         }
 
-        .gorent-success-alert i {
-            font-size: 1.5rem;
-            color: #48BB78;
+        .notice-icon {
             flex-shrink: 0;
         }
 
-        .gorent-success-alert strong {
-            color: #22543D;
-            font-size: 1rem;
-            display: block;
-            margin-bottom: 0.25rem;
+        .notice-icon i {
+            font-size: 2.5rem;
+            color: #4A5FDC;
         }
 
-        .gorent-success-alert p {
-            color: #2F855A;
-            font-size: 0.875rem;
-            margin: 0;
-        }
-
-        .gorent-email-info {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .info-text {
-            font-size: 0.95rem;
-            color: #4A5B7C;
+        .notice-content h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1A202C;
             margin-bottom: 0.75rem;
         }
 
-        .email-display {
-            background: linear-gradient(135deg, #EBF4FF 0%, #F0F4FF 100%);
-            border: 2px solid #4A5FDC;
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 0.75rem 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+        .notice-content p {
+            font-size: 0.95rem;
+            color: #4A5B7C;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
         }
 
-        .email-display i {
-            color: #4A5FDC;
-            font-size: 1.125rem;
+        .email-display {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin: 0.75rem 0;
+            border: 1px solid #CBD5E0;
         }
 
         .email-display strong {
@@ -299,54 +279,32 @@
             font-size: 1rem;
         }
 
-        .info-subtext {
-            font-size: 0.875rem;
-            color: #718096;
-            line-height: 1.5;
-            margin-top: 0.75rem;
+        .notice-subtext {
+            font-size: 0.875rem !important;
+            color: #718096 !important;
+            margin-top: 0.75rem !important;
         }
 
         .gorent-info-box {
-            background: #FFFAF0;
-            border-left: 4px solid #ED8936;
+            background: #FFF5F5;
+            border-left: 4px solid #FC8181;
             border-radius: 6px;
             padding: 1rem;
             margin-bottom: 1.5rem;
         }
 
-        .gorent-info-box h3 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #7C2D12;
-            margin-bottom: 0.75rem;
+        .info-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .gorent-info-box h3 i {
-            color: #ED8936;
-        }
-
-        .gorent-info-box ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .gorent-info-box li {
+            gap: 0.75rem;
+            color: #742A2A;
             font-size: 0.875rem;
-            color: #744210;
-            padding-left: 1.5rem;
-            position: relative;
             margin: 0.5rem 0;
         }
 
-        .gorent-info-box li::before {
-            content: "•";
-            position: absolute;
-            left: 0.5rem;
-            color: #ED8936;
-            font-weight: bold;
+        .info-item i {
+            font-size: 1rem;
+            color: #FC8181;
         }
 
         .gorent-actions {
@@ -354,10 +312,6 @@
             flex-direction: column;
             gap: 0.75rem;
             margin-bottom: 1.5rem;
-        }
-
-        .gorent-actions form {
-            width: 100%;
         }
 
         .gorent-btn-primary,
@@ -371,6 +325,7 @@
             cursor: pointer;
             transition: all 0.2s;
             font-family: inherit;
+            text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -416,9 +371,6 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
         }
 
         .gorent-link:hover {
@@ -428,10 +380,10 @@
         /* Responsive Design */
         @media screen and (max-width: 968px) {
             body {
-                background: linear-gradient(135deg, #EBF4FF 0%, #F0F4FF 100%) !important;
+                background: linear-gradient(135deg, #F0F9FF 0%, #F0F4FF 100%) !important;
             }
 
-            .gorent-verify-container {
+            .gorent-success-container {
                 flex-direction: column !important;
                 position: relative !important;
                 overflow-x: hidden !important;
@@ -480,7 +432,7 @@
                 flex: none !important;
             }
 
-            .gorent-verify-card {
+            .gorent-success-card {
                 padding: 0 !important;
             }
 
@@ -490,7 +442,7 @@
         }
 
         @media (max-width: 480px) {
-            .gorent-form-header h2 {
+            .gorent-success-header h2 {
                 font-size: 1.5rem;
             }
 
@@ -499,8 +451,13 @@
                 width: calc(100% - 1rem) !important;
             }
 
-            .gorent-icon-header i {
-                font-size: 2.5rem;
+            .gorent-verification-notice {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .notice-icon i {
+                font-size: 2rem;
             }
         }
     </style>

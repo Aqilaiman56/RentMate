@@ -318,7 +318,8 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                padding: 2rem 1rem !important;
+                padding: 1rem !important;
+                margin: 0 !important;
             }
 
             /* Make left section a background overlay on mobile */
@@ -397,7 +398,8 @@
 
         @media (max-width: 480px) {
             .gorent-login-container {
-                margin: -1rem;
+                margin: 0 !important;
+                padding: 0.5rem !important;
             }
 
             .gorent-form-header h2 {
@@ -405,7 +407,13 @@
             }
 
             .gorent-right-section {
-                padding: 1.5rem 1rem;
+                padding: 1.5rem 1rem !important;
+                width: calc(100% - 1rem) !important;
+                max-width: 380px !important;
+            }
+
+            .gorent-form {
+                gap: 1rem !important;
             }
         }
     </style>
