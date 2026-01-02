@@ -715,53 +715,32 @@
             background: #e5e7eb;
         }
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-        }
 
         .modal-container {
-            position: relative;
             background: white;
             border-radius: 16px;
-            max-width: 700px;
+            max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: modalSlideIn 0.3s ease;
+            animation: slideUp 0.3s ease-out;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: var(--z-modal);
+            pointer-events: auto;
         }
 
-        @keyframes modalSlideIn {
+        @keyframes slideUp {
             from {
+                transform: translate(-50%, -50%) translateY(20px);
                 opacity: 0;
-                transform: translateY(-20px);
             }
             to {
+                transform: translate(-50%, -50%) translateY(0);
                 opacity: 1;
-                transform: translateY(0);
             }
         }
 

@@ -459,21 +459,8 @@
             object-fit: cover;
         }
 
-        /* Modal Styles */
-        .modal {
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease-out;
-        }
+      
+       
 
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -489,6 +476,12 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.3s ease-out;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: var(--z-modal);
+            pointer-events: auto;
         }
 
         .modal-content.modal-lg {

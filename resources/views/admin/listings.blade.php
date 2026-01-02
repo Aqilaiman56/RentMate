@@ -144,8 +144,8 @@
                         <a href="{{ route('admin.listings.show', $item->ItemID) }}" class="btn-action btn-view">
                             <i class="fas fa-eye"></i> View
                         </a>
-                        <button class="btn-action btn-more" onclick="showMoreActions({{ $item->ItemID }}, '{{ $item->ItemName }}')">
-                            <i class="fas fa-ellipsis-v"></i>
+                        <button class="btn-action btn-action-btn" onclick="showActionModal({{ $item->ItemID }}, '{{ addslashes($item->ItemName) }}')">
+                            <i class="fas fa-cog"></i> Action
                         </button>
                     </div>
                 </div>
@@ -164,6 +164,60 @@
             {{ $items->appends(request()->query())->links() }}
         </div>
     @endif
+
+    <!-- Action Modal -->
+    <div id="actionModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Listing Actions</h2>
+                <span class="close" onclick="closeActionModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p class="modal-description">Choose an action for this listing:</p>
+                <div class="action-buttons-grid">
+                    <button class="action-option btn-keep" onclick="keepListing()">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="action-title">Keep Listing</span>
+                        <span class="action-desc">Maintain this listing as is</span>
+                    </button>
+                    <button class="action-option btn-delete" onclick="confirmDelete()">
+                        <i class="fas fa-trash-alt"></i>
+                        <span class="action-title">Delete Listing</span>
+                        <span class="action-desc">Permanently remove this listing</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeActionModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                <h2 style="color: white; margin: 0;">Confirm Delete</h2>
+                <span class="close" onclick="closeDeleteModal()" style="color: white;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="alert-danger" style="margin-bottom: 20px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Warning!</strong>
+                        <p>This action cannot be undone. The listing will be permanently deleted.</p>
+                    </div>
+                </div>
+                <p style="margin: 0; color: #374151;">Are you sure you want to delete "<strong id="deleteItemName"></strong>"?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="deleteListing()">
+                    <i class="fas fa-trash-alt"></i> Delete Listing
+                </button>
+            </div>
+        </div>
+    </div>
 
     <style>
         /* Add alert styles */
@@ -570,15 +624,13 @@
             background: #fde68a;
         }
 
-        .btn-more {
-            background: #f3f4f6;
-            color: #374151;
-            flex: 0 0 auto;
-            width: 40px;
+        .btn-action-btn {
+            background: #fef3c7;
+            color: #92400e;
         }
 
-        .btn-more:hover {
-            background: #e5e7eb;
+        .btn-action-btn:hover {
+            background: #fde68a;
         }
 
         /* Buttons */
@@ -609,6 +661,205 @@
 
         .btn-secondary:hover {
             background: #e5e7eb;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+    
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: var(--z-modal);
+            pointer-events: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(90vh - 160px);
+            overflow-y: auto;
+        }
+
+        .modal-description {
+            margin: 0 0 20px 0;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            background: #f9fafb;
+        }
+
+        .close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 24px;
+            color: white;
+            line-height: 1;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .action-buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .action-option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+        }
+
+        .action-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-option i {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .action-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .action-desc {
+            font-size: 13px;
+            color: #6b7280;
+            display: block;
+        }
+
+        .btn-keep {
+            border-color: #10b981;
+        }
+
+        .btn-keep:hover {
+            border-color: #059669;
+            background: #d1fae5;
+        }
+
+        .btn-keep i {
+            color: #10b981;
+        }
+
+        .btn-keep .action-title {
+            color: #065f46;
+        }
+
+        .btn-delete {
+            border-color: #ef4444;
+        }
+
+        .btn-delete:hover {
+            border-color: #dc2626;
+            background: #fee2e2;
+        }
+
+        .btn-delete i {
+            color: #ef4444;
+        }
+
+        .btn-delete .action-title {
+            color: #991b1b;
+        }
+
+        .alert-danger {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 10px;
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert-danger i {
+            font-size: 20px;
+            color: #ef4444;
+            flex-shrink: 0;
+        }
+
+        .alert-danger strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #991b1b;
+        }
+
+        .alert-danger p {
+            margin: 0;
+            font-size: 13px;
+            color: #7f1d1d;
         }
 
         /* Responsive Styles */
@@ -922,9 +1173,6 @@
                 gap: 3px;
             }
 
-            .btn-more {
-                width: 36px;
-            }
 
             .pagination-container {
                 padding: 24px 12px;
@@ -983,34 +1231,79 @@
     </style>
 
     <script>
+        let currentItemId = null;
+        let currentItemName = '';
+
         function exportListings() {
             window.location.href = '{{ route('admin.listings.export') }}';
         }
 
-        function showMoreActions(id, name) {
-            if (confirm(`Select action for "${name}":\n\nClick OK to delete listing\nClick Cancel to go back`)) {
-                if (confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
-                    // Create and submit delete form
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/admin/listings/${id}`;
+        function showActionModal(id, name) {
+            currentItemId = id;
+            currentItemName = name;
+            document.getElementById('actionModal').style.display = 'flex';
+            document.getElementById('modalTitle').textContent = `Actions: ${name}`;
+        }
 
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
+        function closeActionModal() {
+            document.getElementById('actionModal').style.display = 'none';
+            currentItemId = null;
+            currentItemName = '';
+        }
 
-                    const methodField = document.createElement('input');
-                    methodField.type = 'hidden';
-                    methodField.name = '_method';
-                    methodField.value = 'DELETE';
+        function keepListing() {
+            closeActionModal();
+            // Optional: Show a success message
+            alert('Listing will be kept as is.');
+        }
 
-                    form.appendChild(csrfToken);
-                    form.appendChild(methodField);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+        function confirmDelete() {
+            closeActionModal();
+            document.getElementById('deleteItemName').textContent = currentItemName;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        function deleteListing() {
+            if (!currentItemId) return;
+
+            // Create and submit delete form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/listings/${currentItemId}`;
+
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+
+            form.appendChild(csrfToken);
+            form.appendChild(methodField);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
             }
         }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeActionModal();
+                closeDeleteModal();
+            }
+        });
     </script>
 @endsection

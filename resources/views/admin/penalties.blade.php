@@ -150,6 +150,9 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     @if(!$penalty->ResolvedStatus)
+                                        <button class="btn-icon btn-action" title="Take Action" onclick="showPenaltyActionModal({{ $penalty->PenaltyID }}, '{{ addslashes($penalty->reportedUser->UserName) }}', {{ $penalty->PenaltyAmount }})">
+                                            <i class="fas fa-bolt"></i>
+                                        </button>
                                         <form action="{{ route('admin.penalties.resolve', $penalty->PenaltyID) }}"
                                               method="POST"
                                               style="display: inline;"
@@ -182,6 +185,150 @@
             {{ $penalties->appends(request()->query())->links() }}
         </div>
     @endif
+
+    <!-- Penalty Action Modal -->
+    <div id="penaltyActionModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="penaltyModalTitle">Penalty Actions</h2>
+                <span class="close" onclick="closePenaltyActionModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p class="modal-description">Choose an action to take for this penalty:</p>
+                <div class="action-buttons-grid">
+                    <button class="action-option btn-suspend" onclick="confirmSuspend()">
+                        <i class="fas fa-user-lock"></i>
+                        <span class="action-title">Suspend User</span>
+                        <span class="action-desc">Temporarily suspend user account</span>
+                    </button>
+                    <button class="action-option btn-forfeit" onclick="confirmForfeit()">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span class="action-title">Forfeit Deposit</span>
+                        <span class="action-desc">Transfer deposit to item owner</span>
+                    </button>
+                    <button class="action-option btn-warning" onclick="confirmWarning()">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span class="action-title">Issue Warning</span>
+                        <span class="action-desc">Send warning notification to user</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closePenaltyActionModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suspend Confirmation Modal -->
+    <div id="suspendModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <h2 style="color: white; margin: 0;">Suspend User</h2>
+                <span class="close" onclick="closeSuspendModal()" style="color: white;">&times;</span>
+            </div>
+            <form id="suspendForm" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert-warning" style="margin-bottom: 20px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>
+                            <strong>Warning!</strong>
+                            <p>The user will be unable to access their account during the suspension period.</p>
+                        </div>
+                    </div>
+                    <p style="margin: 0 0 16px 0; color: #374151;">Suspend user: <strong id="suspendUserName"></strong></p>
+                    <div class="form-group">
+                        <label class="form-label">Suspension Duration *</label>
+                        <select name="duration" class="form-input" required>
+                            <option value="">Select duration</option>
+                            <option value="7">7 Days</option>
+                            <option value="14">14 Days</option>
+                            <option value="30">30 Days</option>
+                            <option value="permanent">Permanent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Reason *</label>
+                        <textarea name="reason" class="form-input" rows="3" required placeholder="Explain why the user is being suspended..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeSuspendModal()">Cancel</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-user-lock"></i> Suspend User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Forfeit Deposit Modal -->
+    <div id="forfeitModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                <h2 style="color: white; margin: 0;">Forfeit Deposit</h2>
+                <span class="close" onclick="closeForfeitModal()" style="color: white;">&times;</span>
+            </div>
+            <form id="forfeitForm" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert-danger" style="margin-bottom: 20px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Warning!</strong>
+                            <p>The deposit will be transferred to the item owner and cannot be reversed.</p>
+                        </div>
+                    </div>
+                    <p style="margin: 0 0 16px 0; color: #374151;">
+                        Forfeit deposit of <strong id="forfeitAmount"></strong> from <strong id="forfeitUserName"></strong>
+                    </p>
+                    <div class="form-group">
+                        <label class="form-label">Reason for Forfeiture *</label>
+                        <textarea name="reason" class="form-input" rows="3" required placeholder="Explain why the deposit is being forfeited..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeForfeitModal()">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-hand-holding-usd"></i> Forfeit Deposit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div id="warningModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0;">Issue Warning</h2>
+                <span class="close" onclick="closeWarningModal()">&times;</span>
+            </div>
+            <form id="warningForm" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <p style="margin: 0 0 16px 0; color: #374151;">Issue warning to: <strong id="warningUserName"></strong></p>
+                    <div class="form-group">
+                        <label class="form-label">Warning Message *</label>
+                        <textarea name="message" class="form-input" rows="4" required placeholder="Enter the warning message to send to the user..."></textarea>
+                    </div>
+                    <div class="alert-info" style="margin-top: 16px;">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Note:</strong>
+                            <p>The user will receive a notification with this warning message.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeWarningModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Send Warning
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <style>
         .alert {
@@ -236,6 +383,15 @@
 
         .btn-check:hover {
             background: #a7f3d0;
+        }
+
+        .btn-action {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .btn-action:hover {
+            background: #fde68a;
         }
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 20px; flex-wrap: wrap; gap: 20px; }
@@ -302,6 +458,326 @@
         .btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
         .btn-secondary:hover { background: #e5e7eb; }
 
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            z-index: var(--z-modal-backdrop);
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: var(--z-modal);
+            pointer-events: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(90vh - 160px);
+            overflow-y: auto;
+        }
+
+        .modal-description {
+            margin: 0 0 20px 0;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            background: #f9fafb;
+        }
+
+        .close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 24px;
+            color: white;
+            line-height: 1;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .action-buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .action-option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+        }
+
+        .action-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-option i {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .action-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .action-desc {
+            font-size: 13px;
+            color: #6b7280;
+            display: block;
+        }
+
+        .btn-suspend {
+            border-color: #f59e0b;
+        }
+
+        .btn-suspend:hover {
+            border-color: #d97706;
+            background: #fef3c7;
+        }
+
+        .btn-suspend i {
+            color: #f59e0b;
+        }
+
+        .btn-suspend .action-title {
+            color: #92400e;
+        }
+
+        .btn-forfeit {
+            border-color: #ef4444;
+        }
+
+        .btn-forfeit:hover {
+            border-color: #dc2626;
+            background: #fee2e2;
+        }
+
+        .btn-forfeit i {
+            color: #ef4444;
+        }
+
+        .btn-forfeit .action-title {
+            color: #991b1b;
+        }
+
+        .btn-warning {
+            border-color: #f59e0b;
+        }
+
+        .btn-warning:hover {
+            border-color: #d97706;
+            background: #fef3c7;
+        }
+
+        .btn-warning i {
+            color: #f59e0b;
+        }
+
+        .btn-warning .action-title {
+            color: #92400e;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .alert-warning {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 10px;
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-warning i {
+            font-size: 20px;
+            color: #f59e0b;
+            flex-shrink: 0;
+        }
+
+        .alert-warning strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #92400e;
+        }
+
+        .alert-warning p {
+            margin: 0;
+            font-size: 13px;
+            color: #78350f;
+        }
+
+        .alert-danger {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 10px;
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert-danger i {
+            font-size: 20px;
+            color: #ef4444;
+            flex-shrink: 0;
+        }
+
+        .alert-danger strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #991b1b;
+        }
+
+        .alert-danger p {
+            margin: 0;
+            font-size: 13px;
+            color: #7f1d1d;
+        }
+
+        .alert-info {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 10px;
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-info i {
+            font-size: 20px;
+            color: #3b82f6;
+            flex-shrink: 0;
+        }
+
+        .alert-info strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #1e40af;
+        }
+
+        .alert-info p {
+            margin: 0;
+            font-size: 13px;
+            color: #1e3a8a;
+        }
+
         /* Responsive Breakpoints */
         @media (max-width: 968px) {
             .header { align-items: flex-start; gap: 16px; }
@@ -327,6 +803,10 @@
     </style>
 
     <script>
+        let currentPenaltyId = null;
+        let currentUserName = '';
+        let currentAmount = 0;
+
         function viewPenalty(id) {
             fetch(`/admin/penalties/${id}`)
                 .then(response => response.json())
@@ -354,5 +834,71 @@ Approved By: ${penalty.approved_by ? penalty.approved_by : 'N/A'}`);
                     alert('Failed to load penalty details');
                 });
         }
+
+        function showPenaltyActionModal(penaltyId, userName, amount) {
+            currentPenaltyId = penaltyId;
+            currentUserName = userName;
+            currentAmount = amount;
+            document.getElementById('penaltyActionModal').style.display = 'flex';
+            document.getElementById('penaltyModalTitle').textContent = `Penalty Actions: ${userName}`;
+        }
+
+        function closePenaltyActionModal() {
+            document.getElementById('penaltyActionModal').style.display = 'none';
+            currentPenaltyId = null;
+            currentUserName = '';
+            currentAmount = 0;
+        }
+
+        function confirmSuspend() {
+            closePenaltyActionModal();
+            document.getElementById('suspendUserName').textContent = currentUserName;
+            document.getElementById('suspendForm').action = `/admin/penalties/${currentPenaltyId}/suspend`;
+            document.getElementById('suspendModal').style.display = 'flex';
+        }
+
+        function closeSuspendModal() {
+            document.getElementById('suspendModal').style.display = 'none';
+        }
+
+        function confirmForfeit() {
+            closePenaltyActionModal();
+            document.getElementById('forfeitUserName').textContent = currentUserName;
+            document.getElementById('forfeitAmount').textContent = `RM ${currentAmount.toFixed(2)}`;
+            document.getElementById('forfeitForm').action = `/admin/penalties/${currentPenaltyId}/forfeit`;
+            document.getElementById('forfeitModal').style.display = 'flex';
+        }
+
+        function closeForfeitModal() {
+            document.getElementById('forfeitModal').style.display = 'none';
+        }
+
+        function confirmWarning() {
+            closePenaltyActionModal();
+            document.getElementById('warningUserName').textContent = currentUserName;
+            document.getElementById('warningForm').action = `/admin/penalties/${currentPenaltyId}/warning`;
+            document.getElementById('warningModal').style.display = 'flex';
+        }
+
+        function closeWarningModal() {
+            document.getElementById('warningModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closePenaltyActionModal();
+                closeSuspendModal();
+                closeForfeitModal();
+                closeWarningModal();
+            }
+        });
     </script>
 @endsection

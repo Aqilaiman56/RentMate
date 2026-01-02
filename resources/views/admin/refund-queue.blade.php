@@ -703,9 +703,11 @@
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
             height: 100%;
-            z-index: 9999;
+            z-index: var(--z-modal-backdrop);
             align-items: center;
             justify-content: center;
         }
@@ -734,6 +736,8 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: modalSlideIn 0.3s ease;
+            z-index: var(--z-modal);
+            margin: auto;
         }
 
         @keyframes modalSlideIn {
