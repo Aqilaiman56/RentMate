@@ -352,13 +352,15 @@
             <div class="item-details">
                 <div class="item-header">
                     <div class="item-title">{{ $item->ItemName }}</div>
-                    <button class="heart-btn {{ $item->isInWishlist ? 'active' : '' }}" onclick="toggleWishlist(event, {{ $item->ItemID }})">
-                        @if($item->isInWishlist)
-                            <i class="fa-solid fa-heart"></i>
-                        @else
-                            <i class="fa-regular fa-heart"></i>
-                        @endif
-                    </button>
+                    @if(auth()->check() && auth()->id() !== $item->UserID)
+                        <button class="heart-btn {{ $item->isInWishlist ? 'active' : '' }}" onclick="toggleWishlist(event, {{ $item->ItemID }})">
+                            @if($item->isInWishlist)
+                                <i class="fa-solid fa-heart"></i>
+                            @else
+                                <i class="fa-regular fa-heart"></i>
+                            @endif
+                        </button>
+                    @endif
                 </div>
                 <div class="item-location">
                     <i class="fa-solid fa-location-dot"></i> {{ $item->location->LocationName ?? 'Location not set' }}
@@ -407,13 +409,18 @@
         })
         .then(response => response.json())
         .then(data => {
-            const heartBtn = event.target.closest('.heart-btn');
-            if(data.added) {
-                heartBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
-                heartBtn.classList.add('active');
+            if (data.success) {
+                const heartBtn = event.target.closest('.heart-btn');
+                if(data.added) {
+                    heartBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+                    heartBtn.classList.add('active');
+                } else {
+                    heartBtn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+                    heartBtn.classList.remove('active');
+                }
             } else {
-                heartBtn.innerHTML = '<i class="fa-regular fa-heart"></i>';
-                heartBtn.classList.remove('active');
+                // Show error message
+                alert(data.message || 'An error occurred');
             }
         })
         .catch(error => {

@@ -7,6 +7,8 @@
 @endphp
 
 @push('styles')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
     .report-container {
         max-width: 800px;
@@ -236,6 +238,69 @@
         border: 1px solid #fecaca;
     }
 
+    /* Select2 Custom Styling */
+    .select2-container--default .select2-selection--single {
+        height: 48px !important;
+        border: 2px solid #e5e7eb !important;
+        border-radius: 12px !important;
+        padding: 8px 16px !important;
+        transition: all 0.3s !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 30px !important;
+        color: #374151 !important;
+        padding-left: 0 !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 46px !important;
+        right: 10px !important;
+    }
+
+    .select2-container--default.select2-container--open .select2-selection--single,
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #4461F2 !important;
+        box-shadow: 0 0 0 3px rgba(68, 97, 242, 0.1) !important;
+    }
+
+    .select2-dropdown {
+        border: 2px solid #4461F2 !important;
+        border-radius: 12px !important;
+        margin-top: 4px !important;
+    }
+
+    .select2-search--dropdown .select2-search__field {
+        border: 2px solid #e5e7eb !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        font-size: 14px !important;
+    }
+
+    .select2-search--dropdown .select2-search__field:focus {
+        border-color: #4461F2 !important;
+        outline: none !important;
+    }
+
+    .select2-results__option {
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+    }
+
+    .select2-results__option--highlighted {
+        background-color: #eff6ff !important;
+        color: #1e40af !important;
+    }
+
+    .select2-results__option--selected {
+        background-color: #4461F2 !important;
+        color: white !important;
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
+
     @media (max-width: 768px) {
         .report-container {
             padding: 20px 15px;
@@ -391,23 +456,46 @@
 @endsection
 
 @push('scripts')
+<!-- jQuery (required for Select2) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+    $(document).ready(function() {
+        // Initialize Select2 for Reported User dropdown
+        $('#reportedUser').select2({
+            placeholder: 'Search for a user...',
+            allowClear: true,
+            width: '100%',
+            theme: 'default'
+        });
+
+        // Initialize Select2 for Booking dropdown
+        $('#booking').select2({
+            placeholder: 'Search for a booking...',
+            allowClear: true,
+            width: '100%',
+            theme: 'default'
+        });
+
+        // Handle the change event for Select2
+        $('#booking').on('select2:select', function() {
+            updateReportedUserFromBooking();
+        });
+    });
+
     // Auto-fill reported user when booking is selected
     function updateReportedUserFromBooking() {
         const bookingSelect = document.getElementById('booking');
-        const reportedUserSelect = document.getElementById('reportedUser');
+        const reportedUserSelect = $('#reportedUser'); // Use jQuery for Select2
 
         if (bookingSelect.value) {
             const selectedOption = bookingSelect.options[bookingSelect.selectedIndex];
             const otherUserId = selectedOption.getAttribute('data-other-user');
 
             if (otherUserId) {
-                for (let i = 0; i < reportedUserSelect.options.length; i++) {
-                    if (reportedUserSelect.options[i].value == otherUserId) {
-                        reportedUserSelect.selectedIndex = i;
-                        break;
-                    }
-                }
+                // Set the value using Select2 method
+                reportedUserSelect.val(otherUserId).trigger('change');
             }
         }
     }

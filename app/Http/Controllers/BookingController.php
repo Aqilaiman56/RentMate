@@ -9,6 +9,7 @@ use App\Models\Deposit;
 use App\Models\ServiceFee;
 use App\Models\Notification;
 use App\Models\Payment;
+use App\Models\RefundQueue;
 use App\Services\ToyyibPayService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -366,9 +367,31 @@ class BookingController extends Controller
         try {
             $booking->update(['Status' => 'cancelled']);
 
-            // Update deposit status
+            // Update deposit status to pending refund
             if ($booking->deposit) {
-                $booking->deposit->update(['Status' => 'refunded']);
+                $booking->deposit->update(['Status' => 'pending_refund']);
+            }
+
+            // Automatically add to refund queue (if not already exists)
+            $user = auth()->user();
+            $refundAmount = $booking->DepositAmount ?? 0;
+
+            // Check if refund queue entry already exists for this booking
+            $existingRefund = RefundQueue::where('BookingID', $booking->BookingID)->first();
+
+            if (!$existingRefund && $refundAmount > 0) {
+                // Create refund queue entry
+                RefundQueue::create([
+                    'DepositID' => $booking->deposit ? $booking->deposit->DepositID : null,
+                    'BookingID' => $booking->BookingID,
+                    'UserID' => $booking->UserID,
+                    'RefundAmount' => $refundAmount,
+                    'Status' => 'pending',
+                    'BankName' => $user->BankName,
+                    'BankAccountNumber' => $user->BankAccountNumber,
+                    'BankAccountHolderName' => $user->BankAccountHolderName,
+                    'Notes' => 'Auto-added: Booking cancelled by renter',
+                ]);
             }
 
             // Availability is now manually controlled by owner
@@ -388,11 +411,11 @@ class BookingController extends Controller
             DB::commit();
 
             return redirect()->route('user.bookings')
-                ->with('success', 'Booking cancelled successfully. Your deposit will be refunded.');
+                ->with('success', 'Booking cancelled successfully. Your deposit refund request has been added to the queue.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to cancel booking.');
+            return back()->with('error', 'Failed to cancel booking: ' . $e->getMessage());
         }
     }
 
@@ -632,20 +655,36 @@ class BookingController extends Controller
             // Update booking status to cancelled/rejected
             $booking->update(['Status' => 'rejected']);
 
-            // Refund deposit if exists
+            // Update deposit status to pending refund
             if ($booking->deposit) {
-                $booking->deposit->update([
-                    'Status' => 'refunded',
-                    'DateRefunded' => now(),
-                    'RefundMethod' => 'Booking Rejected',
-                    'RefundReference' => 'REJ-' . $booking->BookingID . '-' . time()
-                ]);
+                $booking->deposit->update(['Status' => 'pending_refund']);
             }
 
             // Refund payment if it was made
             if ($booking->payment && $booking->payment->Status === 'successful') {
                 $booking->payment->update([
                     'Status' => 'refunded'
+                ]);
+            }
+
+            // Automatically add to refund queue (if not already exists)
+            $refundAmount = $booking->DepositAmount ?? 0;
+            $renter = $booking->user;
+
+            // Check if refund queue entry already exists for this booking
+            $existingRefund = RefundQueue::where('BookingID', $booking->BookingID)->first();
+
+            if (!$existingRefund && $refundAmount > 0) {
+                RefundQueue::create([
+                    'DepositID' => $booking->deposit ? $booking->deposit->DepositID : null,
+                    'BookingID' => $booking->BookingID,
+                    'UserID' => $booking->UserID,
+                    'RefundAmount' => $refundAmount,
+                    'Status' => 'pending',
+                    'BankName' => $renter->BankName,
+                    'BankAccountNumber' => $renter->BankAccountNumber,
+                    'BankAccountHolderName' => $renter->BankAccountHolderName,
+                    'Notes' => 'Auto-added: Booking rejected by owner',
                 ]);
             }
 
@@ -657,7 +696,7 @@ class BookingController extends Controller
                 'UserID' => $booking->UserID,
                 'Type' => 'booking',
                 'Title' => '❌ Booking Request Declined',
-                'Content' => 'Your booking request for "' . $booking->item->ItemName . '" has been declined by the owner. Your deposit will be refunded within 3-5 business days.',
+                'Content' => 'Your booking request for "' . $booking->item->ItemName . '" has been declined by the owner. Your deposit refund request has been added to the queue.',
                 'RelatedID' => $booking->BookingID,
                 'RelatedType' => 'booking',
                 'CreatedAt' => now()
@@ -666,7 +705,7 @@ class BookingController extends Controller
             DB::commit();
 
             return redirect()->back()
-                ->with('success', 'Booking rejected. The renter will be refunded.');
+                ->with('success', 'Booking rejected. The renter refund request has been added to the queue.');
 
         } catch (\Exception $e) {
             DB::rollBack();

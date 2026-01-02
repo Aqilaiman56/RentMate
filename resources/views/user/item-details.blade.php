@@ -932,9 +932,11 @@
                          class="item-main-image">
                 @endif
 
-                <button class="wishlist-btn" onclick="toggleWishlist({{ $item->ItemID }})">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
+                @if(auth()->id() !== $item->UserID)
+                    <button class="wishlist-btn" onclick="toggleWishlist({{ $item->ItemID }})">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                @endif
             </div>
 
             <div class="item-owner">
@@ -1094,6 +1096,14 @@
 
                         <!-- Availability Calendar -->
                         <div class="availability-calendar">
+                            <div style="text-align: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--color-gray-300);">
+                                <h3 style="font-size: var(--text-base); font-weight: var(--font-semibold); color: var(--color-gray-900); margin-bottom: 0.5rem;">
+                                    <i class="fa-solid fa-calendar-days" style="color: var(--color-primary);"></i> Select Your Rental Dates
+                                </h3>
+                                <p style="font-size: var(--text-sm); color: var(--color-gray-600);">
+                                    Click on the calendar to choose your start and end dates
+                                </p>
+                            </div>
                             <div class="calendar-header">
                                 <button type="button" class="calendar-nav-btn" id="prevMonth">
                                     <i class="fa-solid fa-chevron-left"></i>
@@ -1451,13 +1461,18 @@
         })
         .then(response => response.json())
         .then(data => {
-            const heartBtn = document.querySelector('.wishlist-btn');
-            if(data.added) {
-                heartBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
-                heartBtn.style.color = '#FF6B6B';
+            if (data.success) {
+                const heartBtn = document.querySelector('.wishlist-btn');
+                if(data.added) {
+                    heartBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+                    heartBtn.style.color = '#FF6B6B';
+                } else {
+                    heartBtn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+                    heartBtn.style.color = '#000';
+                }
             } else {
-                heartBtn.innerHTML = '<i class="fa-regular fa-heart"></i>';
-                heartBtn.style.color = '#000';
+                // Show error message
+                alert(data.message || 'An error occurred');
             }
         })
         .catch(error => {

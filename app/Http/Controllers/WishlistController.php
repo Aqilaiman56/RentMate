@@ -14,12 +14,29 @@ class WishlistController extends Controller
     public function toggle($itemId)
     {
         $userId = auth()->id();
-        
+
+        // Check if user is trying to add their own item
+        $item = Item::find($itemId);
+
+        if (!$item) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item not found'
+            ], 404);
+        }
+
+        if ($item->UserID == $userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot add your own item to wishlist'
+            ], 403);
+        }
+
         // Check if item exists in wishlist
         $wishlist = Wishlist::where('UserID', $userId)
             ->where('ItemID', $itemId)
             ->first();
-        
+
         if ($wishlist) {
             // Remove from wishlist
             $wishlist->delete();
@@ -49,25 +66,42 @@ class WishlistController extends Controller
     public function add($itemId)
     {
         $userId = auth()->id();
-        
+
+        // Check if user is trying to add their own item
+        $item = Item::find($itemId);
+
+        if (!$item) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item not found'
+            ], 404);
+        }
+
+        if ($item->UserID == $userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot add your own item to wishlist'
+            ], 403);
+        }
+
         // Check if already in wishlist
         $exists = Wishlist::where('UserID', $userId)
             ->where('ItemID', $itemId)
             ->exists();
-        
+
         if ($exists) {
             return response()->json([
                 'success' => false,
                 'message' => 'Item already in wishlist'
             ], 400);
         }
-        
+
         Wishlist::create([
             'UserID' => $userId,
             'ItemID' => $itemId,
             'DateAdded' => now()
         ]);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Item added to wishlist'

@@ -101,6 +101,14 @@ class Booking extends Model
     }
 
     /**
+     * Get the refund queue entry for this booking
+     */
+    public function refundQueue()
+    {
+        return $this->hasOne(RefundQueue::class, 'BookingID', 'BookingID');
+    }
+
+    /**
      * Scope to get bookings for a specific date range
      */
     public function scopeBetweenDates($query, $startDate, $endDate)
