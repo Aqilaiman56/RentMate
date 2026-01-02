@@ -464,7 +464,7 @@
     $(document).ready(function() {
         // Initialize Select2 for Reported User dropdown
         $('#reportedUser').select2({
-            placeholder: 'Search for a user...',
+            placeholder: 'Search or select a user...',
             allowClear: true,
             width: '100%',
             theme: 'default'
@@ -472,7 +472,7 @@
 
         // Initialize Select2 for Booking dropdown
         $('#booking').select2({
-            placeholder: 'Search for a booking...',
+            placeholder: 'Search or select a booking...',
             allowClear: true,
             width: '100%',
             theme: 'default'
