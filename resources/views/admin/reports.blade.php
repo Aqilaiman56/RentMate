@@ -168,11 +168,15 @@
                                         <button class="btn-icon btn-action" title="Take Action" onclick="showActionModal({{ $report->ReportID }}, '{{ $report->Subject }}')">
                                             <i class="fas fa-bolt"></i>
                                         </button>
-                                        @if(!$report->hasPenalty())
+                                    @if($report->hasPenalty())
+                                        <button class="btn-icon btn-penalty" title="View Penalty Details" onclick="viewPenalty({{ $report->penalty->PenaltyID }})">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    @else
                                         <button class="btn-icon btn-penalty" title="Issue Penalty" onclick="showPenaltyModal({{ $report->ReportID }})">
                                             <i class="fas fa-exclamation-triangle"></i>
                                         </button>
-                                        @endif
+                                    @endif
                                     @endif
                                 </div>
                             </td>
@@ -205,6 +209,19 @@
                 <span class="close" onclick="closeViewModal()">&times;</span>
             </div>
             <div class="modal-body" id="reportDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- View Penalty Details Modal -->
+    <div id="penaltyModal" class="modal" style="display: none;">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2 id="penaltyModalTitle">Penalty Details</h2>
+                <span class="close" onclick="closePenaltyModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="penaltyDetailsContent">
                 <!-- Content will be loaded dynamically -->
             </div>
         </div>
@@ -994,6 +1011,81 @@
         function closePenaltyModal() {
             document.getElementById('penaltyModal').style.display = 'none';
             document.getElementById('penaltyForm').reset();
+        }
+
+        function viewPenalty(penaltyId) {
+            fetch(`/admin/penalties/${penaltyId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const penalty = data.penalty;
+                        const content = `
+                            <div style="display: grid; gap: 24px;">
+                                <div>
+                                    <h3 style="margin: 0 0 16px 0; font-size: 16px; color: #6b7280;">Penalty Information</h3>
+                                    <div style="display: grid; gap: 12px;">
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #374151;">Penalty ID:</span>
+                                            <span>#P${penalty.id.toString().padStart(3, '0')}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #374151;">Amount:</span>
+                                            <span style="font-weight: 700; color: #dc2626;">RM ${penalty.amount}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #374151;">Status:</span>
+                                            <span class="${penalty.resolved ? 'text-green-600' : 'text-orange-600'}">${penalty.resolved ? 'Resolved' : 'Pending'}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                            <span style="font-weight: 600; color: #374151;">Date Issued:</span>
+                                            <span>${penalty.date_issued}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 style="margin: 0 0 16px 0; font-size: 16px; color: #6b7280;">User Information</h3>
+                                    <div style="padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                        <span style="font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">${penalty.user.name}</span>
+                                        <span style="color: #6b7280; font-size: 13px;">${penalty.user.email}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Description</h3>
+                                    <p style="margin: 0; padding: 12px; background: #f9fafb; border-radius: 8px; white-space: pre-wrap;">${penalty.description}</p>
+                                </div>
+
+                                ${penalty.report ? `
+                                <div>
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Related Report</h3>
+                                    <div style="padding: 12px; background: #dbeafe; border-radius: 8px;">
+                                        <span style="font-weight: 600;">Report #R${penalty.report.id.toString().padStart(3, '0')}</span><br>
+                                        <span>${penalty.report.subject}</span>
+                                    </div>
+                                </div>
+                                ` : ''}
+
+                                ${penalty.evidence ? `
+                                <div>
+                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Evidence</h3>
+                                    <div style="padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                        <a href="${penalty.evidence}" target="_blank" style="color: #3b82f6; text-decoration: none;">
+                                            <i class="fas fa-image"></i> View Evidence
+                                        </a>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                        document.getElementById('penaltyDetailsContent').innerHTML = content;
+                        document.getElementById('penaltyModal').style.display = 'flex';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load penalty details');
+                });
         }
 
         function submitPenalty(event) {

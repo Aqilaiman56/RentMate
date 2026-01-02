@@ -196,9 +196,8 @@
     @endif
 
     <!-- Deposit Details Modal -->
-    <div id="depositModal" class="modal">
-        <div class="modal-overlay" onclick="closeDepositModal()"></div>
-        <div class="modal-container">
+    <div id="depositModal" class="modal" onclick="closeDepositModal()">
+        <div class="modal-container" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <h2 class="modal-title">Deposit Details</h2>
                 <button class="modal-close" onclick="closeDepositModal()">
@@ -1331,6 +1330,26 @@
             .pagination-container {
                 padding: 20px 10px;
             }
+        }
+
+        /* Modal visibility */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: transparent;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-container {
+            z-index: 10000;
         }
     </style>
 
