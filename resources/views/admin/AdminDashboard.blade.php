@@ -381,6 +381,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            margin-bottom: 12px;
         }
 
         .summary-item {
@@ -410,6 +411,57 @@
         .summary-item.yellow {
             background: #fef3c7;
             color: #d97706;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .notification-action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .notification-action-btn.read-all {
+            background: #4461F2;
+            color: white;
+        }
+
+        .notification-action-btn.read-all:hover {
+            background: #3651E2;
+            transform: translateY(-1px);
+        }
+
+        .notification-action-btn.clear-all {
+            background: #dc2626;
+            color: white;
+        }
+
+        .notification-action-btn.clear-all:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .notification-action-btn.view-all {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .notification-action-btn.view-all:hover {
+            background: #d1d5db;
+            transform: translateY(-1px);
         }
 
         /* Responsive Styles */
@@ -631,6 +683,23 @@
                                 <span class="summary-item yellow">{{ $notifications['counts']['penalties'] }} Penalties</span>
                             @endif
                         </div>
+                        <div class="notification-actions">
+                            <form action="{{ route('admin.notifications.readAll') }}" method="POST" style="flex: 1;">
+                                @csrf
+                                <button type="submit" class="notification-action-btn read-all">
+                                    <i class="fas fa-check-double"></i> Mark Read
+                                </button>
+                            </form>
+                            <form action="{{ route('admin.notifications.clearAll') }}" method="POST" style="flex: 1;" onsubmit="return confirm('Clear all notifications? This cannot be undone.')">
+                                @csrf
+                                <button type="submit" class="notification-action-btn clear-all">
+                                    <i class="fas fa-trash-alt"></i> Clear All
+                                </button>
+                            </form>
+                            <a href="{{ route('admin.notifications.index') }}" class="notification-action-btn view-all">
+                                <i class="fas fa-list"></i> View All
+                            </a>
+                        </div>
                     </div>
                 @endif
                 </div>
@@ -830,9 +899,13 @@
             const notificationBtn = document.getElementById('notificationBtn');
             const notificationDropdown = document.getElementById('notificationDropdown');
 
-            // Prevent dropdown from closing when clicking inside
+            // Prevent dropdown from closing when clicking inside (except for action buttons)
             if (notificationDropdown) {
                 notificationDropdown.addEventListener('click', function(e) {
+                    // Allow form submissions and links to work
+                    if (e.target.closest('form') || e.target.closest('a.notification-action-btn')) {
+                        return;
+                    }
                     e.stopPropagation();
                 });
             }

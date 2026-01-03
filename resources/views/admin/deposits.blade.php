@@ -12,9 +12,6 @@
             <a href="{{ route('admin.deposits.export') }}" class="btn btn-secondary">
                 <i class="fas fa-download"></i> <span class="btn-text">Export Data</span>
             </a>
-            <button class="btn btn-primary" onclick="generateReport()">
-                <i class="fas fa-chart-bar"></i> <span class="btn-text">Generate Report</span>
-            </button>
         </div>
     </div>
 
@@ -1553,31 +1550,5 @@
                 closeDepositModal();
             }
         });
-
-        function generateReport() {
-            fetch('/admin/deposits-report')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const report = data.report;
-                        alert(`Financial Report - Deposits
-                        
-Total Deposits: RM ${parseFloat(report.total_deposits).toFixed(2)}
-Refunded: RM ${parseFloat(report.refunded).toFixed(2)}
-Held: RM ${parseFloat(report.held).toFixed(2)}
-Forfeited: RM ${parseFloat(report.forfeited).toFixed(2)}
-Partial Refunds: RM ${parseFloat(report.partial).toFixed(2)}
-
-Total Transactions: ${report.total_transactions}
-
-Monthly Breakdown:
-${report.monthly_breakdown.map(m => `${m.month_name}: RM ${parseFloat(m.total).toFixed(2)} (${m.count} transactions)`).join('\n')}`);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to generate report');
-                });
-        }
     </script>
 @endsection

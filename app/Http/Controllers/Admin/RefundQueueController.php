@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\RefundQueue;
 use App\Models\Deposit;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -143,7 +144,7 @@ class RefundQueueController extends Controller
         try {
             DB::beginTransaction();
 
-            $refund = RefundQueue::with('deposit')->findOrFail($id);
+            $refund = RefundQueue::with(['deposit', 'user'])->findOrFail($id);
 
             $refund->Status = 'failed';
             $refund->Notes = $request->reason;
@@ -157,9 +158,21 @@ class RefundQueueController extends Controller
             $deposit->Notes = 'Refund failed: ' . $request->reason;
             $deposit->save();
 
+            // Send notification to user about failed refund
+            Notification::create([
+                'UserID' => $refund->UserID,
+                'Type' => 'refund_failed',
+                'Title' => 'Refund Request Failed',
+                'Content' => 'Your refund request of RM ' . number_format($refund->RefundAmount, 2) . ' has failed. Reason: ' . $request->reason . '. Please contact the administrator to resolve this issue and process your refund manually.',
+                'RelatedID' => $refund->RefundQueueID,
+                'RelatedType' => 'RefundQueue',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now()
+            ]);
+
             DB::commit();
 
-            return back()->with('success', 'Refund marked as failed');
+            return back()->with('success', 'Refund marked as failed and user has been notified');
 
         } catch (\Exception $e) {
             DB::rollBack();

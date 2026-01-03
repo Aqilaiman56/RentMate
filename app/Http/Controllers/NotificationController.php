@@ -85,10 +85,21 @@ class NotificationController extends Controller
         $notification = Notification::where('NotificationID', $id)
             ->where('UserID', auth()->id())
             ->firstOrFail();
-        
+
         $notification->delete();
-        
+
         return redirect()->route('notifications.index')
             ->with('success', 'Notification deleted');
+    }
+
+    /**
+     * Clear all notifications for the authenticated user
+     */
+    public function clearAll()
+    {
+        $deletedCount = Notification::where('UserID', auth()->id())->delete();
+
+        return redirect()->route('notifications.index')
+            ->with('success', "All notifications cleared ({$deletedCount} notification(s) removed)");
     }
 }

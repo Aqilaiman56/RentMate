@@ -44,7 +44,9 @@ class ReportsController extends Controller
             $query->where('Priority', $request->priority);
         }
 
-        $query->orderBy('DateReported', 'desc');
+        // Sort by priority (high first), then by date submitted (earliest first)
+        $query->orderByRaw("FIELD(Priority, 'high', 'medium', 'low')")
+              ->orderBy('DateReported', 'asc');
         $reports = $query->paginate(15);
 
         // Stats

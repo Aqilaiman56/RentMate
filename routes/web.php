@@ -177,6 +177,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+    Route::post('/notifications/clear-all', [NotificationController::class, 'clearAll'])->name('notifications.clearAll');
     Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
@@ -302,7 +303,21 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         }
         return app(AdminUsersController::class)->activityLog($id);
     })->name('users.activityLog');
-    
+
+    Route::post('/users/{id}/promote', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminUsersController::class)->promoteToAdmin($id);
+    })->name('users.promote');
+
+    Route::post('/users/{id}/demote', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminUsersController::class)->demoteFromAdmin($id);
+    })->name('users.demote');
+
     // Listings Management
     Route::get('/listings', function(Request $request) {
         if (!auth()->user()->IsAdmin) {
@@ -403,6 +418,42 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         }
         return app(\App\Http\Controllers\Admin\RefundQueueController::class)->markFailed($request, $id);
     })->name('refund-queue.failed');
+
+    // Admin Notifications
+    Route::get('/notifications', function() {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\NotificationController::class)->index();
+    })->name('notifications.index');
+
+    Route::post('/notifications/read-all', function() {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\NotificationController::class)->markAllAsRead();
+    })->name('notifications.readAll');
+
+    Route::post('/notifications/clear-all', function() {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\NotificationController::class)->clearAll();
+    })->name('notifications.clearAll');
+
+    Route::delete('/notifications/{id}', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\NotificationController::class)->destroy($id);
+    })->name('notifications.destroy');
+
+    Route::post('/notifications/{id}/read', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\NotificationController::class)->markAsRead($id);
+    })->name('notifications.read');
 
     // Reports Management
     Route::get('/reports', function(Request $request) {

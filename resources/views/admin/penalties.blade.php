@@ -86,48 +86,53 @@
         </div>
     </form>
 
-    <!-- Penalties Table -->
-    <div class="table-card">
+    <!-- Penalties Cards -->
+    <div class="penalties-cards-container">
         <div class="table-header">
             <h3 class="table-title">Penalty Records</h3>
             <span class="table-count">Showing {{ $penalties->count() }} of {{ $penalties->total() }} penalties</span>
         </div>
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Penalty ID</th>
-                        <th>User</th>
-                        <th>Report/Issue</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($penalties as $penalty)
-                        <tr>
-                            <td><span class="id-badge">#P{{ str_pad($penalty->PenaltyID, 3, '0', STR_PAD_LEFT) }}</span></td>
-                            <td>
-                                <div class="user-cell">
-                                    @if($penalty->reportedUser->ProfileImage)
-                                        <img src="{{ asset('storage/' . $penalty->reportedUser->ProfileImage) }}" 
-                                             alt="{{ $penalty->reportedUser->UserName }}" 
-                                             class="user-avatar-img">
-                                    @else
-                                        <div class="user-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal'][$penalty->reportedUser->UserID % 6] }}">
-                                            {{ strtoupper(substr($penalty->reportedUser->UserName, 0, 1)) }}
-                                        </div>
-                                    @endif
-                                    <div class="user-info">
-                                        <div class="user-name">{{ $penalty->reportedUser->UserName }}</div>
-                                        <div class="user-email">{{ $penalty->reportedUser->Email }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
+
+        @forelse($penalties as $penalty)
+            <div class="penalty-card" id="penalty-{{ $penalty->PenaltyID }}">
+                <!-- Card Header - Always Visible -->
+                <div class="penalty-card-header" onclick="togglePenalty({{ $penalty->PenaltyID }})">
+                    <div class="penalty-user-section">
+                        @if($penalty->reportedUser->ProfileImage)
+                            <img src="{{ asset('storage/' . $penalty->reportedUser->ProfileImage) }}"
+                                 alt="{{ $penalty->reportedUser->UserName }}"
+                                 class="penalty-avatar-img">
+                        @else
+                            <div class="penalty-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal'][$penalty->reportedUser->UserID % 6] }}">
+                                {{ strtoupper(substr($penalty->reportedUser->UserName, 0, 1)) }}
+                            </div>
+                        @endif
+                        <div class="penalty-user-info">
+                            <div class="penalty-user-name">{{ $penalty->reportedUser->UserName }}</div>
+                            <div class="penalty-user-email">{{ $penalty->reportedUser->Email }}</div>
+                        </div>
+                    </div>
+                    <div class="penalty-header-right">
+                        <span class="status-badge {{ $penalty->ResolvedStatus ? 'status-resolved' : 'status-pending' }}">
+                            {{ $penalty->ResolvedStatus ? 'Resolved' : 'Pending' }}
+                        </span>
+                        <i class="fas fa-chevron-down penalty-toggle-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Card Body - Expandable -->
+                <div class="penalty-card-body">
+                    <div class="penalty-details-grid">
+                        <div class="penalty-detail-item">
+                            <div class="penalty-detail-label">Penalty ID</div>
+                            <div class="penalty-detail-value">
+                                <span class="id-badge">#P{{ str_pad($penalty->PenaltyID, 3, '0', STR_PAD_LEFT) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="penalty-detail-item">
+                            <div class="penalty-detail-label">Report/Issue</div>
+                            <div class="penalty-detail-value">
                                 @if($penalty->report)
                                     <a href="{{ route('admin.reports') }}?search={{ $penalty->report->ReportID }}" class="report-link">
                                         #R{{ str_pad($penalty->report->ReportID, 3, '0', STR_PAD_LEFT) }} - {{ ucwords(str_replace('-', ' ', $penalty->report->ReportType)) }}
@@ -135,48 +140,55 @@
                                 @else
                                     <span class="text-muted">No linked report</span>
                                 @endif
-                            </td>
-                            <td class="description-cell">{{ Str::limit($penalty->Description, 50) }}</td>
-                            <td><span class="amount-badge">RM {{ number_format($penalty->PenaltyAmount, 2) }}</span></td>
-                            <td>{{ $penalty->DateReported->format('M d, Y') }}</td>
-                            <td>
-                                <span class="status-badge {{ $penalty->ResolvedStatus ? 'status-resolved' : 'status-pending' }}">
-                                    {{ $penalty->ResolvedStatus ? 'Resolved' : 'Pending' }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon btn-view" title="View Details" onclick="viewPenalty({{ $penalty->PenaltyID }})">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    @if(!$penalty->ResolvedStatus)
-                                        <button class="btn-icon btn-action" title="Take Action" onclick="showPenaltyActionModal({{ $penalty->PenaltyID }}, '{{ addslashes($penalty->reportedUser->UserName) }}', {{ $penalty->PenaltyAmount }})">
-                                            <i class="fas fa-bolt"></i>
-                                        </button>
-                                        <form action="{{ route('admin.penalties.resolve', $penalty->PenaltyID) }}"
-                                              method="POST"
-                                              style="display: inline;"
-                                              onsubmit="return confirm('Mark this penalty as resolved?')">
-                                            @csrf
-                                            <button type="submit" class="btn-icon btn-check" title="Mark as Resolved">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" style="text-align: center; padding: 60px; color: #6b7280;">
-                                <p style="font-size: 18px; font-weight: 600;">No penalties found</p>
-                                <p style="margin-top: 10px;">Try adjusting your filters</p>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                            </div>
+                        </div>
+
+                        <div class="penalty-detail-item penalty-detail-full">
+                            <div class="penalty-detail-label">Description</div>
+                            <div class="penalty-detail-value">{{ $penalty->Description }}</div>
+                        </div>
+
+                        <div class="penalty-detail-item">
+                            <div class="penalty-detail-label">Amount</div>
+                            <div class="penalty-detail-value">
+                                <span class="amount-badge">RM {{ number_format($penalty->PenaltyAmount, 2) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="penalty-detail-item">
+                            <div class="penalty-detail-label">Date Issued</div>
+                            <div class="penalty-detail-value">{{ $penalty->DateReported->format('M d, Y') }}</div>
+                        </div>
+                    </div>
+
+                    <div class="penalty-card-actions">
+                        <button class="penalty-action-btn btn-view" onclick="event.stopPropagation(); viewPenalty({{ $penalty->PenaltyID }})">
+                            <i class="fas fa-eye"></i> View Details
+                        </button>
+                        @if(!$penalty->ResolvedStatus)
+                            <button class="penalty-action-btn btn-action" onclick="event.stopPropagation(); showPenaltyActionModal({{ $penalty->PenaltyID }}, '{{ addslashes($penalty->reportedUser->UserName) }}', {{ $penalty->PenaltyAmount }})">
+                                <i class="fas fa-bolt"></i> Take Action
+                            </button>
+                            <form action="{{ route('admin.penalties.resolve', $penalty->PenaltyID) }}"
+                                  method="POST"
+                                  style="display: inline;"
+                                  onsubmit="return confirm('Mark this penalty as resolved?')">
+                                @csrf
+                                <button type="submit" class="penalty-action-btn btn-check" onclick="event.stopPropagation()">
+                                    <i class="fas fa-check"></i> Mark Resolved
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="empty-state">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                <p style="font-size: 18px; font-weight: 600; color: #6b7280; margin: 0;">No penalties found</p>
+                <p style="margin-top: 8px; color: #9ca3af;">Try adjusting your filters</p>
+            </div>
+        @endforelse
     </div>
 
     <!-- Pagination -->
@@ -874,6 +886,210 @@
             color: #1e3a8a;
         }
 
+        /* Penalty Cards Styling */
+        .penalties-cards-container {
+            margin: 0 20px;
+        }
+
+        .penalty-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .penalty-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .penalty-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            user-select: none;
+        }
+
+        .penalty-card-header:hover {
+            background: #f9fafb;
+        }
+
+        .penalty-user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .penalty-avatar,
+        .penalty-avatar-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .penalty-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+        }
+
+        .penalty-avatar-img {
+            object-fit: cover;
+        }
+
+        .penalty-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .penalty-user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .penalty-user-email {
+            font-size: 14px;
+            color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .penalty-header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .penalty-toggle-icon {
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.3s;
+        }
+
+        .penalty-card.expanded .penalty-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .penalty-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #f9fafb;
+        }
+
+        .penalty-card.expanded .penalty-card-body {
+            max-height: 800px;
+        }
+
+        .penalty-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .penalty-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .penalty-detail-full {
+            grid-column: 1 / -1;
+        }
+
+        .penalty-detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .penalty-detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .penalty-card-actions {
+            display: flex;
+            gap: 12px;
+            padding: 20px 24px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+            flex-wrap: wrap;
+        }
+
+        .penalty-action-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .penalty-action-btn.btn-view {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .penalty-action-btn.btn-view:hover {
+            background: #bfdbfe;
+            transform: translateY(-1px);
+        }
+
+        .penalty-action-btn.btn-action {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .penalty-action-btn.btn-action:hover {
+            background: #fde68a;
+            transform: translateY(-1px);
+        }
+
+        .penalty-action-btn.btn-check {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .penalty-action-btn.btn-check:hover {
+            background: #a7f3d0;
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
         /* Responsive Breakpoints */
         @media (max-width: 968px) {
             .header { align-items: flex-start; gap: 16px; }
@@ -950,31 +1166,25 @@
                 justify-content: center;
             }
 
-            /* Penalties table */
-            .table-card {
+            /* Penalty cards */
+            .penalties-cards-container {
                 margin: 0 15px;
             }
 
-            .table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+            .penalty-details-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
             }
 
-            .data-table {
-                min-width: 1000px;
+            .penalty-card-actions {
+                padding: 16px;
+                flex-direction: column;
             }
 
-            /* Table cells responsive */
-            .user-cell {
-                min-width: 200px;
-            }
-
-            .description-cell {
-                min-width: 200px;
-            }
-
-            .action-buttons {
-                min-width: 120px;
+            .penalty-action-btn {
+                width: 100%;
+                justify-content: center;
             }
 
             /* Modal adjustments */
@@ -1095,6 +1305,35 @@
                 font-size: 11px;
             }
 
+            /* Penalty cards mobile */
+            .penalty-card-header {
+                padding: 12px;
+            }
+
+            .penalty-avatar,
+            .penalty-avatar-img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .penalty-user-name {
+                font-size: 14px;
+            }
+
+            .penalty-user-email {
+                font-size: 12px;
+            }
+
+            .status-badge {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+
+            .penalty-details-grid {
+                padding: 12px;
+                gap: 12px;
+            }
+
             /* Modal further adjustments */
             .modal-content {
                 width: 100%;
@@ -1200,6 +1439,11 @@
         let currentPenaltyId = null;
         let currentUserName = '';
         let currentAmount = 0;
+
+        function togglePenalty(penaltyId) {
+            const card = document.getElementById('penalty-' + penaltyId);
+            card.classList.toggle('expanded');
+        }
 
         function viewPenalty(id) {
             fetch(`/admin/penalties/${id}`)

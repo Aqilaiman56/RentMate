@@ -15,8 +15,19 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        // Start query for non-admin users
-        $query = User::where('IsAdmin', 0);
+        // Start query - show all users if filter is 'all', otherwise non-admin
+        $query = User::query();
+
+        // Filter by admin status
+        if ($request->has('filter') && $request->filter !== 'all') {
+            if ($request->filter === 'admin') {
+                $query->where('IsAdmin', true);
+            } elseif ($request->filter === 'regular') {
+                $query->where('IsAdmin', false);
+            } elseif ($request->filter === 'suspended') {
+                $query->where('IsSuspended', true);
+            }
+        }
 
         // Search filter
         if ($request->has('search') && $request->search != '') {
@@ -58,21 +69,22 @@ class UsersController extends Controller
         $users = $query->paginate(20);
 
         // Calculate statistics
-        $totalUsers = User::where('IsAdmin', 0)->count();
-        $activeUsers = User::where('IsAdmin', 0)
-            ->where('CreatedAt', '>=', now()->subMonth())
+        $totalUsers = User::count();
+        $activeUsers = User::where('CreatedAt', '>=', now()->subMonth())
             ->count();
-        
+
         // Count by user type
         $adminCount = User::where('IsAdmin', 1)->count();
         $regularUserCount = User::where('IsAdmin', 0)->count();
+        $suspendedCount = User::where('IsSuspended', 1)->count();
 
         return view('admin.users', compact(
             'users',
             'totalUsers',
             'activeUsers',
             'adminCount',
-            'regularUserCount'
+            'regularUserCount',
+            'suspendedCount'
         ));
     }
 
@@ -91,6 +103,93 @@ class UsersController extends Controller
         $reviewsCount = $user->reviews()->count();
 
         return view('admin.users.show', compact('user', 'itemsCount', 'bookingsCount', 'reviewsCount'));
+    }
+
+    /**
+     * Promote user to admin
+     */
+    public function promoteToAdmin($id)
+    {
+        $user = User::where('UserID', $id)->firstOrFail();
+
+        // Check if already admin
+        if ($user->IsAdmin) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This user is already an admin.'
+                ], 400);
+            }
+            return back()->with('error', 'This user is already an admin.');
+        }
+
+        // Promote to admin
+        $user->update(['IsAdmin' => true]);
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $user->UserName . ' has been promoted to admin.'
+            ]);
+        }
+
+        return back()->with('success', $user->UserName . ' has been promoted to admin.');
+    }
+
+    /**
+     * Demote admin to regular user
+     */
+    public function demoteFromAdmin($id)
+    {
+        $user = User::where('UserID', $id)->firstOrFail();
+
+        // Check if already regular user
+        if (!$user->IsAdmin) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This user is not an admin.'
+                ], 400);
+            }
+            return back()->with('error', 'This user is not an admin.');
+        }
+
+        // Prevent demoting yourself
+        if ($user->UserID === auth()->id()) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You cannot demote yourself from admin.'
+                ], 400);
+            }
+            return back()->with('error', 'You cannot demote yourself from admin.');
+        }
+
+        // Count total admins
+        $adminCount = User::where('IsAdmin', true)->count();
+
+        // Prevent removing last admin
+        if ($adminCount <= 1) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot demote the last admin. There must be at least one admin.'
+                ], 400);
+            }
+            return back()->with('error', 'Cannot demote the last admin. There must be at least one admin.');
+        }
+
+        // Demote from admin
+        $user->update(['IsAdmin' => false]);
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $user->UserName . ' has been demoted to regular user.'
+            ]);
+        }
+
+        return back()->with('success', $user->UserName . ' has been demoted to regular user.');
     }
 
     /**

@@ -45,6 +45,14 @@
             <div class="stat-label">Administrators</div>
         </div>
     </div>
+
+    <div class="stat-card">
+        <div class="stat-icon red"><i class="fas fa-ban"></i></div>
+        <div class="stat-content">
+            <div class="stat-value">{{ $suspendedCount }}</div>
+            <div class="stat-label">Suspended</div>
+        </div>
+    </div>
 </div>
 
 <!-- Filters and Search -->
@@ -64,12 +72,11 @@
         @endif
     </div>
     <div class="filter-buttons">
-        <select class="filter-select" name="user_type" onchange="this.form.submit()">
-            <option value="all" {{ request('user_type') == 'all' ? 'selected' : '' }}>
-                <i class="fas fa-users"></i> All Types
-            </option>
-            <option value="User" {{ request('user_type') == 'User' ? 'selected' : '' }}>Users</option>
-            <option value="Admin" {{ request('user_type') == 'Admin' ? 'selected' : '' }}>Admins</option>
+        <select class="filter-select" name="filter" onchange="this.form.submit()">
+            <option value="all" {{ request('filter') == 'all' || !request('filter') ? 'selected' : '' }}>All Users</option>
+            <option value="admin" {{ request('filter') == 'admin' ? 'selected' : '' }}>Admins Only</option>
+            <option value="regular" {{ request('filter') == 'regular' ? 'selected' : '' }}>Regular Users</option>
+            <option value="suspended" {{ request('filter') == 'suspended' ? 'selected' : '' }}>Suspended</option>
         </select>
         <select class="filter-select" name="sort" onchange="this.form.submit()">
             <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
@@ -83,129 +90,130 @@
         <button type="button" class="btn btn-secondary btn-action-small" onclick="exportUsers()">
             <i class="fas fa-download"></i> <span class="btn-text">Export</span>
         </button>
-        <button type="button" class="btn btn-primary btn-action-small" onclick="addNewUser()">
-            <i class="fas fa-plus"></i> <span class="btn-text">Add User</span>
-        </button>
     </div>
 </form>
 
-<!-- Users Table -->
+<!-- Users Cards -->
 <div class="table-card">
     <div class="table-header">
         <h3 class="table-title">User Accounts</h3>
         <span class="table-count">Showing {{ $users->count() }} of {{ $users->total() }} users</span>
     </div>
-    <div class="table-container">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>User Type</th>
-                    <th>Joined Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($users as $user)
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                @if($user->ProfileImage)
-                                    <img src="{{ asset('storage/' . $user->ProfileImage) }}"
-                                         alt="{{ $user->UserName }}"
-                                         class="user-avatar-img">
+    <div class="users-container">
+        @forelse($users as $user)
+            <div class="user-card" id="user-{{ $user->UserID }}">
+                <div class="user-card-header" onclick="toggleUser({{ $user->UserID }})">
+                    <div class="user-section">
+                        @if($user->ProfileImage)
+                            <img src="{{ asset('storage/' . $user->ProfileImage) }}"
+                                 alt="{{ $user->UserName }}"
+                                 class="user-avatar-img">
+                        @else
+                            <div class="user-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal'][($user->UserID) % 6] }}">
+                                {{ strtoupper(substr($user->UserName, 0, 2)) }}
+                            </div>
+                        @endif
+                        <div class="user-info-header">
+                            <div class="user-name">{{ $user->UserName }}</div>
+                            <div class="user-email">{{ $user->Email }}</div>
+                        </div>
+                    </div>
+                    <div class="user-header-right">
+                        <div class="status-badges">
+                            <span class="status-badge {{ $user->IsAdmin ? 'admin-badge' : 'user-badge' }}">
+                                @if($user->IsAdmin)
+                                    <i class="fas fa-user-shield"></i> Admin
                                 @else
-                                    <div class="user-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal'][($user->UserID) % 6] }}">
-                                        {{ strtoupper(substr($user->UserName, 0, 2)) }}
-                                    </div>
+                                    <i class="fas fa-user"></i> User
                                 @endif
-                                <div class="user-info">
-                                    <div class="user-name">{{ $user->UserName }}</div>
-                                    <div class="user-email">{{ $user->Email }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <span class="type-badge {{ $user->IsAdmin ? 'admin' : 'user' }}">
-                                    @if($user->IsAdmin)
-                                        <i class="fas fa-user-shield"></i> Admin
-                                    @else
-                                        <i class="fas fa-user"></i> User
-                                    @endif
+                            </span>
+                            @if($user->IsSuspended)
+                                <span class="status-badge suspended-badge">
+                                    <i class="fas fa-ban"></i> Suspended
                                 </span>
-                                @if($user->IsSuspended)
-                                    <span class="type-badge" style="background: #ef4444; color: white;">
-                                        <i class="fas fa-ban"></i> Suspended
-                                    </span>
-                                @endif
-                            </div>
-                        </td>
-                        <td>
-                            <i class="fas fa-calendar"></i>
-                            {{ $user->CreatedAt ? \Carbon\Carbon::parse($user->CreatedAt)->format('M d, Y') : 'N/A' }}
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <a href="{{ route('admin.users.show', $user->UserID) }}"
-                                   class="btn-icon btn-view"
-                                   title="View Profile">
-                                    <i class="fas fa-eye"></i>
-                                </a>
+                            @endif
+                        </div>
+                        <i class="fas fa-chevron-down user-toggle-icon"></i>
+                    </div>
+                </div>
+                <div class="user-card-body">
+                    <div class="user-details-grid">
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-hashtag"></i> User ID</div>
+                            <div class="detail-value">{{ $user->UserID }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-phone"></i> Phone</div>
+                            <div class="detail-value">{{ $user->PhoneNumber ?? 'N/A' }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-map-marker-alt"></i> Location</div>
+                            <div class="detail-value">{{ $user->Location ?? 'N/A' }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-calendar"></i> Joined Date</div>
+                            <div class="detail-value">{{ $user->CreatedAt ? \Carbon\Carbon::parse($user->CreatedAt)->format('M d, Y') : 'N/A' }}</div>
+                        </div>
+                        @if($user->IsSuspended && $user->SuspendedUntil)
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-clock"></i> Suspended Until</div>
+                            <div class="detail-value">{{ \Carbon\Carbon::parse($user->SuspendedUntil)->format('M d, Y') }}</div>
+                        </div>
+                        @endif
+                        @if($user->IsSuspended && $user->SuspensionReason)
+                        <div class="detail-item full-width">
+                            <div class="detail-label"><i class="fas fa-info-circle"></i> Suspension Reason</div>
+                            <div class="detail-value">{{ $user->SuspensionReason }}</div>
+                        </div>
+                        @endif
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ route('admin.users.show', $user->UserID) }}" class="action-btn btn-view-action">
+                            <i class="fas fa-eye"></i> View Profile
+                        </a>
 
-                                <div class="dropdown-wrapper">
-                                    <button class="btn-icon btn-more"
-                                            title="More Actions"
-                                            onclick="toggleDropdown({{ $user->UserID }})">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
+                        @if($user->IsAdmin)
+                            @if($user->UserID !== auth()->id())
+                                <button onclick="demoteUser({{ $user->UserID }}, '{{ $user->UserName }}'); event.stopPropagation();" class="action-btn btn-warning">
+                                    <i class="fas fa-user-minus"></i> Demote from Admin
+                                </button>
+                            @else
+                                <button disabled class="action-btn btn-disabled">
+                                    <i class="fas fa-user-shield"></i> You (Admin)
+                                </button>
+                            @endif
+                        @else
+                            <button onclick="promoteUser({{ $user->UserID }}, '{{ $user->UserName }}'); event.stopPropagation();" class="action-btn btn-success">
+                                <i class="fas fa-user-plus"></i> Promote to Admin
+                            </button>
+                        @endif
 
-                                    <div class="action-dropdown" id="dropdown-{{ $user->UserID }}">
-                                        @if(!$user->IsAdmin)
-                                            @if($user->IsSuspended)
-                                                <a href="#" onclick="unsuspendUser({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item">
-                                                    <i class="fas fa-check-circle"></i> Unsuspend User
-                                                </a>
-                                            @else
-                                                <a href="#" onclick="suspendUser({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item">
-                                                    <i class="fas fa-ban"></i> Suspend User
-                                                </a>
-                                            @endif
-                                        @endif
+                        @if($user->IsSuspended)
+                            <button onclick="unsuspendUser({{ $user->UserID }}, '{{ $user->UserName }}'); event.stopPropagation();" class="action-btn btn-success">
+                                <i class="fas fa-check-circle"></i> Unsuspend
+                            </button>
+                        @else
+                            @if($user->UserID !== auth()->id())
+                                <button onclick="suspendUser({{ $user->UserID }}, '{{ $user->UserName }}'); event.stopPropagation();" class="action-btn btn-warning">
+                                    <i class="fas fa-ban"></i> Suspend
+                                </button>
+                            @endif
+                        @endif
 
-                                        <a href="#" onclick="resetPassword({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item">
-                                            <i class="fas fa-key"></i> Reset Password
-                                        </a>
-
-                                        <a href="#" onclick="viewActivityLog({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item">
-                                            <i class="fas fa-history"></i> View Activity Log
-                                        </a>
-
-                                        <a href="{{ route('admin.users.show', $user->UserID) }}" class="dropdown-item">
-                                            <i class="fas fa-user-edit"></i> Edit Profile
-                                        </a>
-
-                                        @if(!$user->IsAdmin)
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" onclick="deleteUser({{ $user->UserID }}, '{{ $user->UserName }}'); return false;" class="dropdown-item danger">
-                                                <i class="fas fa-trash-alt"></i> Delete User
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 40px; color: #6b7280;">
-                            <i class="fas fa-users" style="font-size: 48px; opacity: 0.3; display: block; margin-bottom: 16px;"></i>
-                            No users found
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                        @if($user->UserID !== auth()->id() && !$user->IsAdmin)
+                            <button onclick="deleteUser({{ $user->UserID }}, '{{ $user->UserName }}'); event.stopPropagation();" class="action-btn btn-danger">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <p>No users found</p>
+            </div>
+        @endforelse
     </div>
 
     <!-- Pagination -->
@@ -444,6 +452,7 @@
         .stat-icon.green { background: #d1fae5; color: #059669; }
         .stat-icon.orange { background: #fed7aa; color: #ea580c; }
         .stat-icon.purple { background: #e9d5ff; color: #9333ea; }
+        .stat-icon.red { background: #fee2e2; color: #dc2626; }
 
         .stat-content {
             flex: 1;
@@ -594,61 +603,60 @@
             font-weight: 500;
         }
 
-        .table-container {
-            overflow-x: auto;
+        /* Users Container */
+        .users-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
+        /* User Card */
+        .user-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
         }
 
-        .data-table thead {
+        .user-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            cursor: pointer;
+            background: #ffffff;
+            transition: background 0.2s;
+        }
+
+        .user-card-header:hover {
             background: #f9fafb;
         }
 
-        .data-table th {
-            padding: 16px 20px;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 700;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .data-table td {
-            padding: 16px 20px;
-            border-top: 1px solid #e5e7eb;
-            font-size: 14px;
-            color: #374151;
-        }
-
-        .data-table tbody tr {
-            transition: background-color 0.2s;
-        }
-
-        .data-table tbody tr:hover {
-            background: #f9fafb;
-        }
-
-        /* User Cell */
-        .user-cell {
+        .user-section {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
         }
 
         .user-avatar {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 16px;
             color: white;
+            flex-shrink: 0;
         }
 
         .user-avatar.blue { background: #3b82f6; }
@@ -659,30 +667,51 @@
         .user-avatar.teal { background: #14b8a6; }
 
         .user-avatar-img {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             object-fit: cover;
+            flex-shrink: 0;
         }
 
-        .user-info {
+        .user-info-header {
             display: flex;
             flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
         }
 
         .user-name {
             font-weight: 600;
             color: #1f2937;
-            font-size: 14px;
+            font-size: 15px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .user-email {
-            font-size: 12px;
+            font-size: 13px;
             color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        /* Type Badge */
-        .type-badge {
+        .user-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -692,14 +721,173 @@
             font-weight: 600;
         }
 
-        .type-badge.user {
+        .user-badge {
             background: #dbeafe;
             color: #1e40af;
         }
 
-        .type-badge.admin {
+        .admin-badge {
             background: #fce7f3;
             color: #9f1239;
+        }
+
+        .suspended-badge {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .user-toggle-icon {
+            color: #9ca3af;
+            transition: transform 0.3s;
+            font-size: 14px;
+        }
+
+        .user-card.expanded .user-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        /* User Card Body */
+        .user-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .user-card.expanded .user-card-body {
+            max-height: 1000px;
+        }
+
+        .user-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .detail-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        /* Card Actions */
+        .card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            padding-top: 0;
+        }
+
+        .action-btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-view-action {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .btn-view-action:hover {
+            background: #bfdbfe;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .btn-success:hover {
+            background: #a7f3d0;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .btn-warning:hover {
+            background: #fde68a;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .btn-primary:hover {
+            background: #bfdbfe;
+            transform: translateY(-1px);
+        }
+
+        .btn-disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            opacity: 0.3;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin: 0;
         }
 
         .pagination-container {
@@ -1557,27 +1745,68 @@
     </style>
 
     <script>
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.dropdown-wrapper')) {
-                document.querySelectorAll('.action-dropdown').forEach(dropdown => {
-                    dropdown.classList.remove('active');
-                });
+        // Toggle user card expansion
+        function toggleUser(userId) {
+            const card = document.getElementById('user-' + userId);
+            card.classList.toggle('expanded');
+        }
+
+        // Promote user to admin
+        function promoteUser(id, name) {
+            if (!confirm(`Promote "${name}" to admin?\n\nThis will grant them full administrative access.`)) {
+                return;
             }
-        });
 
-        function toggleDropdown(userId) {
-            event.stopPropagation();
-            const dropdown = document.getElementById(`dropdown-${userId}`);
-            const allDropdowns = document.querySelectorAll('.action-dropdown');
-
-            allDropdowns.forEach(d => {
-                if (d !== dropdown) {
-                    d.classList.remove('active');
+            fetch(`/admin/users/${id}/promote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
                 }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessToast(data.message);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to promote user'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while promoting the user');
             });
+        }
 
-            dropdown.classList.toggle('active');
+        // Demote admin to regular user
+        function demoteUser(id, name) {
+            if (!confirm(`Demote "${name}" from admin?\n\nThis will remove their administrative access.`)) {
+                return;
+            }
+
+            fetch(`/admin/users/${id}/demote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessToast(data.message);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to demote user'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while demoting the user');
+            });
         }
 
         function clearSearch() {

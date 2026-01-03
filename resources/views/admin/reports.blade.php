@@ -83,7 +83,6 @@
             <select class="filter-select" name="status" onchange="this.form.submit()">
                 <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>All Status</option>
                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="investigating" {{ request('status') == 'investigating' ? 'selected' : '' }}>Investigating</option>
                 <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Resolved</option>
                 <option value="dismissed" {{ request('status') == 'dismissed' ? 'selected' : '' }}>Dismissed</option>
             </select>
@@ -97,101 +96,119 @@
         </div>
     </form>
 
-    <!-- Reports Table -->
-    <div class="table-card">
+    <!-- Reports Cards -->
+    <div class="reports-cards-container">
         <div class="table-header">
             <h3 class="table-title">Report Records</h3>
             <span class="table-count">Showing {{ $reports->count() }} of {{ $reports->total() }} reports</span>
         </div>
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Report ID</th>
-                        <th>Reporter</th>
-                        <th>Against</th>
-                        <th>Type</th>
-                        <th>Priority</th>
-                        <th>Subject</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($reports as $report)
-                        <tr>
-                            <td><span class="id-badge">#R{{ str_pad($report->ReportID, 3, '0', STR_PAD_LEFT) }}</span></td>
-                            <td>
-                                <div class="user-cell">
+
+        @forelse($reports as $report)
+            <div class="report-card" id="report-{{ $report->ReportID }}">
+                <!-- Card Header - Always Visible -->
+                <div class="report-card-header" onclick="toggleReport({{ $report->ReportID }})">
+                    <div class="report-user-section">
+                        @if($report->reportedUser->ProfileImage)
+                            <img src="{{ asset('storage/' . $report->reportedUser->ProfileImage) }}"
+                                 alt="{{ $report->reportedUser->UserName }}"
+                                 class="report-avatar-img">
+                        @else
+                            <div class="report-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal', 'red', 'indigo'][$report->reportedUser->UserID % 8] }}">
+                                {{ strtoupper(substr($report->reportedUser->UserName, 0, 2)) }}
+                            </div>
+                        @endif
+                        <div class="report-user-info">
+                            <div class="report-user-name">{{ $report->reportedUser->UserName }}</div>
+                            <div class="report-user-email">{{ $report->reportedUser->Email }}</div>
+                        </div>
+                    </div>
+                    <div class="report-header-right">
+                        <span class="status-badge status-{{ $report->Status }}">{{ ucfirst($report->Status) }}</span>
+                        <i class="fas fa-chevron-down report-toggle-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Card Body - Expandable -->
+                <div class="report-card-body">
+                    <div class="report-details-grid">
+                        <div class="report-detail-item">
+                            <div class="report-detail-label">Report ID</div>
+                            <div class="report-detail-value">
+                                <span class="id-badge">#R{{ str_pad($report->ReportID, 3, '0', STR_PAD_LEFT) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="report-detail-item">
+                            <div class="report-detail-label">Reporter</div>
+                            <div class="report-detail-value">
+                                <div class="report-reporter-info">
                                     @if($report->reporter->ProfileImage)
-                                        <img src="{{ asset('storage/' . $report->reporter->ProfileImage) }}" 
-                                             alt="{{ $report->reporter->UserName }}" 
-                                             class="user-avatar-img">
+                                        <img src="{{ asset('storage/' . $report->reporter->ProfileImage) }}"
+                                             alt="{{ $report->reporter->UserName }}"
+                                             class="report-small-avatar-img">
                                     @else
-                                        <div class="user-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal', 'red', 'indigo'][$report->reporter->UserID % 8] }}">
+                                        <div class="report-small-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal', 'red', 'indigo'][$report->reporter->UserID % 8] }}">
                                             {{ strtoupper(substr($report->reporter->UserName, 0, 2)) }}
                                         </div>
                                     @endif
-                                    <div class="user-info">
-                                        <div class="user-name">{{ $report->reporter->UserName }}</div>
-                                    </div>
+                                    <span>{{ $report->reporter->UserName }}</span>
                                 </div>
-                            </td>
-                            <td>
-                                <div class="user-cell">
-                                    @if($report->reportedUser->ProfileImage)
-                                        <img src="{{ asset('storage/' . $report->reportedUser->ProfileImage) }}" 
-                                             alt="{{ $report->reportedUser->UserName }}" 
-                                             class="user-avatar-img">
-                                    @else
-                                        <div class="user-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal', 'red', 'indigo'][$report->reportedUser->UserID % 8] }}">
-                                            {{ strtoupper(substr($report->reportedUser->UserName, 0, 2)) }}
-                                        </div>
-                                    @endif
-                                    <div class="user-info">
-                                        <div class="user-name">{{ $report->reportedUser->UserName }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="type-badge type-{{ $report->ReportType }}">{{ ucwords(str_replace('-', ' ', $report->ReportType)) }}</span></td>
-                            <td><span class="priority-badge priority-{{ $report->Priority }}">{{ ucfirst($report->Priority) }}</span></td>
-                            <td class="subject-cell">{{ $report->Subject }}</td>
-                            <td>{{ $report->DateReported->format('M d, Y') }}</td>
-                            <td><span class="status-badge status-{{ $report->Status }}">{{ ucfirst($report->Status) }}</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon btn-view" title="View Details" onclick="viewReport({{ $report->ReportID }})">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    @if($report->Status == 'pending' || $report->Status == 'investigating')
-                                        <button class="btn-icon btn-action" title="Take Action" onclick="showActionModal({{ $report->ReportID }}, '{{ $report->Subject }}')">
-                                            <i class="fas fa-bolt"></i>
-                                        </button>
-                                    @if($report->hasPenalty())
-                                        <button class="btn-icon btn-penalty" title="View Penalty Details" onclick="viewPenalty({{ $report->penalty->PenaltyID }})">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    @else
-                                        <button class="btn-icon btn-penalty" title="Issue Penalty" onclick="showPenaltyModal({{ $report->ReportID }})">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                        </button>
-                                    @endif
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="9" style="text-align: center; padding: 60px; color: #6b7280;">
-                                <p style="font-size: 18px; font-weight: 600;">No reports found</p>
-                                <p style="margin-top: 10px;">Try adjusting your filters</p>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                            </div>
+                        </div>
+
+                        <div class="report-detail-item">
+                            <div class="report-detail-label">Type</div>
+                            <div class="report-detail-value">
+                                <span class="type-badge type-{{ $report->ReportType }}">{{ ucwords(str_replace('-', ' ', $report->ReportType)) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="report-detail-item">
+                            <div class="report-detail-label">Priority</div>
+                            <div class="report-detail-value">
+                                <span class="priority-badge priority-{{ $report->Priority }}">{{ ucfirst($report->Priority) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="report-detail-item report-detail-full">
+                            <div class="report-detail-label">Subject</div>
+                            <div class="report-detail-value">{{ $report->Subject }}</div>
+                        </div>
+
+                        <div class="report-detail-item">
+                            <div class="report-detail-label">Date Reported</div>
+                            <div class="report-detail-value">{{ $report->DateReported->format('M d, Y') }}</div>
+                        </div>
+                    </div>
+
+                    <div class="report-card-actions">
+                        <button class="report-action-btn btn-view" onclick="event.stopPropagation(); viewReport({{ $report->ReportID }})">
+                            <i class="fas fa-eye"></i> View Details
+                        </button>
+                        @if($report->Status == 'pending' || $report->Status == 'investigating')
+                            <button class="report-action-btn btn-action" onclick="event.stopPropagation(); showActionModal({{ $report->ReportID }}, '{{ $report->Subject }}')">
+                                <i class="fas fa-bolt"></i> Take Action
+                            </button>
+                            @if($report->hasPenalty())
+                                <button class="report-action-btn btn-penalty" onclick="event.stopPropagation(); viewPenalty({{ $report->penalty->PenaltyID }})">
+                                    <i class="fas fa-eye"></i> View Penalty
+                                </button>
+                            @else
+                                <button class="report-action-btn btn-penalty" onclick="event.stopPropagation(); showPenaltyModal({{ $report->ReportID }})">
+                                    <i class="fas fa-exclamation-triangle"></i> Issue Penalty
+                                </button>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="empty-state">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                <p style="font-size: 18px; font-weight: 600; color: #6b7280; margin: 0;">No reports found</p>
+                <p style="margin-top: 8px; color: #9ca3af;">Try adjusting your filters</p>
+            </div>
+        @endforelse
     </div>
 
     <!-- Pagination -->
@@ -779,6 +796,255 @@
         .btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
         .btn-secondary:hover { background: #e5e7eb; }
 
+        /* Report Cards Styling */
+        .reports-cards-container {
+            margin: 0 20px;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .report-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .report-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            user-select: none;
+        }
+
+        .report-card-header:hover {
+            background: #f9fafb;
+        }
+
+        .report-user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .report-avatar,
+        .report-avatar-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .report-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+        }
+
+        .report-avatar.blue { background: #3b82f6; }
+        .report-avatar.pink { background: #ec4899; }
+        .report-avatar.green { background: #10b981; }
+        .report-avatar.orange { background: #f97316; }
+        .report-avatar.purple { background: #a855f7; }
+        .report-avatar.teal { background: #14b8a6; }
+        .report-avatar.red { background: #ef4444; }
+        .report-avatar.indigo { background: #6366f1; }
+
+        .report-avatar-img {
+            object-fit: cover;
+        }
+
+        .report-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .report-user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .report-user-email {
+            font-size: 14px;
+            color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .report-header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .report-toggle-icon {
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.3s;
+        }
+
+        .report-card.expanded .report-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .report-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #f9fafb;
+        }
+
+        .report-card.expanded .report-card-body {
+            max-height: 1000px;
+        }
+
+        .report-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .report-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .report-detail-full {
+            grid-column: 1 / -1;
+        }
+
+        .report-detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .report-detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .report-reporter-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .report-small-avatar,
+        .report-small-avatar-img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .report-small-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 11px;
+            color: white;
+        }
+
+        .report-small-avatar.blue { background: #3b82f6; }
+        .report-small-avatar.pink { background: #ec4899; }
+        .report-small-avatar.green { background: #10b981; }
+        .report-small-avatar.orange { background: #f97316; }
+        .report-small-avatar.purple { background: #a855f7; }
+        .report-small-avatar.teal { background: #14b8a6; }
+        .report-small-avatar.red { background: #ef4444; }
+        .report-small-avatar.indigo { background: #6366f1; }
+
+        .report-small-avatar-img {
+            object-fit: cover;
+        }
+
+        .report-card-actions {
+            display: flex;
+            gap: 12px;
+            padding: 20px 24px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+            flex-wrap: wrap;
+        }
+
+        .report-action-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-action-btn.btn-view {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .report-action-btn.btn-view:hover {
+            background: #bfdbfe;
+            transform: translateY(-1px);
+        }
+
+        .report-action-btn.btn-action {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .report-action-btn.btn-action:hover {
+            background: #fde68a;
+            transform: translateY(-1px);
+        }
+
+        .report-action-btn.btn-penalty {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .report-action-btn.btn-penalty:hover {
+            background: #fecaca;
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
         /* Responsive Breakpoints */
         @media (max-width: 968px) {
             .header { align-items: flex-start; gap: 16px; }
@@ -795,6 +1061,26 @@
             .header-title { font-size: 24px; }
             .page-description { font-size: 14px; }
             .stats-grid { grid-template-columns: 1fr; }
+
+            .reports-cards-container {
+                margin: 0 15px;
+            }
+
+            .report-details-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .report-card-actions {
+                padding: 16px;
+                flex-direction: column;
+            }
+
+            .report-action-btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -802,11 +1088,51 @@
             .page-description { font-size: 12px; }
             .table-controls { flex-direction: column; align-items: stretch; }
             .search-box { max-width: 100%; }
+
+            .report-card-header {
+                padding: 12px;
+            }
+
+            .report-avatar,
+            .report-avatar-img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .report-user-name {
+                font-size: 14px;
+            }
+
+            .report-user-email {
+                font-size: 12px;
+            }
+
+            .status-badge {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+
+            .report-details-grid {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .modal-content {
+                width: 100%;
+                max-width: 100%;
+                border-radius: 0;
+                max-height: 100vh;
+            }
         }
     </style>
 
     <script>
         let currentReportId = null;
+
+        function toggleReport(reportId) {
+            const card = document.getElementById('report-' + reportId);
+            card.classList.toggle('expanded');
+        }
 
         function viewReport(id) {
             fetch(`/admin/reports/${id}`)

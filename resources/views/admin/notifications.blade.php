@@ -1,15 +1,13 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Notifications - GoRentUMS')
+@section('title', 'Admin Notifications')
 
-@php($hideSearch = true)
-
-@push('styles')
+@section('content')
 <style>
     .notifications-container {
-        max-width: 900px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 30px 20px;
+        padding: 20px;
     }
 
     .page-header {
@@ -112,16 +110,29 @@
         flex-shrink: 0;
     }
 
-    .notification-icon.message {
+    .notification-icon.report {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .notification-icon.refund_failed, .notification-icon.RefundQueue {
+        background: #fed7aa;
+        color: #ea580c;
+    }
+
+    .notification-icon.deposit {
         background: #dbeafe;
+        color: #2563eb;
     }
 
-    .notification-icon.booking {
-        background: #d1fae5;
-    }
-
-    .notification-icon.review {
+    .notification-icon.penalty {
         background: #fef3c7;
+        color: #d97706;
+    }
+
+    .notification-icon.default {
+        background: #e5e7eb;
+        color: #6b7280;
     }
 
     .notification-content {
@@ -130,8 +141,7 @@
     }
 
     .notification-title {
-        font
-    font-size: 16px;
+        font-size: 16px;
         font-weight: 600;
         color: #1f2937;
         margin-bottom: 5px;
@@ -166,15 +176,6 @@
         transition: all 0.2s;
         text-decoration: none;
         display: inline-block;
-    }
-
-    .btn-view {
-        background: #e8eeff;
-        color: #4461F2;
-    }
-
-    .btn-view:hover {
-        background: #d0ddff;
     }
 
     .btn-delete {
@@ -284,13 +285,11 @@
         }
     }
 </style>
-@endpush
 
-@section('content')
 <div class="notifications-container">
     <div class="page-header">
         <div class="header-left">
-            <h1><i class="fas fa-bell"></i> Notifications</h1>
+            <h1><i class="fas fa-bell"></i> Admin Notifications</h1>
             <p>
                 @if($unreadCount > 0)
                     {{ $unreadCount }} unread notification(s)
@@ -302,7 +301,7 @@
 
         <div class="header-actions">
             @if($unreadCount > 0)
-                <form action="{{ route('notifications.readAll') }}" method="POST">
+                <form action="{{ route('admin.notifications.readAll') }}" method="POST">
                     @csrf
                     <button type="submit" class="mark-all-btn">
                         <i class="fas fa-check-double"></i> Mark All as Read
@@ -311,7 +310,7 @@
             @endif
 
             @if($notifications->count() > 0)
-                <form action="{{ route('notifications.clearAll') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear all notifications? This action cannot be undone.')">
+                <form action="{{ route('admin.notifications.clearAll') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear all notifications? This action cannot be undone.')">
                     @csrf
                     <button type="submit" class="clear-all-btn">
                         <i class="fas fa-trash-alt"></i> Clear All
@@ -335,20 +334,18 @@
                         <span class="unread-dot"></span>
                     @endif
 
-                    <div class="notification-icon {{ $notification->Type }}">
-                        @switch($notification->Type)
-                            @case('message')
-                                <i class="fas fa-comment"></i>
-                                @break
-                            @case('booking')
-                                <i class="fas fa-calendar-check"></i>
-                                @break
-                            @case('review')
-                                <i class="fas fa-star"></i>
-                                @break
-                            @default
-                                <i class="fas fa-bell"></i>
-                        @endswitch
+                    <div class="notification-icon {{ $notification->RelatedType ?? 'default' }}">
+                        @if($notification->RelatedType === 'report')
+                            <i class="fas fa-flag"></i>
+                        @elseif($notification->RelatedType === 'RefundQueue' || $notification->RelatedType === 'refund_failed')
+                            <i class="fas fa-money-bill-wave"></i>
+                        @elseif($notification->RelatedType === 'deposit')
+                            <i class="fas fa-hand-holding-usd"></i>
+                        @elseif($notification->RelatedType === 'penalty')
+                            <i class="fas fa-exclamation-triangle"></i>
+                        @else
+                            <i class="fas fa-bell"></i>
+                        @endif
                     </div>
 
                     <div class="notification-content">
@@ -358,12 +355,7 @@
                     </div>
 
                     <div class="notification-actions">
-                        <form action="{{ route('notifications.read', $notification->NotificationID) }}" method="POST" style="display: inline;">
-                            @csrf
-                            <button type="submit" class="notification-btn btn-view">View</button>
-                        </form>
-
-                        <form action="{{ route('notifications.destroy', $notification->NotificationID) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete this notification?')">
+                        <form action="{{ route('admin.notifications.destroy', $notification->NotificationID) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete this notification?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="notification-btn btn-delete">Delete</button>

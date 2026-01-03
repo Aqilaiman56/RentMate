@@ -84,86 +84,101 @@
     </form>
 
     <!-- Refund Queue Table -->
-    <div class="table-card">
+    <div class="refund-cards-container">
         <div class="table-header">
             <h3 class="table-title">Refund Requests</h3>
             <span class="table-count">Showing {{ $refunds->count() }} of {{ $refunds->total() }} refunds</span>
         </div>
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Ref ID</th>
-                        <th>User</th>
-                        <th>Bank Details</th>
-                        <th>Amount</th>
-                        <th>Item</th>
-                        <th>Created</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($refunds as $refund)
-                        <tr>
-                            <td><span class="id-badge">#RQ{{ str_pad($refund->RefundQueueID, 4, '0', STR_PAD_LEFT) }}</span></td>
-                            <td>
-                                <div class="user-cell">
-                                    @if($refund->user->ProfileImage)
-                                        <img src="{{ asset('storage/' . $refund->user->ProfileImage) }}"
-                                             alt="{{ $refund->user->UserName }}"
-                                             class="user-avatar-img">
-                                    @else
-                                        <div class="user-avatar blue">
-                                            {{ strtoupper(substr($refund->user->UserName, 0, 2)) }}
-                                        </div>
-                                    @endif
-                                    <div class="user-info">
-                                        <div class="user-name">{{ $refund->user->UserName }}</div>
-                                        <div class="user-email">{{ $refund->user->Email }}</div>
-                                    </div>
+
+        @forelse($refunds as $refund)
+            <div class="refund-card" id="refund-{{ $refund->RefundQueueID }}">
+                <!-- Card Header - User Info (Always Visible) -->
+                <div class="refund-card-header" onclick="toggleRefund({{ $refund->RefundQueueID }})">
+                    <div class="refund-user-section">
+                        @if($refund->user->ProfileImage)
+                            <img src="{{ asset('storage/' . $refund->user->ProfileImage) }}"
+                                 alt="{{ $refund->user->UserName }}"
+                                 class="refund-avatar-img">
+                        @else
+                            <div class="refund-avatar blue">
+                                {{ strtoupper(substr($refund->user->UserName, 0, 2)) }}
+                            </div>
+                        @endif
+                        <div class="refund-user-info">
+                            <div class="refund-user-name">{{ $refund->user->UserName }}</div>
+                            <div class="refund-user-email">{{ $refund->user->Email }}</div>
+                        </div>
+                    </div>
+                    <div class="refund-header-right">
+                        <span class="status-badge status-{{ strtolower($refund->Status) }}">
+                            {{ ucfirst($refund->Status) }}
+                        </span>
+                        <i class="fas fa-chevron-down refund-toggle-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Card Body - Details (Expandable) -->
+                <div class="refund-card-body">
+                    <div class="refund-details-grid">
+                        <div class="refund-detail-item">
+                            <span class="refund-detail-label">Ref ID</span>
+                            <span class="refund-detail-value">
+                                <span class="id-badge">#RQ{{ str_pad($refund->RefundQueueID, 4, '0', STR_PAD_LEFT) }}</span>
+                            </span>
+                        </div>
+
+                        <div class="refund-detail-item">
+                            <span class="refund-detail-label">Bank Details</span>
+                            <span class="refund-detail-value">
+                                <div class="bank-info-compact">
+                                    <div>{{ $refund->BankName }}</div>
+                                    <div class="bank-account-compact">{{ $refund->BankAccountNumber }}</div>
+                                    <div class="bank-holder-compact">{{ $refund->BankAccountHolderName }}</div>
                                 </div>
-                            </td>
-                            <td>
-                                <div class="bank-cell">
-                                    <div class="bank-name">{{ $refund->BankName }}</div>
-                                    <div class="bank-account">{{ $refund->BankAccountNumber }}</div>
-                                    <div class="bank-holder">{{ $refund->BankAccountHolderName }}</div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="amount-badge large">
-                                    RM {{ number_format($refund->RefundAmount, 2) }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="item-cell">
-                                    <span class="item-name">{{ $refund->deposit->booking->item->ItemName ?? 'N/A' }}</span>
-                                </div>
-                            </td>
-                            <td>{{ $refund->created_at->format('M d, Y') }}</td>
-                            <td>
+                            </span>
+                        </div>
+
+                        <div class="refund-detail-item">
+                            <span class="refund-detail-label">Amount</span>
+                            <span class="refund-detail-value">
+                                <span class="amount-badge large">RM {{ number_format($refund->RefundAmount, 2) }}</span>
+                            </span>
+                        </div>
+
+                        <div class="refund-detail-item">
+                            <span class="refund-detail-label">Item</span>
+                            <span class="refund-detail-value">{{ $refund->deposit->booking->item->ItemName ?? 'N/A' }}</span>
+                        </div>
+
+                        <div class="refund-detail-item">
+                            <span class="refund-detail-label">Created At</span>
+                            <span class="refund-detail-value">{{ $refund->created_at->format('M d, Y - h:i A') }}</span>
+                        </div>
+
+                        <div class="refund-detail-item">
+                            <span class="refund-detail-label">Status</span>
+                            <span class="refund-detail-value">
                                 <span class="status-badge status-{{ strtolower($refund->Status) }}">
                                     {{ ucfirst($refund->Status) }}
                                 </span>
-                            </td>
-                            <td>
-                                <button class="btn-action" onclick="showRefundActions({{ $refund->RefundQueueID }}, '{{ $refund->Status }}')">
-                                    <i class="fas fa-cog"></i> Actions
-                                </button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" style="text-align: center; padding: 60px; color: #6b7280;">
-                                <p style="font-size: 18px; font-weight: 600;">No refund requests found</p>
-                                <p style="margin-top: 10px;">Try adjusting your filters</p>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="refund-card-actions">
+                        <button class="btn-action btn-action-full" onclick="showRefundActions({{ $refund->RefundQueueID }}, '{{ $refund->Status }}')">
+                            <i class="fas fa-cog"></i> Actions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="empty-state">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                <p style="font-size: 18px; font-weight: 600; color: #374151; margin-bottom: 8px;">No refund requests found</p>
+                <p style="color: #6b7280;">Try adjusting your filters</p>
+            </div>
+        @endforelse
     </div>
 
     <!-- Pagination -->
@@ -466,20 +481,182 @@
         }
 
         /* Table Card */
-        .table-card {
+        /* Refund Cards Container */
+        .refund-cards-container {
+            margin: 0 20px;
+        }
+
+        .refund-card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            margin: 0 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
             overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .refund-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .refund-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            background: white;
+            transition: background 0.2s;
+        }
+
+        .refund-card-header:hover {
+            background: #f9fafb;
+        }
+
+        .refund-user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .refund-avatar-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .refund-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
+            background: #3b82f6;
+        }
+
+        .refund-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .refund-user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .refund-user-email {
+            font-size: 13px;
+            color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .refund-header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .refund-toggle-icon {
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.3s;
+        }
+
+        .refund-card.expanded .refund-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .refund-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #f9fafb;
+        }
+
+        .refund-card.expanded .refund-card-body {
+            max-height: 800px;
+        }
+
+        .refund-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .refund-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .refund-detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .refund-detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .bank-info-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .bank-account-compact {
+            font-size: 13px;
+            color: #6b7280;
+            font-family: monospace;
+        }
+
+        .bank-holder-compact {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .refund-card-actions {
+            padding: 0 20px 20px 20px;
+        }
+
+        .btn-action-full {
+            width: 100%;
+            justify-content: center;
+            padding: 12px 20px;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            margin: 20px;
         }
 
         .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 24px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 20px;
+            margin-bottom: 16px;
         }
 
         .table-title {
@@ -492,6 +669,7 @@
         .table-count {
             font-size: 14px;
             color: #6b7280;
+            font-weight: 500;
         }
 
         .table-container {
@@ -939,31 +1117,50 @@
                 justify-content: center;
             }
 
-            /* Refund table */
-            .table-card {
+            /* Refund Cards */
+            .refund-cards-container {
                 margin: 0 15px;
             }
 
-            .table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 16px;
             }
 
-            .data-table {
-                min-width: 800px;
+            .refund-card-header {
+                padding: 16px;
             }
 
-            /* Table cells responsive */
-            .user-cell {
-                min-width: 200px;
+            .refund-avatar-img,
+            .refund-avatar {
+                width: 44px;
+                height: 44px;
+                font-size: 16px;
             }
 
-            .bank-cell {
-                min-width: 180px;
+            .refund-user-name {
+                font-size: 15px;
             }
 
-            .item-cell {
-                min-width: 150px;
+            .refund-user-email {
+                font-size: 12px;
+            }
+
+            .refund-details-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .refund-card-actions {
+                padding: 0 16px 16px 16px;
+            }
+
+            .empty-state {
+                margin: 0 15px;
+                padding: 40px 20px;
             }
 
             /* Modal adjustments */
@@ -1054,6 +1251,89 @@
 
             .stat-label {
                 font-size: 11px;
+            }
+
+            /* Refund Cards - Extra Small */
+            .refund-card-header {
+                padding: 12px;
+            }
+
+            .refund-user-section {
+                gap: 12px;
+            }
+
+            .refund-avatar-img,
+            .refund-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+
+            .refund-user-name {
+                font-size: 14px;
+            }
+
+            .refund-user-email {
+                font-size: 11px;
+            }
+
+            .refund-header-right {
+                gap: 10px;
+            }
+
+            .status-badge {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+
+            .refund-toggle-icon {
+                font-size: 16px;
+            }
+
+            .refund-details-grid {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .refund-detail-label {
+                font-size: 11px;
+            }
+
+            .refund-detail-value {
+                font-size: 13px;
+            }
+
+            .refund-card-actions {
+                padding: 0 12px 12px 12px;
+            }
+
+            .btn-action-full {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .table-header {
+                padding: 12px;
+            }
+
+            .table-title {
+                font-size: 16px;
+            }
+
+            .table-count {
+                font-size: 12px;
+            }
+
+            .empty-state {
+                padding: 30px 15px;
+            }
+
+            .empty-state i {
+                font-size: 36px !important;
+            }
+
+            .empty-state p {
+                font-size: 14px !important;
             }
 
             /* Modal further adjustments */
@@ -1561,6 +1841,11 @@
     <script>
         let currentRefundId = null;
         let currentRefundStatus = null;
+
+        function toggleRefund(refundId) {
+            const card = document.getElementById('refund-' + refundId);
+            card.classList.toggle('expanded');
+        }
 
         function showRefundActions(refundId, status) {
             currentRefundId = refundId;

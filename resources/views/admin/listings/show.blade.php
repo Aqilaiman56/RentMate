@@ -196,7 +196,7 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label"><i class="fas fa-calendar-alt"></i> Last Updated:</span>
-                <span class="detail-value">{{ $item->updated_at ? \Carbon\Carbon::parse($item->updated_at)->format('M d, Y h:i A') : 'N/A' }}</span>
+                <span class="detail-value">{{ $item->DateAdded ? \Carbon\Carbon::parse($item->DateAdded)->format('M d, Y h:i A') : 'N/A' }}</span>
             </div>
         </div>
     </div>
@@ -239,7 +239,7 @@
                                 </td>
                                 <td>{{ $booking->StartDate ? \Carbon\Carbon::parse($booking->StartDate)->format('M d, Y') : 'N/A' }}</td>
                                 <td>{{ $booking->EndDate ? \Carbon\Carbon::parse($booking->EndDate)->format('M d, Y') : 'N/A' }}</td>
-                                <td>RM {{ number_format($booking->TotalPaid ?? 0, 2) }}</td>
+                                <td>RM {{ number_format($booking->DepositAmount ?? 0, 2) }}</td>
                                 <td>
                                     <span class="status-badge status-{{ strtolower($booking->Status) }}">
                                         {{ $booking->Status }}
@@ -460,7 +460,7 @@
         color: #92400e;
     }
 
-    .status-approved, .status-completed {
+    .status-approved, .status-completed, .status-confirmed {
         background: #d1fae5;
         color: #065f46;
     }
@@ -704,14 +704,14 @@
     .details-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 16px;
+        gap: 12px;
     }
 
     .detail-row {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        padding: 12px;
+        gap: 12px;
+        padding: 10px 12px;
         background: #f9fafb;
         border-radius: 8px;
     }
@@ -722,6 +722,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        flex-shrink: 0;
     }
 
     .detail-label i {
@@ -731,6 +732,7 @@
     .detail-value {
         font-weight: 600;
         color: #1f2937;
+        margin-left: auto;
     }
 
     .bookings-table {
