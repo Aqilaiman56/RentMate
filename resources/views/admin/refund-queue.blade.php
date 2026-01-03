@@ -174,14 +174,11 @@
     @endif
 
     <!-- Complete Refund Modal -->
-    <div id="completeModal" class="modal">
-        <div class="modal-overlay" onclick="closeModal('completeModal')"></div>
-        <div class="modal-container" style="max-width: 500px;">
+    <div id="completeModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
-                <h2 class="modal-title">Complete Refund</h2>
-                <button class="modal-close" onclick="closeModal('completeModal')">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h2>Complete Refund</h2>
+                <span class="close" onclick="closeModal('completeModal')">&times;</span>
             </div>
             <form id="completeForm" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -207,14 +204,11 @@
     </div>
 
     <!-- Mark Failed Modal -->
-    <div id="failedModal" class="modal">
-        <div class="modal-overlay" onclick="closeModal('failedModal')"></div>
-        <div class="modal-container" style="max-width: 500px;">
+    <div id="failedModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
-                <h2 class="modal-title">Mark as Failed</h2>
-                <button class="modal-close" onclick="closeModal('failedModal')">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h2 style="color: white; margin: 0;">Mark as Failed</h2>
+                <span class="close" onclick="closeModal('failedModal')">&times;</span>
             </div>
             <form id="failedForm" method="POST">
                 @csrf
@@ -231,6 +225,43 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Action Selection Modal -->
+    <div id="actionModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Refund Actions</h2>
+                <span class="close" onclick="closeModal('actionModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p class="modal-description">
+                    Choose an action for Refund <strong id="actionRefundId"></strong>
+                </p>
+                <div class="action-buttons-grid">
+                    <button id="btnProcessing" class="action-option btn-processing" onclick="markAsProcessing()">
+                        <i class="fas fa-spinner"></i>
+                        <span class="action-title">Mark as Processing</span>
+                        <span class="action-desc">Start processing this refund</span>
+                    </button>
+
+                    <button id="btnComplete" class="action-option btn-complete" onclick="showCompleteModal()">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="action-title">Complete Refund</span>
+                        <span class="action-desc">Mark refund as completed</span>
+                    </button>
+
+                    <button id="btnFailed" class="action-option btn-failed" onclick="showFailedModal()">
+                        <i class="fas fa-times-circle"></i>
+                        <span class="action-title">Mark as Failed</span>
+                        <span class="action-desc">Refund could not be completed</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('actionModal')">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -700,7 +731,7 @@
         /* Modal Styles */
         .modal {
             display: none;
-            position: fixed;
+            position: center;
             top: 0;
             left: 0;
             right: 0;
@@ -851,96 +882,769 @@
         }
 
         @media (max-width: 768px) {
-            .header { flex-direction: column; align-items: stretch; gap: 12px; }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 0 15px;
+            }
             .header-title { font-size: 24px; }
-            .page-description { font-size: 14px; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .page-description {
+                font-size: 14px;
+                padding: 0 15px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                padding: 0 15px;
+                gap: 12px;
+            }
+            .stat-card {
+                padding: 16px;
+            }
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+            .stat-value {
+                font-size: 24px;
+            }
+            .stat-label {
+                font-size: 13px;
+            }
+
+            /* Table controls */
+            .table-controls {
+                flex-direction: column;
+                padding: 0 15px;
+                gap: 12px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .filter-buttons {
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Refund table */
+            .table-card {
+                margin: 0 15px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .data-table {
+                min-width: 800px;
+            }
+
+            /* Table cells responsive */
+            .user-cell {
+                min-width: 200px;
+            }
+
+            .bank-cell {
+                min-width: 180px;
+            }
+
+            .item-cell {
+                min-width: 150px;
+            }
+
+            /* Modal adjustments */
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                margin: 10px;
+            }
+
+            .modal-header {
+                padding: 20px 15px;
+            }
+
+            .modal-body {
+                padding: 20px 15px;
+            }
+
+            .modal-footer {
+                padding: 15px;
+                flex-direction: column;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+            }
+
+            /* Form groups */
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-label {
+                font-size: 14px;
+            }
+
+            .form-input {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            /* Action options */
+            .action-option {
+                padding: 15px;
+            }
+
+            .action-option i {
+                font-size: 28px;
+            }
+
+            .action-title {
+                font-size: 15px;
+            }
+
+            .action-desc {
+                font-size: 12px;
+            }
+
+            /* Pagination */
+            .pagination-container {
+                padding: 20px 15px;
+            }
         }
 
         @media (max-width: 480px) {
-            .header-title { font-size: 20px; }
-            .page-description { font-size: 12px; }
+            .header-title {
+                font-size: 20px;
+                line-height: 1.3;
+            }
+            .page-description {
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            /* Smaller stat cards */
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            /* Modal further adjustments */
+            .modal-content {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                border-radius: 0;
+                max-height: 100vh;
+            }
+
+            .modal-header h2 {
+                font-size: 18px;
+            }
+
+            .modal-body {
+                padding: 15px;
+                max-height: calc(100vh - 140px);
+            }
+
+            .modal-footer {
+                padding: 12px 15px;
+            }
+
+            /* Close button */
+            .close {
+                width: 28px;
+                height: 28px;
+                font-size: 20px;
+            }
+
+            /* Smaller action cards */
+            .action-option {
+                padding: 12px;
+            }
+
+            .action-option i {
+                font-size: 24px;
+                margin-bottom: 2px;
+            }
+
+            .action-title {
+                font-size: 14px;
+            }
+
+            .action-desc {
+                font-size: 11px;
+            }
+
+            /* Button text adjustments */
+            .btn {
+                font-size: 13px;
+                padding: 10px 16px;
+            }
+
+            .btn i {
+                font-size: 12px;
+            }
+
+            /* Form inputs */
+            .form-input {
+                font-size: 13px;
+                padding: 8px;
+            }
+
+            .form-label {
+                font-size: 13px;
+            }
+
+            .form-hint {
+                font-size: 11px;
+            }
+        }
+
+        /* Landscape mobile view */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .modal-content {
+                max-height: 95vh;
+            }
+
+            .modal-body {
+                max-height: calc(95vh - 140px);
+            }
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: var(--z-modal);
+            pointer-events: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translate(-50%, -50%) translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(90vh - 160px);
+            overflow-y: auto;
+        }
+
+        .modal-description {
+            margin: 0 0 20px 0;
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            background: #f9fafb;
+        }
+
+        .close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 24px;
+            color: white;
+            line-height: 1;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Action Modal Styles */
+        .action-buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .action-option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+        }
+
+        .action-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-option i {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .action-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .action-desc {
+            font-size: 13px;
+            color: #6b7280;
+            display: block;
+        }
+
+        .btn-processing {
+            border-color: #3b82f6;
+        }
+
+        .btn-processing:hover {
+            border-color: #2563eb;
+            background: #dbeafe;
+        }
+
+        .btn-processing i {
+            color: #3b82f6;
+        }
+
+        .btn-processing .action-title {
+            color: #1e40af;
+        }
+
+        .btn-complete {
+            border-color: #10b981;
+        }
+
+        .btn-complete:hover {
+            border-color: #059669;
+            background: #d1fae5;
+        }
+
+        .btn-complete i {
+            color: #10b981;
+        }
+
+        .btn-complete .action-title {
+            color: #065f46;
+        }
+
+        .btn-failed {
+            border-color: #ef4444;
+        }
+
+        .btn-failed:hover {
+            border-color: #dc2626;
+            background: #fee2e2;
+        }
+
+        .btn-failed i {
+            color: #ef4444;
+        }
+
+        .btn-failed .action-title {
+            color: #991b1b;
+        }
+
+        .action-option:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-option:disabled:hover {
+            border-color: #e5e7eb;
+            background: white;
+            transform: none;
+            box-shadow: none;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 0 15px;
+            }
+            .header-title { font-size: 24px; }
+            .page-description {
+                font-size: 14px;
+                padding: 0 15px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                padding: 0 15px;
+                gap: 12px;
+            }
+
+            /* Table controls */
+            .table-controls {
+                flex-direction: column;
+                padding: 0 15px;
+                gap: 12px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .filter-buttons {
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Refund table */
+            .refund-table {
+                overflow-x: auto;
+                margin: 0 15px;
+            }
+
+            .refund-table table {
+                min-width: 800px;
+            }
+
+            /* Modal adjustments */
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                margin: 10px;
+            }
+
+            .modal-header {
+                padding: 20px 15px;
+            }
+
+            .modal-body {
+                padding: 20px 15px;
+            }
+
+            .modal-footer {
+                padding: 15px;
+                flex-direction: column;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+            }
+
+            /* Form groups */
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-label {
+                font-size: 14px;
+            }
+
+            .form-input {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            /* Action options */
+            .action-option {
+                padding: 15px;
+            }
+
+            .action-option i {
+                font-size: 28px;
+            }
+
+            .action-title {
+                font-size: 15px;
+            }
+
+            .action-desc {
+                font-size: 12px;
+            }
+
+            /* Pagination */
+            .pagination-container {
+                padding: 20px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 20px;
+                line-height: 1.3;
+            }
+            .page-description {
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            /* Smaller stat cards */
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+            }
+
+            /* Modal further adjustments */
+            .modal-content {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                border-radius: 0;
+                max-height: 100vh;
+            }
+
+            .modal-header h2 {
+                font-size: 18px;
+            }
+
+            .modal-body {
+                padding: 15px;
+                max-height: calc(100vh - 140px);
+            }
+
+            .modal-footer {
+                padding: 12px 15px;
+            }
+
+            /* Close button */
+            .close {
+                width: 28px;
+                height: 28px;
+                font-size: 20px;
+            }
+
+            /* Smaller action cards */
+            .action-option {
+                padding: 12px;
+            }
+
+            .action-option i {
+                font-size: 24px;
+                margin-bottom: 2px;
+            }
+
+            .action-title {
+                font-size: 14px;
+            }
+
+            .action-desc {
+                font-size: 11px;
+            }
+
+            /* Button text adjustments */
+            .btn {
+                font-size: 13px;
+                padding: 10px 16px;
+            }
+
+            .btn i {
+                font-size: 12px;
+            }
+
+            /* Form inputs */
+            .form-input {
+                font-size: 13px;
+                padding: 8px;
+            }
+
+            .form-label {
+                font-size: 13px;
+            }
+
+            .form-hint {
+                font-size: 11px;
+            }
+        }
+
+        /* Landscape mobile view */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .modal-content {
+                max-height: 95vh;
+            }
+
+            .modal-body {
+                max-height: calc(95vh - 140px);
+            }
         }
     </style>
 
     <script>
+        let currentRefundId = null;
+        let currentRefundStatus = null;
+
         function showRefundActions(refundId, status) {
-            const actions = [
-                { label: 'View Details', action: () => alert('Details for #RQ' + refundId.toString().padStart(4, '0')) },
-            ];
+            currentRefundId = refundId;
+            currentRefundStatus = status;
 
+            // Update modal title with refund ID
+            document.getElementById('actionRefundId').textContent = '#RQ' + refundId.toString().padStart(4, '0');
+
+            // Show/hide action buttons based on status
+            const btnProcessing = document.getElementById('btnProcessing');
+            const btnComplete = document.getElementById('btnComplete');
+            const btnFailed = document.getElementById('btnFailed');
+
+            // Enable/disable buttons based on status
             if (status === 'pending') {
-                actions.push({
-                    label: 'Mark as Processing',
-                    action: () => {
-                        if (confirm('Mark this refund as processing?')) {
-                            const form = document.createElement('form');
-                            form.method = 'POST';
-                            form.action = `/admin/refund-queue/${refundId}/processing`;
-                            const csrf = document.createElement('input');
-                            csrf.type = 'hidden';
-                            csrf.name = '_token';
-                            csrf.value = '{{ csrf_token() }}';
-                            form.appendChild(csrf);
-                            document.body.appendChild(form);
-                            form.submit();
-                        }
-                    }
-                });
+                // Pending: can do all actions
+                btnProcessing.disabled = false;
+                btnComplete.disabled = false;
+                btnFailed.disabled = false;
+            } else if (status === 'processing') {
+                // Processing: can only complete or mark as failed
+                btnProcessing.disabled = true;
+                btnComplete.disabled = false;
+                btnFailed.disabled = false;
+            } else {
+                // Completed or Failed: disable all
+                btnProcessing.disabled = true;
+                btnComplete.disabled = true;
+                btnFailed.disabled = true;
             }
 
-            if (status === 'pending' || status === 'processing') {
-                actions.push({
-                    label: 'Complete Refund',
-                    action: () => {
-                        document.getElementById('completeForm').action = `/admin/refund-queue/${refundId}/complete`;
-                        document.getElementById('completeModal').classList.add('show');
-                    }
-                });
-                actions.push({
-                    label: 'Mark as Failed',
-                    action: () => {
-                        document.getElementById('failedForm').action = `/admin/refund-queue/${refundId}/failed`;
-                        document.getElementById('failedModal').classList.add('show');
-                    }
-                });
+            // Show the action modal
+            document.getElementById('actionModal').style.display = 'block';
+        }
+
+        function markAsProcessing() {
+            if (currentRefundId && currentRefundStatus === 'pending') {
+                // Close action modal
+                closeModal('actionModal');
+
+                // Create and submit form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/refund-queue/${currentRefundId}/processing`;
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = '{{ csrf_token() }}';
+                form.appendChild(csrf);
+                document.body.appendChild(form);
+                form.submit();
             }
+        }
 
-            // Create action menu
-            const menu = actions.map(a => `<button onclick="(${a.action})()" class="action-menu-item">${a.label}</button>`).join('');
+        function showCompleteModal() {
+            if (currentRefundId && (currentRefundStatus === 'pending' || currentRefundStatus === 'processing')) {
+                // Close action modal
+                closeModal('actionModal');
 
-            // Show simple confirm for now
-            const choice = prompt('Choose action:\n1. Mark as Processing\n2. Complete Refund\n3. Mark as Failed\n\nEnter number:');
+                // Set form action and show complete modal
+                document.getElementById('completeForm').action = `/admin/refund-queue/${currentRefundId}/complete`;
+                document.getElementById('completeModal').style.display = 'block';
+            }
+        }
 
-            if (choice === '1' && status === 'pending') {
-                if (confirm('Mark this refund as processing?')) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/admin/refund-queue/${refundId}/processing`;
-                    const csrf = document.createElement('input');
-                    csrf.type = 'hidden';
-                    csrf.name = '_token';
-                    csrf.value = '{{ csrf_token() }}';
-                    form.appendChild(csrf);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            } else if (choice === '2') {
-                document.getElementById('completeForm').action = `/admin/refund-queue/${refundId}/complete`;
-                document.getElementById('completeModal').classList.add('show');
-            } else if (choice === '3') {
-                document.getElementById('failedForm').action = `/admin/refund-queue/${refundId}/failed`;
-                document.getElementById('failedModal').classList.add('show');
+        function showFailedModal() {
+            if (currentRefundId && (currentRefundStatus === 'pending' || currentRefundStatus === 'processing')) {
+                // Close action modal
+                closeModal('actionModal');
+
+                // Set form action and show failed modal
+                document.getElementById('failedForm').action = `/admin/refund-queue/${currentRefundId}/failed`;
+                document.getElementById('failedModal').style.display = 'block';
             }
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
+            document.getElementById(modalId).style.display = 'none';
         }
 
         // Close modal on escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
+                closeModal('actionModal');
                 closeModal('completeModal');
                 closeModal('failedModal');
             }

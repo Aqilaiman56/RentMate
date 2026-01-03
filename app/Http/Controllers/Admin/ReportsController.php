@@ -143,6 +143,18 @@ class ReportsController extends Controller
                 ]);
             }
 
+            // Notify the reporter that their report has been resolved
+            \App\Models\Notification::create([
+                'UserID' => $report->ReportedByID,
+                'Type' => 'report_resolved',
+                'Title' => 'Report Resolved',
+                'Content' => 'Your report "' . $report->Subject . '" has been resolved by admin.' . ($request->apply_penalty ? ' A penalty has been applied.' : ''),
+                'RelatedID' => $report->ReportID,
+                'RelatedType' => 'report',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now(),
+            ]);
+
             DB::commit();
             return back()->with('success', 'Report resolved successfully' . ($request->apply_penalty ? ' with penalty applied' : ''));
 
@@ -164,6 +176,18 @@ class ReportsController extends Controller
         $report->AdminNotes = $request->admin_notes;
         $report->DateResolved = Carbon::now();
         $report->save();
+
+        // Notify the reporter that their report has been dismissed
+        \App\Models\Notification::create([
+            'UserID' => $report->ReportedByID,
+            'Type' => 'report_dismissed',
+            'Title' => 'Report Dismissed',
+            'Content' => 'Your report "' . $report->Subject . '" has been dismissed by admin.',
+            'RelatedID' => $report->ReportID,
+            'RelatedType' => 'report',
+            'IsRead' => false,
+            'CreatedAt' => Carbon::now(),
+        ]);
 
         return back()->with('success', 'Report dismissed');
     }
@@ -209,6 +233,30 @@ class ReportsController extends Controller
             $report->DateResolved = Carbon::now();
             $report->save();
 
+            // Notify the reporter that their report has been resolved with user suspension
+            \App\Models\Notification::create([
+                'UserID' => $report->ReportedByID,
+                'Type' => 'report_resolved',
+                'Title' => 'Report Resolved - User Suspended',
+                'Content' => 'Your report "' . $report->Subject . '" has been resolved. The reported user has been suspended.',
+                'RelatedID' => $report->ReportID,
+                'RelatedType' => 'report',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now(),
+            ]);
+
+            // Notify the suspended user
+            \App\Models\Notification::create([
+                'UserID' => $report->ReportedUserID,
+                'Type' => 'account_suspended',
+                'Title' => 'Account Suspended',
+                'Content' => 'Your account has been suspended. Reason: ' . $request->suspension_reason,
+                'RelatedID' => $report->ReportID,
+                'RelatedType' => 'report',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now(),
+            ]);
+
             DB::commit();
 
             $duration = $suspendedUntil ? 'until ' . $suspendedUntil->format('M d, Y') : 'permanently';
@@ -250,8 +298,29 @@ class ReportsController extends Controller
             $report->DateResolved = Carbon::now();
             $report->save();
 
-            // TODO: Send email notification to the user
-            // You can implement email notification here
+            // Notify the reporter that their report has been resolved with a warning
+            \App\Models\Notification::create([
+                'UserID' => $report->ReportedByID,
+                'Type' => 'report_resolved',
+                'Title' => 'Report Resolved - Warning Issued',
+                'Content' => 'Your report "' . $report->Subject . '" has been resolved. A ' . $request->warning_level . ' warning has been issued.',
+                'RelatedID' => $report->ReportID,
+                'RelatedType' => 'report',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now(),
+            ]);
+
+            // Notify the warned user
+            \App\Models\Notification::create([
+                'UserID' => $report->ReportedUserID,
+                'Type' => 'warning_issued',
+                'Title' => ucfirst($request->warning_level) . ' Warning Issued',
+                'Content' => $request->warning_message,
+                'RelatedID' => $report->ReportID,
+                'RelatedType' => 'report',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now(),
+            ]);
 
             DB::commit();
             return back()->with('success', ucfirst($request->warning_level) . ' warning issued to ' . $report->reportedUser->UserName);
@@ -297,6 +366,30 @@ class ReportsController extends Controller
                                 . "Admin Notes: " . ($request->admin_notes ?? 'N/A');
             $report->DateResolved = Carbon::now();
             $report->save();
+
+            // Notify the reporter that their report has been resolved with deposit hold
+            \App\Models\Notification::create([
+                'UserID' => $report->ReportedByID,
+                'Type' => 'report_resolved',
+                'Title' => 'Report Resolved - Deposit Held',
+                'Content' => 'Your report "' . $report->Subject . '" has been resolved. A deposit of RM ' . number_format($request->hold_amount, 2) . ' has been held.',
+                'RelatedID' => $report->ReportID,
+                'RelatedType' => 'report',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now(),
+            ]);
+
+            // Notify the user whose deposit is being held
+            \App\Models\Notification::create([
+                'UserID' => $report->ReportedUserID,
+                'Type' => 'deposit_held',
+                'Title' => 'Deposit Held',
+                'Content' => 'A deposit of RM ' . number_format($request->hold_amount, 2) . ' has been held. Reason: ' . $request->hold_reason,
+                'RelatedID' => $report->ReportID,
+                'RelatedType' => 'report',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now(),
+            ]);
 
             DB::commit();
             return back()->with('success', 'Deposit of RM ' . number_format($request->hold_amount, 2) . ' held against ' . $report->reportedUser->UserName);

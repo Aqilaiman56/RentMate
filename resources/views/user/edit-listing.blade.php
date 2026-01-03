@@ -444,17 +444,19 @@
                     </label>
                     <div class="price-input-group">
                         <span class="price-prefix">RM</span>
-                        <input 
-                            type="number" 
-                            id="PricePerDay" 
-                            name="PricePerDay" 
-                            class="form-input" 
+                        <input
+                            type="number"
+                            id="PricePerDay"
+                            name="PricePerDay"
+                            class="form-input"
                             placeholder="0.00"
                             step="0.01"
                             min="0"
+                            max="9999.99"
                             value="{{ old('PricePerDay', $item->PricePerDay) }}"
                             required
                             style="flex: 1;"
+                            oninput="limitDigits(this, 4)"
                         >
                         <span class="price-suffix">/ day</span>
                     </div>
@@ -469,17 +471,19 @@
                     </label>
                     <div class="price-input-group">
                         <span class="price-prefix">RM</span>
-                        <input 
-                            type="number" 
-                            id="DepositAmount" 
-                            name="DepositAmount" 
-                            class="form-input" 
+                        <input
+                            type="number"
+                            id="DepositAmount"
+                            name="DepositAmount"
+                            class="form-input"
                             placeholder="0.00"
                             step="0.01"
                             min="0"
+                            max="9999.99"
                             value="{{ old('DepositAmount', $item->DepositAmount) }}"
                             required
                             style="flex: 1;"
+                            oninput="limitDigits(this, 4)"
                         >
                     </div>
                     <div class="form-help">Refundable security deposit to protect your item</div>
@@ -622,6 +626,31 @@
 
 @push('scripts')
 <script>
+    // Function to limit digits in price/deposit fields
+    function limitDigits(input, maxDigits) {
+        let value = input.value;
+
+        // Remove any leading zeros except when value is "0" or starts with "0."
+        if (value.length > 1 && value[0] === '0' && value[1] !== '.') {
+            value = value.replace(/^0+/, '');
+            input.value = value;
+        }
+
+        // Split by decimal point
+        let parts = value.split('.');
+
+        // Limit the integer part to maxDigits
+        if (parts[0].length > maxDigits) {
+            parts[0] = parts[0].substring(0, maxDigits);
+            input.value = parts.join('.');
+        }
+
+        // Ensure max value is 9999.99
+        if (parseFloat(input.value) > 9999.99) {
+            input.value = '9999.99';
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const imageUploadArea = document.getElementById('imageUploadArea');
         const imageInput = document.getElementById('images');
@@ -731,6 +760,34 @@
             imageInput.files = dataTransfer.files;
         }
 
+        // Real-time validation for negative numbers
+        const priceInput = document.getElementById('PricePerDay');
+        const depositInput = document.getElementById('DepositAmount');
+        const quantityInput = document.getElementById('Quantity');
+
+        function validateNumber(input, minValue, fieldName) {
+            input.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                if (this.value !== '' && (isNaN(value) || value < minValue)) {
+                    this.setCustomValidity(fieldName + ' cannot be negative. Please enter a valid amount.');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                const value = parseFloat(this.value);
+                if (this.value !== '' && (isNaN(value) || value < minValue)) {
+                    this.setCustomValidity(fieldName + ' cannot be negative. Please enter a valid amount.');
+                    this.reportValidity();
+                }
+            });
+        }
+
+        validateNumber(priceInput, 0, 'Price per day');
+        validateNumber(depositInput, 0, 'Deposit amount');
+        validateNumber(quantityInput, 1, 'Quantity');
+
         // Form validation
         const form = document.getElementById('editListingForm');
         form.addEventListener('submit', function(e) {
@@ -739,6 +796,7 @@
             const description = document.getElementById('Description').value.trim();
             const price = document.getElementById('PricePerDay').value;
             const deposit = document.getElementById('DepositAmount').value;
+            const quantity = document.getElementById('Quantity').value;
             const location = document.getElementById('LocationID').value;
 
             if (!itemName || !category || !description || !price || !deposit || !location) {
@@ -747,15 +805,24 @@
                 return false;
             }
 
-            if (parseFloat(price) <= 0) {
+            if (parseFloat(price) < 0) {
                 e.preventDefault();
-                alert('Price must be greater than 0');
+                priceInput.setCustomValidity('Price per day cannot be negative. Please enter a valid price.');
+                priceInput.reportValidity();
                 return false;
             }
 
             if (parseFloat(deposit) < 0) {
                 e.preventDefault();
-                alert('Deposit amount cannot be negative');
+                depositInput.setCustomValidity('Deposit amount cannot be negative. Please enter a valid amount.');
+                depositInput.reportValidity();
+                return false;
+            }
+
+            if (parseInt(quantity) < 1) {
+                e.preventDefault();
+                quantityInput.setCustomValidity('Quantity must be at least 1.');
+                quantityInput.reportValidity();
                 return false;
             }
         });

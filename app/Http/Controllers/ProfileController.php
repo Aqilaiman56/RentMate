@@ -211,7 +211,7 @@ class ProfileController extends Controller
             $itemId = $booking->ItemID ?? null;
         }
 
-        \App\Models\Report::create([
+        $report = \App\Models\Report::create([
             'ReportedByID' => auth()->id(),
             'ReportedUserID' => $validated['ReportedUserID'] ?? null,
             'BookingID' => $validated['BookingID'] ?? null,
@@ -223,6 +223,18 @@ class ProfileController extends Controller
             'EvidencePath' => $evidencePath,
             'Status' => 'pending',
             'DateReported' => now(),
+        ]);
+
+        // Create notification for the user who submitted the report
+        \App\Models\Notification::create([
+            'UserID' => auth()->id(),
+            'Type' => 'report_submitted',
+            'Title' => 'Report Submitted',
+            'Content' => 'Your report "' . $validated['Subject'] . '" has been submitted successfully and is pending admin review.',
+            'RelatedID' => $report->ReportID,
+            'RelatedType' => 'report',
+            'IsRead' => false,
+            'CreatedAt' => now(),
         ]);
 
         return Redirect::route('user.report')->with('success', 'Report submitted successfully. Admin will review it soon.');

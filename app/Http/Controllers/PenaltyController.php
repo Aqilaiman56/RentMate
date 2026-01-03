@@ -126,12 +126,34 @@ class PenaltyController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $penalty = Penalty::with(['reportedBy', 'reportedUser', 'booking', 'item', 'approvedByAdmin', 'report'])
+        $penalty = Penalty::with(['reportedBy', 'reportedUser', 'booking.item', 'item', 'approvedByAdmin', 'report'])
             ->findOrFail($id);
 
         return response()->json([
             'success' => true,
-            'penalty' => $penalty
+            'penalty' => [
+                'id' => $penalty->PenaltyID,
+                'amount' => number_format($penalty->PenaltyAmount, 2),
+                'description' => $penalty->Description,
+                'date_issued' => $penalty->DateReported->format('M d, Y'),
+                'status' => $penalty->ResolvedStatus ? 'Resolved' : 'Pending',
+                'user' => [
+                    'name' => $penalty->reportedUser->UserName,
+                    'email' => $penalty->reportedUser->Email,
+                ],
+                'report' => $penalty->report ? [
+                    'id' => $penalty->report->ReportID,
+                    'type' => ucwords(str_replace('-', ' ', $penalty->report->ReportType)),
+                ] : null,
+                'booking' => $penalty->booking ? [
+                    'item' => $penalty->booking->item->ItemName,
+                    'dates' => $penalty->booking->StartDate->format('M d') . ' - ' . $penalty->booking->EndDate->format('M d, Y'),
+                ] : null,
+                'item' => $penalty->item ? [
+                    'name' => $penalty->item->ItemName,
+                ] : null,
+                'approved_by' => $penalty->approvedByAdmin ? $penalty->approvedByAdmin->UserName : null,
+            ]
         ]);
     }
 

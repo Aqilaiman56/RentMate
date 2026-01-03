@@ -45,6 +45,8 @@ class NotificationController extends Controller
             return redirect()->route('booking.show', $notification->RelatedID);
         } elseif ($notification->RelatedType === 'payment') {
             return redirect()->route('payment.show', $notification->RelatedID);
+        } elseif ($notification->RelatedType === 'report') {
+            return redirect()->route('user.report')->with('info', 'Your report has been submitted and is under review.');
         }
 
         return redirect()->route('notifications.index');

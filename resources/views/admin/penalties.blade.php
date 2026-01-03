@@ -330,7 +330,103 @@
         </div>
     </div>
 
+    <!-- Penalty Details Modal -->
+    <div id="penaltyDetailsModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 style="margin: 0;">Penalty Details</h2>
+                <span class="close" onclick="closePenaltyDetailsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="penalty-detail-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">PENALTY ID</span>
+                        <span class="detail-value" id="detail-penalty-id">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">USER</span>
+                        <span class="detail-value" id="detail-user">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">REPORT/ISSUE</span>
+                        <span class="detail-value" id="detail-report">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">DESCRIPTION</span>
+                        <span class="detail-value" id="detail-description" style="white-space: pre-wrap;">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">PENALTY AMOUNT</span>
+                        <span class="detail-value highlight-amount" id="detail-amount">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">DATE ISSUED</span>
+                        <span class="detail-value" id="detail-date">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">STATUS</span>
+                        <span class="detail-value">
+                            <span id="detail-status" class="status-badge">-</span>
+                        </span>
+                    </div>
+                    <div class="detail-row" id="booking-row" style="display: none;">
+                        <span class="detail-label">BOOKING DETAILS</span>
+                        <span class="detail-value" id="detail-booking">-</span>
+                    </div>
+                    <div class="detail-row" id="approved-row" style="display: none;">
+                        <span class="detail-label">APPROVED BY</span>
+                        <span class="detail-value" id="detail-approved-by">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closePenaltyDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <style>
+        .penalty-detail-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 140px;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+            text-align: right;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .highlight-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #dc2626;
+        }
+
         .alert {
             padding: 16px 20px;
             border-radius: 12px;
@@ -478,7 +574,7 @@
 
         /* Modal Styles */
         .modal {
-            position: fixed;
+            position: middle;
             z-index: var(--z-modal-backdrop);
             left: 0;
             top: 0;
@@ -789,16 +885,314 @@
         }
 
         @media (max-width: 768px) {
-            .header { flex-direction: column; align-items: stretch; gap: 12px; }
-            .header-actions { align-self: flex-start; }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 0 15px;
+            }
+            .header-actions {
+                align-self: flex-start;
+                width: 100%;
+            }
+            .header-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
             .header-title { font-size: 24px; }
-            .page-description { font-size: 14px; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .page-description {
+                font-size: 14px;
+                padding: 0 15px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                padding: 0 15px;
+                gap: 12px;
+            }
+            .stat-card {
+                padding: 16px;
+            }
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+            .stat-value {
+                font-size: 24px;
+            }
+            .stat-label {
+                font-size: 13px;
+            }
+
+            /* Table controls */
+            .table-controls {
+                flex-direction: column;
+                padding: 0 15px;
+                gap: 12px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .filter-buttons {
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Penalties table */
+            .table-card {
+                margin: 0 15px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .data-table {
+                min-width: 1000px;
+            }
+
+            /* Table cells responsive */
+            .user-cell {
+                min-width: 200px;
+            }
+
+            .description-cell {
+                min-width: 200px;
+            }
+
+            .action-buttons {
+                min-width: 120px;
+            }
+
+            /* Modal adjustments */
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                margin: 10px;
+            }
+
+            .modal-header {
+                padding: 20px 15px;
+            }
+
+            .modal-body {
+                padding: 20px 15px;
+            }
+
+            .modal-footer {
+                padding: 15px;
+                flex-direction: column;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+            }
+
+            /* Form groups */
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-label {
+                font-size: 14px;
+            }
+
+            .form-input {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            /* Action options */
+            .action-buttons-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .action-option {
+                padding: 15px;
+            }
+
+            .action-option i {
+                font-size: 28px;
+            }
+
+            .action-title {
+                font-size: 15px;
+            }
+
+            .action-desc {
+                font-size: 12px;
+            }
+
+            /* Pagination */
+            .pagination-container {
+                padding: 20px 15px;
+            }
+
+            /* Detail grid */
+            .penalty-detail-grid {
+                gap: 12px;
+            }
+
+            .detail-row {
+                padding: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .detail-label {
+                min-width: auto;
+                font-size: 12px;
+            }
+
+            .detail-value {
+                font-size: 13px;
+                text-align: left;
+                width: 100%;
+            }
         }
 
         @media (max-width: 480px) {
-            .header-title { font-size: 20px; }
-            .page-description { font-size: 12px; }
+            .header-title {
+                font-size: 20px;
+                line-height: 1.3;
+            }
+            .page-description {
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            /* Smaller stat cards */
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            /* Modal further adjustments */
+            .modal-content {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                border-radius: 0;
+                max-height: 100vh;
+            }
+
+            .modal-header h2 {
+                font-size: 18px;
+            }
+
+            .modal-body {
+                padding: 15px;
+                max-height: calc(100vh - 140px);
+            }
+
+            .modal-footer {
+                padding: 12px 15px;
+            }
+
+            /* Close button */
+            .close {
+                width: 28px;
+                height: 28px;
+                font-size: 20px;
+            }
+
+            /* Smaller action cards */
+            .action-option {
+                padding: 12px;
+            }
+
+            .action-option i {
+                font-size: 24px;
+                margin-bottom: 2px;
+            }
+
+            .action-title {
+                font-size: 14px;
+            }
+
+            .action-desc {
+                font-size: 11px;
+            }
+
+            /* Button text adjustments */
+            .btn {
+                font-size: 13px;
+                padding: 10px 16px;
+            }
+
+            .btn i {
+                font-size: 12px;
+            }
+
+            /* Form inputs */
+            .form-input {
+                font-size: 13px;
+                padding: 8px;
+            }
+
+            .form-label {
+                font-size: 13px;
+            }
+
+            .form-hint {
+                font-size: 11px;
+            }
+
+            /* Detail grid further adjustments */
+            .detail-row {
+                padding: 10px;
+            }
+
+            .detail-label {
+                font-size: 11px;
+            }
+
+            .detail-value {
+                font-size: 12px;
+            }
+
+            .highlight-amount {
+                font-size: 16px;
+            }
+        }
+
+        /* Landscape mobile view */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .modal-content {
+                max-height: 95vh;
+            }
+
+            .modal-body {
+                max-height: calc(95vh - 140px);
+            }
         }
     </style>
 
@@ -813,26 +1207,62 @@
                 .then(data => {
                     if (data.success) {
                         const penalty = data.penalty;
-                        alert(`Penalty Details #P${id.toString().padStart(3, '0')}
 
-User: ${penalty.user.name} (${penalty.user.email})
-${penalty.report ? 'Related Report: #R' + penalty.report.id + ' - ' + penalty.report.type : 'No linked report'}
+                        // Populate modal with penalty details
+                        document.getElementById('detail-penalty-id').textContent = `#P${id.toString().padStart(3, '0')}`;
+                        document.getElementById('detail-user').textContent = `${penalty.user.name} (${penalty.user.email})`;
 
-Description: ${penalty.description}
-Amount: RM ${penalty.amount}
-Date Issued: ${penalty.date_issued}
-Status: ${penalty.status}
+                        // Report/Issue
+                        if (penalty.report) {
+                            document.getElementById('detail-report').innerHTML = `<a href="/admin/reports" style="color: #3b82f6; text-decoration: none;">#R${penalty.report.id} - ${penalty.report.type}</a>`;
+                        } else {
+                            document.getElementById('detail-report').innerHTML = '<span style="color: #9ca3af; font-style: italic;">No linked report</span>';
+                        }
 
-${penalty.booking ? 'Booking: ' + penalty.booking.item + ' (' + penalty.booking.dates + ')' : ''}
-${penalty.item ? 'Item: ' + penalty.item.name : ''}
+                        // Description
+                        document.getElementById('detail-description').textContent = penalty.description;
 
-Approved By: ${penalty.approved_by ? penalty.approved_by : 'N/A'}`);
+                        // Amount
+                        document.getElementById('detail-amount').textContent = `RM ${penalty.amount}`;
+
+                        // Date
+                        document.getElementById('detail-date').textContent = penalty.date_issued;
+
+                        // Status with badge styling
+                        const statusBadge = document.getElementById('detail-status');
+                        statusBadge.textContent = penalty.status;
+                        statusBadge.className = penalty.status === 'Resolved' ? 'status-badge status-resolved' : 'status-badge status-pending';
+
+                        // Booking details (optional)
+                        const bookingRow = document.getElementById('booking-row');
+                        if (penalty.booking) {
+                            bookingRow.style.display = 'flex';
+                            document.getElementById('detail-booking').textContent = `${penalty.booking.item} (${penalty.booking.dates})`;
+                        } else {
+                            bookingRow.style.display = 'none';
+                        }
+
+                        // Approved by (optional)
+                        const approvedRow = document.getElementById('approved-row');
+                        if (penalty.approved_by) {
+                            approvedRow.style.display = 'flex';
+                            document.getElementById('detail-approved-by').textContent = penalty.approved_by;
+                        } else {
+                            approvedRow.style.display = 'none';
+                        }
+
+                        // Show the modal
+                        document.getElementById('penaltyDetailsModal').style.display = 'flex';
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('Failed to load penalty details');
                 });
+        }
+
+        function closePenaltyDetailsModal() {
+            document.getElementById('penaltyDetailsModal').style.display = 'none';
         }
 
         function showPenaltyActionModal(penaltyId, userName, amount) {

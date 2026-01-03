@@ -118,12 +118,21 @@ class ItemController extends Controller
             'Description' => 'required|string|min:50',
             'CategoryID' => 'required|exists:category,CategoryID',
             'LocationID' => 'required|exists:location,LocationID',
-            'DepositAmount' => 'required|numeric|min:0',
-            'PricePerDay' => 'required|numeric|min:0',
+            'DepositAmount' => 'required|numeric|min:0|max:9999.99',
+            'PricePerDay' => 'required|numeric|min:0|max:9999.99',
             'images' => 'required|array|min:1|max:4',
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'Quantity' => 'required|integer|min:1',
             'Availability' => 'nullable|boolean'
+        ], [
+            'DepositAmount.min' => 'Deposit amount cannot be negative. Please enter a valid amount.',
+            'DepositAmount.max' => 'Deposit amount cannot exceed RM 9,999.99.',
+            'PricePerDay.min' => 'Price per day cannot be negative. Please enter a valid price.',
+            'PricePerDay.max' => 'Price per day cannot exceed RM 9,999.99.',
+            'Quantity.min' => 'Quantity must be at least 1.',
+            'DepositAmount.numeric' => 'Deposit amount must be a valid number.',
+            'PricePerDay.numeric' => 'Price per day must be a valid number.',
+            'Quantity.integer' => 'Quantity must be a whole number.'
         ]);
 
         $validated['UserID'] = auth()->id();
@@ -178,12 +187,21 @@ class ItemController extends Controller
             'Description' => 'required|string|min:50',
             'CategoryID' => 'required|exists:category,CategoryID',
             'LocationID' => 'required|exists:location,LocationID',
-            'DepositAmount' => 'required|numeric|min:0',
-            'PricePerDay' => 'required|numeric|min:0',
+            'DepositAmount' => 'required|numeric|min:0|max:9999.99',
+            'PricePerDay' => 'required|numeric|min:0|max:9999.99',
             'images' => 'nullable|array|min:1|max:4',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'Quantity' => 'required|integer|min:1',
             'Availability' => 'nullable|boolean'
+        ], [
+            'DepositAmount.min' => 'Deposit amount cannot be negative. Please enter a valid amount.',
+            'DepositAmount.max' => 'Deposit amount cannot exceed RM 9,999.99.',
+            'PricePerDay.min' => 'Price per day cannot be negative. Please enter a valid price.',
+            'PricePerDay.max' => 'Price per day cannot exceed RM 9,999.99.',
+            'Quantity.min' => 'Quantity must be at least 1.',
+            'DepositAmount.numeric' => 'Deposit amount must be a valid number.',
+            'PricePerDay.numeric' => 'Price per day must be a valid number.',
+            'Quantity.integer' => 'Quantity must be a whole number.'
         ]);
 
         // Handle image upload if new images provided
