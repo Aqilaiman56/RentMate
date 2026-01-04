@@ -78,16 +78,19 @@
 
                     <!-- Name -->
                     <div class="gorent-form-group">
-                        <label for="UserName" class="gorent-label">Full Name</label>
-                        <input id="UserName" 
-                               class="gorent-input" 
-                               type="text" 
-                               name="name" 
-                               value="{{ old('name') }}" 
-                               required 
-                               autofocus 
+                        <label for="UserName" class="gorent-label">UserName</label>
+                        <input id="UserName"
+                               class="gorent-input"
+                               type="text"
+                               name="name"
+                               value="{{ old('name') }}"
+                               required
+                               autofocus
                                autocomplete="name"
-                               placeholder="Enter your full name">
+                               pattern="[A-Za-z0-9]+"
+                               title="Username can only contain letters and numbers (no spaces or special characters)"
+                               placeholder="Enter your username (letters and numbers only)">
+                        <small style="display: block; margin-top: 5px; font-size: 12px; color: #6b7280;">Only letters and numbers allowed (no spaces or special characters)</small>
                         <x-input-error :messages="$errors->get('name')" class="gorent-error" />
                     </div>
 
@@ -527,10 +530,10 @@
     <script>
         function togglePassword(fieldId) {
             const passwordInput = document.getElementById(fieldId);
-            const toggleIcon = fieldId === 'password' 
+            const toggleIcon = fieldId === 'password'
                 ? document.getElementById('toggleIconPassword')
                 : document.getElementById('toggleIconConfirm');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 toggleIcon.classList.remove('fa-eye');
@@ -541,5 +544,31 @@
                 toggleIcon.classList.add('fa-eye');
             }
         }
+
+        // Username validation - only allow letters and numbers
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.getElementById('UserName');
+
+            if (usernameInput) {
+                usernameInput.addEventListener('input', function(e) {
+                    // Remove any characters that are not letters or numbers
+                    this.value = this.value.replace(/[^A-Za-z0-9]/g, '');
+
+                    // Validate
+                    if (this.value.length > 0 && !/^[A-Za-z0-9]+$/.test(this.value)) {
+                        this.setCustomValidity('Username can only contain letters and numbers (no spaces or special characters)');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
+
+                usernameInput.addEventListener('blur', function() {
+                    if (this.value.length > 0 && !/^[A-Za-z0-9]+$/.test(this.value)) {
+                        this.setCustomValidity('Username can only contain letters and numbers (no spaces or special characters)');
+                        this.reportValidity();
+                    }
+                });
+            }
+        });
     </script>
 </x-guest-layout>

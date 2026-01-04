@@ -456,6 +456,13 @@
 
                 <!-- Dropdown Menu -->
                 <div class="dropdown-menu" id="profileDropdown">
+                    @if(auth()->user()->IsAdmin)
+                        <a href="{{ route('admin.dashboard') }}" class="dropdown-item" style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); color: #4F46E5; font-weight: 600;">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Admin Dashboard</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                    @endif
                     <a href="{{ route('user.profile') }}" class="dropdown-item">
                         <i class="fas fa-user"></i>
                         <span>Profile Settings</span>

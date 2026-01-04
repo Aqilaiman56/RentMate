@@ -10,6 +10,8 @@ class LocationSeeder extends Seeder
     public function run()
     {
         $locations = [
+            ['LocationName' => 'Inside UMS'],
+            ['LocationName' => 'Outside UMS'],
             ['LocationName' => 'Kuala Lumpur'],
             ['LocationName' => 'Selangor'],
             ['LocationName' => 'Penang'],

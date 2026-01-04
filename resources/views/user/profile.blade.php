@@ -379,7 +379,8 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="UserName" class="form-label">User Name*</label>
-                    <input type="text" id="UserName" name="UserName" value="{{ old('UserName', $user->UserName) }}" class="form-input" required>
+                    <input type="text" id="UserName" name="UserName" value="{{ old('UserName', $user->UserName) }}" class="form-input" required pattern="[A-Za-z0-9]+" title="Username can only contain letters and numbers (no spaces or special characters)">
+                    <small class="form-hint">Only letters and numbers allowed (no spaces or special characters)</small>
                 </div>
 
                 <div class="form-group">
@@ -394,7 +395,14 @@
 
                 <div class="form-group">
                     <label for="Location" class="form-label">Location</label>
-                    <input type="text" id="Location" name="Location" value="{{ old('Location', $user->Location) }}" class="form-input" placeholder="e.g., Inside or outside UMS">
+                    <select id="Location" name="Location" class="form-input">
+                        <option value="">-- Select Location --</option>
+                        @foreach($locations as $location)
+                            <option value="{{ $location->LocationName }}" {{ old('Location', $user->Location) == $location->LocationName ? 'selected' : '' }}>
+                                {{ $location->LocationName }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="form-group full-width">
@@ -577,5 +585,31 @@
             icon.classList.add('fa-eye');
         }
     }
+
+    // Username validation - only allow letters and numbers
+    document.addEventListener('DOMContentLoaded', function() {
+        const usernameInput = document.getElementById('UserName');
+
+        if (usernameInput) {
+            usernameInput.addEventListener('input', function(e) {
+                // Remove any characters that are not letters or numbers
+                this.value = this.value.replace(/[^A-Za-z0-9]/g, '');
+
+                // Validate
+                if (this.value.length > 0 && !/^[A-Za-z0-9]+$/.test(this.value)) {
+                    this.setCustomValidity('Username can only contain letters and numbers (no spaces or special characters)');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            usernameInput.addEventListener('blur', function() {
+                if (this.value.length > 0 && !/^[A-Za-z0-9]+$/.test(this.value)) {
+                    this.setCustomValidity('Username can only contain letters and numbers (no spaces or special characters)');
+                    this.reportValidity();
+                }
+            });
+        }
+    });
 </script>
 @endpush

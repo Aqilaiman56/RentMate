@@ -122,7 +122,7 @@ class ItemController extends Controller
             'PricePerDay' => 'required|numeric|min:0|max:9999.99',
             'images' => 'required|array|min:1|max:4',
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'Quantity' => 'required|integer|min:1',
+            'Quantity' => 'required|integer|min:1|max:10',
             'Availability' => 'nullable|boolean'
         ], [
             'DepositAmount.min' => 'Deposit amount cannot be negative. Please enter a valid amount.',
@@ -130,6 +130,7 @@ class ItemController extends Controller
             'PricePerDay.min' => 'Price per day cannot be negative. Please enter a valid price.',
             'PricePerDay.max' => 'Price per day cannot exceed RM 9,999.99.',
             'Quantity.min' => 'Quantity must be at least 1.',
+            'Quantity.max' => 'Quantity cannot exceed 10.',
             'DepositAmount.numeric' => 'Deposit amount must be a valid number.',
             'PricePerDay.numeric' => 'Price per day must be a valid number.',
             'Quantity.integer' => 'Quantity must be a whole number.'
@@ -191,7 +192,7 @@ class ItemController extends Controller
             'PricePerDay' => 'required|numeric|min:0|max:9999.99',
             'images' => 'nullable|array|min:1|max:4',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'Quantity' => 'required|integer|min:1',
+            'Quantity' => 'required|integer|min:1|max:10',
             'Availability' => 'nullable|boolean'
         ], [
             'DepositAmount.min' => 'Deposit amount cannot be negative. Please enter a valid amount.',
@@ -199,6 +200,7 @@ class ItemController extends Controller
             'PricePerDay.min' => 'Price per day cannot be negative. Please enter a valid price.',
             'PricePerDay.max' => 'Price per day cannot exceed RM 9,999.99.',
             'Quantity.min' => 'Quantity must be at least 1.',
+            'Quantity.max' => 'Quantity cannot exceed 10.',
             'DepositAmount.numeric' => 'Deposit amount must be a valid number.',
             'PricePerDay.numeric' => 'Price per day must be a valid number.',
             'Quantity.integer' => 'Quantity must be a whole number.'

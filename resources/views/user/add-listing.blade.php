@@ -494,17 +494,18 @@
                     <label class="form-label" for="Quantity">
                         Quantity Available <span class="required">*</span>
                     </label>
-                    <input 
-                        type="number" 
-                        id="Quantity" 
-                        name="Quantity" 
-                        class="form-input" 
+                    <input
+                        type="number"
+                        id="Quantity"
+                        name="Quantity"
+                        class="form-input"
                         placeholder="1"
                         min="1"
+                        max="10"
                         value="{{ old('Quantity', 1) }}"
                         required
                     >
-                    <div class="form-help">How many units of this item do you have available for rent?</div>
+                    <div class="form-help">How many units of this item do you have available for rent? (Maximum: 10)</div>
                     @error('Quantity')
                         <div class="error-message">{{ $message }}</div>
                     @enderror
@@ -684,11 +685,13 @@
         const depositInput = document.getElementById('DepositAmount');
         const quantityInput = document.getElementById('Quantity');
 
-        function validateNumber(input, minValue, fieldName) {
+        function validateNumber(input, minValue, fieldName, maxValue = null) {
             input.addEventListener('input', function() {
                 const value = parseFloat(this.value);
                 if (this.value !== '' && (isNaN(value) || value < minValue)) {
                     this.setCustomValidity(fieldName + ' cannot be negative. Please enter a valid amount.');
+                } else if (maxValue !== null && value > maxValue) {
+                    this.setCustomValidity(fieldName + ' cannot exceed ' + maxValue + '.');
                 } else {
                     this.setCustomValidity('');
                 }
@@ -699,13 +702,16 @@
                 if (this.value !== '' && (isNaN(value) || value < minValue)) {
                     this.setCustomValidity(fieldName + ' cannot be negative. Please enter a valid amount.');
                     this.reportValidity();
+                } else if (maxValue !== null && value > maxValue) {
+                    this.setCustomValidity(fieldName + ' cannot exceed ' + maxValue + '.');
+                    this.reportValidity();
                 }
             });
         }
 
         validateNumber(priceInput, 0, 'Price per day');
         validateNumber(depositInput, 0, 'Deposit amount');
-        validateNumber(quantityInput, 1, 'Quantity');
+        validateNumber(quantityInput, 1, 'Quantity', 10);
 
         // Form validation
         const form = document.getElementById('addListingForm');
@@ -742,6 +748,13 @@
             if (parseInt(quantity) < 1) {
                 e.preventDefault();
                 quantityInput.setCustomValidity('Quantity must be at least 1.');
+                quantityInput.reportValidity();
+                return false;
+            }
+
+            if (parseInt(quantity) > 10) {
+                e.preventDefault();
+                quantityInput.setCustomValidity('Quantity cannot exceed 10.');
                 quantityInput.reportValidity();
                 return false;
             }

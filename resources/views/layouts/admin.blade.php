@@ -707,6 +707,11 @@
         </div>
 
         <nav class="sidebar-nav">
+            <a href="{{ route('user.HomePage') }}" class="nav-item" style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); color: #4F46E5; font-weight: 600; border-left-color: #4F46E5;">
+                <span class="nav-icon"><i class="fas fa-arrow-left"></i></span>
+                <span class="nav-label">Back to User Site</span>
+            </a>
+            <div style="height: 1px; background: #E5E7EB; margin: 0.625rem 0;"></div>
             <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
                 <span class="nav-label">Dashboard</span>

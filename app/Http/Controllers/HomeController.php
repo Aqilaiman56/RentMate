@@ -39,11 +39,18 @@ class HomeController extends Controller
             $query->where('CategoryID', $request->category);
         }
         
-        // Filter by search term (item name or description)
+        // Filter by search term (item name, description, category name, or location name)
         if ($request->has('search') && $request->search != '') {
-            $query->where(function($q) use ($request) {
-                $q->where('ItemName', 'LIKE', '%' . $request->search . '%')
-                  ->orWhere('Description', 'LIKE', '%' . $request->search . '%');
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('ItemName', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('Description', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhereHas('category', function($cq) use ($searchTerm) {
+                      $cq->where('CategoryName', 'LIKE', '%' . $searchTerm . '%');
+                  })
+                  ->orWhereHas('location', function($lq) use ($searchTerm) {
+                      $lq->where('LocationName', 'LIKE', '%' . $searchTerm . '%');
+                  });
             });
         }
         

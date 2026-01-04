@@ -295,7 +295,7 @@
     /* Review Modal */
     .modal {
         display: none;
-        position: fixed;
+        position: centered fixed;
         z-index: 1000;
         left: 0;
         top: 0;
@@ -317,11 +317,14 @@
         padding: 30px;
         width: 90%;
         max-width: 500px;
-        max-height: 90vh;
+        max-height: 80vh;
         overflow-y: auto;
         animation: slideUp 0.3s;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    }
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
 
     /* Custom scrollbar for modal */
     .modal-content::-webkit-scrollbar {
@@ -435,16 +438,18 @@
     }
 
     .submit-review-btn {
-        width: 100%;
+        width: auto;
         background: #4461F2;
         color: white;
-        padding: 14px;
+        padding: 14px 30px;
         border-radius: 10px;
         border: none;
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
+        display: block;
+        margin: 0 auto;
     }
 
     .submit-review-btn:hover {

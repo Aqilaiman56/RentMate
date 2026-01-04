@@ -68,13 +68,15 @@ class ProfileController extends Controller
     public function userProfile(): View
     {
         $user = auth()->user();
-        
+
         // Get user statistics
         $totalListings = \App\Models\Item::where('UserID', $user->UserID)->count();
         $totalBookings = \App\Models\Booking::where('UserID', $user->UserID)->count();
         $totalReviews = \App\Models\Review::where('UserID', $user->UserID)->count();
-        
-        return view('user.profile', compact('user', 'totalListings', 'totalBookings', 'totalReviews'));
+
+        $locations = \App\Models\Location::all();
+
+        return view('user.profile', compact('user', 'totalListings', 'totalBookings', 'totalReviews', 'locations'));
     }
 
     /**
@@ -85,14 +87,17 @@ class ProfileController extends Controller
         $user = auth()->user();
         
         $validated = $request->validate([
-            'UserName' => 'required|string|max:255',
+            'UserName' => 'required|string|max:255|regex:/^[A-Za-z0-9]+$/',
             'Email' => 'required|email|unique:users,Email,' . $user->UserID . ',UserID',
             'PhoneNumber' => 'nullable|string|max:20',
-            'Location' => 'nullable|string|max:255',
+            'Location' => 'nullable|exists:location,LocationName',
             'BankName' => 'nullable|string|max:100',
             'BankAccountNumber' => 'nullable|string|max:50',
             'BankAccountHolderName' => 'nullable|string|max:100',
             'ProfileImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ], [
+            'UserName.regex' => 'Username can only contain letters and numbers (no spaces or special characters).',
+            'Location.exists' => 'Please select a valid location from the list.'
         ]);
 
         // Handle profile image upload
