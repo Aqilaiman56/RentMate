@@ -1,8 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin Notifications')
-
-@section('content')
+@section('main-content')
 <style>
     .notifications-container {
         max-width: 1200px;

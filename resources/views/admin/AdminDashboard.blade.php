@@ -151,6 +151,8 @@
             border-radius: 10px;
             transition: all 0.3s;
             color: #374151;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .notification-btn:hover {
@@ -161,17 +163,6 @@
 
         .notification-btn:active {
             transform: scale(0.95);
-        }
-
-        .notification-btn.active {
-            background-color: #4461F2;
-            border-color: #4461F2;
-            color: white;
-        }
-
-        .notification-btn.active .notification-badge {
-            animation: none;
-            background: #ef4444;
         }
 
         .notification-badge {
@@ -196,272 +187,6 @@
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
-        }
-
-        /* Notification Dropdown */
-        .notification-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            width: 420px;
-            max-width: 90vw;
-            max-height: 600px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            z-index: 1001;
-            overflow: hidden;
-        }
-
-        .notification-dropdown.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .notification-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            border-bottom: 2px solid #e5e7eb;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .notification-header h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: white;
-            margin: 0;
-        }
-
-        .notification-count {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.9);
-            background: rgba(255, 255, 255, 0.2);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 600;
-        }
-
-        .notification-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .notification-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px 20px;
-            border-bottom: 1px solid #f3f4f6;
-            transition: all 0.2s;
-            text-decoration: none;
-            color: inherit;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .notification-item:hover {
-            background-color: #f9fafb;
-            transform: translateX(2px);
-        }
-
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-
-        .notification-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        .notification-red .notification-icon {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .notification-orange .notification-icon {
-            background: #fed7aa;
-            color: #ea580c;
-        }
-
-        .notification-blue .notification-icon {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-
-        .notification-yellow .notification-icon {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .notification-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .notification-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-
-        .notification-message {
-            font-size: 13px;
-            color: #6b7280;
-            margin-bottom: 4px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .notification-time {
-            font-size: 11px;
-            color: #9ca3af;
-        }
-
-        .notification-badge-small {
-            font-size: 10px;
-            background: #f3f4f6;
-            color: #6b7280;
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .notification-empty {
-            padding: 60px 20px;
-            text-align: center;
-            color: #9ca3af;
-        }
-
-        .notification-empty i {
-            font-size: 48px;
-            margin-bottom: 12px;
-            color: #d1d5db;
-        }
-
-        .notification-empty p {
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .notification-footer {
-            padding: 12px 20px;
-            background: #f9fafb;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .notification-summary {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .summary-item {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .summary-item.red {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .summary-item.orange {
-            background: #fed7aa;
-            color: #ea580c;
-        }
-
-        .summary-item.blue {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-
-        .summary-item.yellow {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .notification-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .notification-action-btn {
-            flex: 1;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            text-decoration: none;
-        }
-
-        .notification-action-btn.read-all {
-            background: #4461F2;
-            color: white;
-        }
-
-        .notification-action-btn.read-all:hover {
-            background: #3651E2;
-            transform: translateY(-1px);
-        }
-
-        .notification-action-btn.clear-all {
-            background: #dc2626;
-            color: white;
-        }
-
-        .notification-action-btn.clear-all:hover {
-            background: #b91c1c;
-            transform: translateY(-1px);
-        }
-
-        .notification-action-btn.view-all {
-            background: #e5e7eb;
-            color: #374151;
-        }
-
-        .notification-action-btn.view-all:hover {
-            background: #d1d5db;
-            transform: translateY(-1px);
         }
 
         /* Responsive Styles */
@@ -517,15 +242,6 @@
                 justify-content: flex-end;
             }
 
-            .notification-dropdown {
-                position: fixed;
-                top: auto;
-                right: 10px;
-                left: 10px;
-                width: auto;
-                max-height: 500px;
-            }
-
             .notification-btn {
                 padding: 8px 12px;
                 font-size: 18px;
@@ -577,50 +293,6 @@
                 font-weight: 900;
                 font-size: 16px;
             }
-
-            .notification-dropdown {
-                max-height: 400px;
-            }
-
-            .notification-header h3 {
-                font-size: 14px;
-            }
-
-            .notification-item {
-                padding: 10px 14px;
-            }
-
-            .notification-icon {
-                width: 35px;
-                height: 35px;
-                font-size: 16px;
-            }
-
-            .notification-title {
-                font-size: 13px;
-            }
-
-            .notification-message {
-                font-size: 12px;
-            }
-        }
-
-        /* Notification List Scrollbar */
-        .notification-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .notification-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .notification-list::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-
-        .notification-list::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
         }
     </style>
 
@@ -631,79 +303,12 @@
             <h1 class="header-title">Dashboard Overview</h1>
         </div>
         <div class="header-actions">
-            <div style="position: relative;">
-                <button class="notification-btn" id="notificationBtn" type="button">
-                    <i class="fas fa-bell"></i>
-                    @if(($notifications['total_count'] ?? 0) > 0)
-                        <span class="notification-badge">{{ $notifications['total_count'] }}</span>
-                    @endif
-                </button>
-
-                <!-- Notification Dropdown -->
-                <div class="notification-dropdown" id="notificationDropdown">
-                <div class="notification-header">
-                    <h3>Notifications</h3>
-                    <span class="notification-count">{{ $notifications['total_count'] ?? 0 }} new</span>
-                </div>
-                <div class="notification-list">
-                    @forelse($notifications['items'] ?? [] as $notification)
-                        <a href="{{ $notification['link'] }}" class="notification-item notification-{{ $notification['color'] }}">
-                            <div class="notification-icon">
-                                <i class="fas {{ $notification['icon'] }}"></i>
-                            </div>
-                            <div class="notification-content">
-                                <div class="notification-title">{{ $notification['title'] }}</div>
-                                <div class="notification-message">{{ $notification['message'] }}</div>
-                                <div class="notification-time">{{ $notification['time'] }}</div>
-                            </div>
-                            @if(isset($notification['badge']))
-                                <div class="notification-badge-small">{{ $notification['badge'] }}</div>
-                            @endif
-                        </a>
-                    @empty
-                        <div class="notification-empty">
-                            <i class="fas fa-check-circle"></i>
-                            <p>No new notifications</p>
-                        </div>
-                    @endforelse
-                </div>
+            <a href="{{ route('admin.notifications.index') }}" class="notification-btn" id="notificationBtn">
+                <i class="fas fa-bell"></i>
                 @if(($notifications['total_count'] ?? 0) > 0)
-                    <div class="notification-footer">
-                        <div class="notification-summary">
-                            @if(($notifications['counts']['reports'] ?? 0) > 0)
-                                <span class="summary-item red">{{ $notifications['counts']['reports'] }} Reports</span>
-                            @endif
-                            @if(($notifications['counts']['refunds'] ?? 0) > 0)
-                                <span class="summary-item orange">{{ $notifications['counts']['refunds'] }} Refunds</span>
-                            @endif
-                            @if(($notifications['counts']['deposits'] ?? 0) > 0)
-                                <span class="summary-item blue">{{ $notifications['counts']['deposits'] }} Deposits</span>
-                            @endif
-                            @if(($notifications['counts']['penalties'] ?? 0) > 0)
-                                <span class="summary-item yellow">{{ $notifications['counts']['penalties'] }} Penalties</span>
-                            @endif
-                        </div>
-                        <div class="notification-actions">
-                            <form action="{{ route('admin.notifications.readAll') }}" method="POST" style="flex: 1;">
-                                @csrf
-                                <button type="submit" class="notification-action-btn read-all">
-                                    <i class="fas fa-check-double"></i> Mark Read
-                                </button>
-                            </form>
-                            <form action="{{ route('admin.notifications.clearAll') }}" method="POST" style="flex: 1;" onsubmit="return confirm('Clear all notifications? This cannot be undone.')">
-                                @csrf
-                                <button type="submit" class="notification-action-btn clear-all">
-                                    <i class="fas fa-trash-alt"></i> Clear All
-                                </button>
-                            </form>
-                            <a href="{{ route('admin.notifications.index') }}" class="notification-action-btn view-all">
-                                <i class="fas fa-list"></i> View All
-                            </a>
-                        </div>
-                    </div>
+                    <span class="notification-badge">{{ $notifications['total_count'] }}</span>
                 @endif
-                </div>
-            </div>
+            </a>
 
             <div class="profile-section" id="profileSection">
                 <span class="profile-name">{{ auth()->user()->UserName ?? 'Admin' }}</span>
@@ -800,24 +405,6 @@
             </div>
         </a>
 
-        <!-- Penalty Actions Card -->
-        <a href="{{ route('admin.penalties') }}" class="stat-card">
-            <div class="stat-card-header">
-                <div class="stat-icon-wrapper purple"><i class="fas fa-exclamation-triangle"></i></div>
-                <div class="stat-trend up">
-                    <i class="fas fa-arrow-up"></i> Real-time
-                </div>
-            </div>
-            <div class="stat-card-body">
-                <div class="stat-value">{{ $totalPenalties ?? 0 }}</div>
-                <div class="stat-label">Penalty Actions</div>
-            </div>
-            <div class="stat-card-footer">
-                <span class="stat-details">RM {{ number_format($totalPenaltyAmount ?? 0, 2) }} collected</span>
-                <span class="view-details">View details <i class="fas fa-arrow-right"></i></span>
-            </div>
-        </a>
-
         <!-- Service Fee Count Card -->
         <a href="{{ route('admin.service-fees') }}" class="stat-card">
             <div class="stat-card-header">
@@ -864,75 +451,10 @@
             }
         });
 
-        // Notification Dropdown Toggle
-        function toggleNotifications(event) {
-            if (event) {
-                event.stopPropagation();
-            }
-
-            const dropdown = document.getElementById('notificationDropdown');
-            const profileDropdown = document.getElementById('profileDropdown');
-            const notificationBtn = document.getElementById('notificationBtn');
-
-            // Close profile dropdown if open
-            if (profileDropdown) {
-                profileDropdown.classList.remove('show');
-            }
-
-            // Toggle notification dropdown
-            if (dropdown) {
-                const isOpen = dropdown.classList.toggle('show');
-
-                // Toggle active class on button
-                if (notificationBtn) {
-                    if (isOpen) {
-                        notificationBtn.classList.add('active');
-                    } else {
-                        notificationBtn.classList.remove('active');
-                    }
-                }
-            }
-        }
-
-        // Initialize notification dropdown handlers
-        document.addEventListener('DOMContentLoaded', function() {
-            const notificationBtn = document.getElementById('notificationBtn');
-            const notificationDropdown = document.getElementById('notificationDropdown');
-
-            // Prevent dropdown from closing when clicking inside (except for action buttons)
-            if (notificationDropdown) {
-                notificationDropdown.addEventListener('click', function(e) {
-                    // Allow form submissions and links to work
-                    if (e.target.closest('form') || e.target.closest('a.notification-action-btn')) {
-                        return;
-                    }
-                    e.stopPropagation();
-                });
-            }
-
-            // Handle notification button click
-            if (notificationBtn) {
-                notificationBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    toggleNotifications(e);
-                });
-            }
-        });
-
-        // Close dropdowns when clicking outside
+        // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
-            const notificationBtn = document.getElementById('notificationBtn');
-            const notificationDropdown = document.getElementById('notificationDropdown');
             const profileSection = document.getElementById('profileSection');
             const profileDropdown = document.getElementById('profileDropdown');
-
-            // Close notification dropdown if clicking outside
-            if (notificationDropdown && notificationBtn) {
-                if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
-                    notificationDropdown.classList.remove('show');
-                    notificationBtn.classList.remove('active');
-                }
-            }
 
             // Close profile dropdown if clicking outside
             if (profileSection && profileDropdown) {

@@ -180,6 +180,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notifications/clear-all', [NotificationController::class, 'clearAll'])->name('notifications.clearAll');
     Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unreadCount');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('/notifications/report/{reportId}', [NotificationController::class, 'viewReport'])->name('notifications.report.view');
 });
 
 /*

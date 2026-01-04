@@ -82,7 +82,7 @@ class NotificationController extends Controller
         } elseif ($notification->RelatedType === 'deposit') {
             return redirect()->route('admin.deposits');
         } elseif ($notification->RelatedType === 'penalty') {
-            return redirect()->route('admin.penalties');
+            return redirect()->route('admin.reports'); // Redirect to reports since penalties are now merged there
         }
 
         return redirect()->route('admin.notifications.index');

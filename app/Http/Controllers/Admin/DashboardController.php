@@ -12,6 +12,7 @@ use App\Models\Deposit;
 use App\Models\RefundQueue;
 use App\Models\Category;
 use App\Models\Location;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -67,132 +68,19 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get admin notifications
+     * Get admin notifications from the Notification model
      */
     public function getNotifications()
     {
-        $notifications = [];
-
-        // Pending Reports
-        $pendingReportsCount = Penalty::where('ResolvedStatus', 0)->count();
-        if ($pendingReportsCount > 0) {
-            $recentReports = Penalty::where('ResolvedStatus', 0)
-                ->with(['reportedUser', 'item'])
-                ->orderBy('DateReported', 'desc')
-                ->limit(3)
-                ->get();
-
-            foreach ($recentReports as $report) {
-                $notifications[] = [
-                    'type' => 'report',
-                    'icon' => 'fa-flag',
-                    'color' => 'red',
-                    'title' => 'New Report',
-                    'message' => 'Report against ' . ($report->reportedUser->UserName ?? 'Unknown User'),
-                    'time' => $report->DateReported->diffForHumans(),
-                    'link' => route('admin.reports.show', $report->PenaltyID),
-                    'badge' => $pendingReportsCount . ' pending'
-                ];
-            }
-        }
-
-        // Pending Refunds
-        $pendingRefundsCount = RefundQueue::where('Status', 'pending')->count();
-        if ($pendingRefundsCount > 0) {
-            $recentRefunds = RefundQueue::where('Status', 'pending')
-                ->with('user')
-                ->orderBy('created_at', 'desc')
-                ->limit(3)
-                ->get();
-
-            foreach ($recentRefunds as $refund) {
-                $notifications[] = [
-                    'type' => 'refund',
-                    'icon' => 'fa-hand-holding-usd',
-                    'color' => 'orange',
-                    'title' => 'Refund Pending',
-                    'message' => 'RM ' . number_format($refund->RefundAmount, 2) . ' refund for ' . $refund->user->UserName,
-                    'time' => $refund->created_at->diffForHumans(),
-                    'link' => route('admin.refund-queue'),
-                    'badge' => $pendingRefundsCount . ' pending'
-                ];
-            }
-        }
-
-        // New Deposits (held - potential refunds)
-        $heldDepositsCount = Deposit::where('Status', 'held')
-            ->whereHas('booking', function($q) {
-                $q->where('Status', 'completed')
-                  ->where('EndDate', '<', now());
-            })
+        // Get unread notifications count for the current admin user
+        $unreadCount = Notification::where('UserID', auth()->id())
+            ->unread()
             ->count();
-
-        if ($heldDepositsCount > 0) {
-            $recentHeldDeposits = Deposit::where('Status', 'held')
-                ->whereHas('booking', function($q) {
-                    $q->where('Status', 'completed')
-                      ->where('EndDate', '<', now());
-                })
-                ->with('booking.user')
-                ->orderBy('DateCollected', 'desc')
-                ->limit(2)
-                ->get();
-
-            foreach ($recentHeldDeposits as $deposit) {
-                $notifications[] = [
-                    'type' => 'deposit',
-                    'icon' => 'fa-coins',
-                    'color' => 'blue',
-                    'title' => 'Deposit Ready for Refund',
-                    'message' => 'RM ' . number_format($deposit->DepositAmount, 2) . ' for ' . $deposit->booking->user->UserName,
-                    'time' => $deposit->booking->EndDate->diffForHumans(),
-                    'link' => route('admin.deposits'),
-                    'badge' => $heldDepositsCount . ' ready'
-                ];
-            }
-        }
-
-        // Active Penalties (approved and has penalty amount)
-        $activePenaltiesCount = Penalty::where('ResolvedStatus', 1)
-            ->where('PenaltyAmount', '>', 0)
-            ->count();
-
-        if ($activePenaltiesCount > 0) {
-            $recentPenalties = Penalty::where('ResolvedStatus', 1)
-                ->where('PenaltyAmount', '>', 0)
-                ->with('reportedUser')
-                ->orderBy('DateReported', 'desc')
-                ->limit(2)
-                ->get();
-
-            foreach ($recentPenalties as $penalty) {
-                $notifications[] = [
-                    'type' => 'penalty',
-                    'icon' => 'fa-exclamation-triangle',
-                    'color' => 'yellow',
-                    'title' => 'Active Penalty',
-                    'message' => 'RM ' . number_format($penalty->PenaltyAmount, 2) . ' penalty for ' . ($penalty->reportedUser->UserName ?? 'Unknown User'),
-                    'time' => $penalty->DateReported->diffForHumans(),
-                    'link' => route('admin.penalties'),
-                    'badge' => $activePenaltiesCount . ' active'
-                ];
-            }
-        }
-
-        // Sort by time (most recent first)
-        usort($notifications, function($a, $b) {
-            return strtotime($b['time']) - strtotime($a['time']);
-        });
 
         return [
-            'items' => array_slice($notifications, 0, 10), // Limit to 10 most recent
-            'total_count' => count($notifications),
-            'counts' => [
-                'reports' => $pendingReportsCount,
-                'refunds' => $pendingRefundsCount,
-                'deposits' => $heldDepositsCount,
-                'penalties' => $activePenaltiesCount,
-            ]
+            'items' => [],
+            'total_count' => $unreadCount,
+            'counts' => []
         ];
     }
 

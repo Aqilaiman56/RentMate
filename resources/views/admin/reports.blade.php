@@ -424,41 +424,91 @@
         </div>
     </div>
 
-    <!-- Issue Penalty Modal -->
+    <!-- Issue/View Penalty Modal -->
     <div id="penaltyModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Issue Penalty</h2>
+                <h2 id="penaltyModalTitle">Issue Penalty</h2>
                 <span class="close" onclick="closePenaltyModal()">&times;</span>
             </div>
-            <form id="penaltyForm" onsubmit="submitPenalty(event)">
-                @csrf
+
+            <!-- View Mode -->
+            <div id="penaltyViewMode" style="display: none;">
                 <div class="modal-body">
-                    <input type="hidden" id="penalty_report_id" name="ReportID">
-
-                    <div class="form-group">
-                        <label class="form-label">Penalty Amount (RM)</label>
-                        <input type="number" name="PenaltyAmount" class="form-control" step="0.01" min="0" max="999999.99" placeholder="0.00" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Penalty Description</label>
-                        <textarea name="Description" class="form-control" rows="4" placeholder="Describe the reason for this penalty..." required></textarea>
-                    </div>
-
-                    <div class="alert-warning">
-                        <div>
-                            <strong>Note:</strong>
-                            <p>This penalty will be recorded in the user's account and they will be notified. The report will be automatically marked as resolved.</p>
+                    <div class="penalty-view-details">
+                        <div class="penalty-detail-row">
+                            <span class="detail-label"><i class="fas fa-hashtag"></i> Penalty ID</span>
+                            <span class="detail-value" id="view_penalty_id"></span>
+                        </div>
+                        <div class="penalty-detail-row">
+                            <span class="detail-label"><i class="fas fa-user"></i> Penalized User</span>
+                            <span class="detail-value" id="view_penalized_user"></span>
+                        </div>
+                        <div class="penalty-detail-row">
+                            <span class="detail-label"><i class="fas fa-dollar-sign"></i> Penalty Amount</span>
+                            <span class="detail-value penalty-amount" id="view_penalty_amount"></span>
+                        </div>
+                        <div class="penalty-detail-row">
+                            <span class="detail-label"><i class="fas fa-calendar"></i> Date Issued</span>
+                            <span class="detail-value" id="view_date_issued"></span>
+                        </div>
+                        <div class="penalty-detail-row">
+                            <span class="detail-label"><i class="fas fa-user-shield"></i> Issued By</span>
+                            <span class="detail-value" id="view_issued_by"></span>
+                        </div>
+                        <div class="penalty-detail-row full-width">
+                            <span class="detail-label"><i class="fas fa-file-alt"></i> Description</span>
+                            <p class="detail-description" id="view_description"></p>
+                        </div>
+                        <div class="penalty-detail-row">
+                            <span class="detail-label"><i class="fas fa-info-circle"></i> Status</span>
+                            <span class="detail-value" id="view_status"></span>
+                        </div>
+                        <div class="penalty-detail-row" id="view_related_report_row">
+                            <span class="detail-label"><i class="fas fa-flag"></i> Related Report</span>
+                            <span class="detail-value" id="view_related_report"></span>
                         </div>
                     </div>
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closePenaltyModal()">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Issue Penalty</button>
+                    <button type="button" class="btn btn-secondary" onclick="closePenaltyModal()">Close</button>
+                    <button type="button" class="btn btn-success" id="resolvePenaltyBtn" onclick="resolvePenalty()" style="display: none;">
+                        <i class="fas fa-check"></i> Mark as Resolved
+                    </button>
                 </div>
-            </form>
+            </div>
+
+            <!-- Create Mode -->
+            <div id="penaltyCreateMode" style="display: block;">
+                <form id="penaltyForm" onsubmit="submitPenalty(event)">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" id="penalty_report_id" name="ReportID">
+
+                        <div class="form-group">
+                            <label class="form-label">Penalty Amount (RM)</label>
+                            <input type="number" name="PenaltyAmount" class="form-control" step="0.01" min="0" max="999999.99" placeholder="0.00" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Penalty Description</label>
+                            <textarea name="Description" class="form-control" rows="4" placeholder="Describe the reason for this penalty..." required></textarea>
+                        </div>
+
+                        <div class="alert-warning">
+                            <div>
+                                <strong>Note:</strong>
+                                <p>This penalty will be recorded in the user's account and they will be notified. The report will be automatically marked as resolved.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closePenaltyModal()">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Issue Penalty</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -501,6 +551,19 @@
             to { opacity: 1; }
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
         .modal-content {
             background: white;
             border-radius: 16px;
@@ -510,11 +573,10 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.3s ease-out;
-            position: fixed;
+            position: absolute;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            z-index: var(--z-modal);
             pointer-events: auto;
         }
 
@@ -524,11 +586,11 @@
 
         @keyframes slideUp {
             from {
-                transform: translateY(20px);
+                transform: translate(-50%, calc(-50% + 20px));
                 opacity: 0;
             }
             to {
-                transform: translateY(0);
+                transform: translate(-50%, -50%);
                 opacity: 1;
             }
         }
@@ -552,6 +614,8 @@
             padding: 30px;
             max-height: calc(90vh - 160px);
             overflow-y: auto;
+            display: block;
+            visibility: visible;
         }
 
         .modal-footer {
@@ -561,6 +625,64 @@
             gap: 12px;
             justify-content: flex-end;
             background: #f9fafb;
+        }
+
+        /* Penalty View Styles */
+        .penalty-view-details {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .penalty-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 3px solid #e5e7eb;
+        }
+
+        .penalty-detail-row.full-width {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-label i {
+            color: #9ca3af;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .detail-value.penalty-amount {
+            color: #dc2626;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .detail-description {
+            margin: 0;
+            color: #374151;
+            line-height: 1.6;
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            width: 100%;
         }
 
         .close {
@@ -584,6 +706,8 @@
 
         .form-group {
             margin-bottom: 24px;
+            display: block;
+            visibility: visible;
         }
 
         .form-label {
@@ -795,6 +919,10 @@
         .btn-primary:hover { background: #2563eb; }
         .btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
         .btn-secondary:hover { background: #e5e7eb; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn-success:hover { background: #15803d; }
 
         /* Report Cards Styling */
         .reports-cards-container {
@@ -1329,82 +1457,79 @@
         });
 
         // Penalty Modal Functions
+        let currentPenaltyId = null;
+
         function showPenaltyModal(reportId) {
-            document.getElementById('penalty_report_id').value = reportId;
-            document.getElementById('penaltyModal').style.display = 'flex';
+            const modal = document.getElementById('penaltyModal');
+            const createMode = document.getElementById('penaltyCreateMode');
+            const viewMode = document.getElementById('penaltyViewMode');
+            const title = document.getElementById('penaltyModalTitle');
+            const reportIdField = document.getElementById('penalty_report_id');
+
+            // Show create mode
+            createMode.style.display = 'block';
+            viewMode.style.display = 'none';
+            title.textContent = 'Issue Penalty';
+            reportIdField.value = reportId;
+            modal.style.display = 'flex';
+            currentPenaltyId = null;
+
+            console.log('Modal shown for report:', reportId);
         }
 
         function closePenaltyModal() {
             document.getElementById('penaltyModal').style.display = 'none';
             document.getElementById('penaltyForm').reset();
+            currentPenaltyId = null;
         }
 
         function viewPenalty(penaltyId) {
+            currentPenaltyId = penaltyId;
             fetch(`/admin/penalties/${penaltyId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const penalty = data.penalty;
-                        const content = `
-                            <div style="display: grid; gap: 24px;">
-                                <div>
-                                    <h3 style="margin: 0 0 16px 0; font-size: 16px; color: #6b7280;">Penalty Information</h3>
-                                    <div style="display: grid; gap: 12px;">
-                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
-                                            <span style="font-weight: 600; color: #374151;">Penalty ID:</span>
-                                            <span>#P${penalty.id.toString().padStart(3, '0')}</span>
-                                        </div>
-                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
-                                            <span style="font-weight: 600; color: #374151;">Amount:</span>
-                                            <span style="font-weight: 700; color: #dc2626;">RM ${penalty.amount}</span>
-                                        </div>
-                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
-                                            <span style="font-weight: 600; color: #374151;">Status:</span>
-                                            <span class="${penalty.resolved ? 'text-green-600' : 'text-orange-600'}">${penalty.resolved ? 'Resolved' : 'Pending'}</span>
-                                        </div>
-                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #f9fafb; border-radius: 8px;">
-                                            <span style="font-weight: 600; color: #374151;">Date Issued:</span>
-                                            <span>${penalty.date_issued}</span>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div>
-                                    <h3 style="margin: 0 0 16px 0; font-size: 16px; color: #6b7280;">User Information</h3>
-                                    <div style="padding: 12px; background: #f9fafb; border-radius: 8px;">
-                                        <span style="font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">${penalty.user.name}</span>
-                                        <span style="color: #6b7280; font-size: 13px;">${penalty.user.email}</span>
-                                    </div>
-                                </div>
+                        // Show view mode
+                        document.getElementById('penaltyCreateMode').style.display = 'none';
+                        document.getElementById('penaltyViewMode').style.display = 'block';
+                        document.getElementById('penaltyModalTitle').textContent = 'Penalty Details';
 
-                                <div>
-                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Description</h3>
-                                    <p style="margin: 0; padding: 12px; background: #f9fafb; border-radius: 8px; white-space: pre-wrap;">${penalty.description}</p>
-                                </div>
+                        // Populate penalty details
+                        document.getElementById('view_penalty_id').textContent = `#P${penalty.id.toString().padStart(3, '0')}`;
+                        document.getElementById('view_penalized_user').textContent = penalty.user.name;
+                        document.getElementById('view_penalty_amount').textContent = `RM ${penalty.amount}`;
+                        document.getElementById('view_date_issued').textContent = penalty.date_issued;
+                        document.getElementById('view_issued_by').textContent = penalty.admin ? penalty.admin.name : 'System';
+                        document.getElementById('view_description').textContent = penalty.description;
 
-                                ${penalty.report ? `
-                                <div>
-                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Related Report</h3>
-                                    <div style="padding: 12px; background: #dbeafe; border-radius: 8px;">
-                                        <span style="font-weight: 600;">Report #R${penalty.report.id.toString().padStart(3, '0')}</span><br>
-                                        <span>${penalty.report.subject}</span>
-                                    </div>
-                                </div>
-                                ` : ''}
+                        // Status with badge
+                        const statusBadge = penalty.resolved
+                            ? '<span class="status-badge status-resolved">Resolved</span>'
+                            : '<span class="status-badge status-pending">Pending</span>';
+                        document.getElementById('view_status').innerHTML = statusBadge;
 
-                                ${penalty.evidence ? `
-                                <div>
-                                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #6b7280;">Evidence</h3>
-                                    <div style="padding: 12px; background: #f9fafb; border-radius: 8px;">
-                                        <a href="${penalty.evidence}" target="_blank" style="color: #3b82f6; text-decoration: none;">
-                                            <i class="fas fa-image"></i> View Evidence
-                                        </a>
-                                    </div>
-                                </div>
-                                ` : ''}
-                            </div>
-                        `;
-                        document.getElementById('penaltyDetailsContent').innerHTML = content;
+                        // Related report
+                        if (penalty.report) {
+                            document.getElementById('view_related_report').innerHTML = `
+                                <a href="#report-${penalty.report.id}" class="report-link" onclick="closePenaltyModal()">
+                                    #R${penalty.report.id.toString().padStart(3, '0')} - ${penalty.report.subject || penalty.report.type}
+                                </a>
+                            `;
+                            document.getElementById('view_related_report_row').style.display = 'flex';
+                        } else {
+                            document.getElementById('view_related_report_row').style.display = 'none';
+                        }
+
+                        // Show/hide resolve button
+                        const resolveBtn = document.getElementById('resolvePenaltyBtn');
+                        if (!penalty.resolved && resolveBtn) {
+                            resolveBtn.style.display = 'inline-block';
+                        } else if (resolveBtn) {
+                            resolveBtn.style.display = 'none';
+                        }
+
                         document.getElementById('penaltyModal').style.display = 'flex';
                     }
                 })
@@ -1412,6 +1537,34 @@
                     console.error('Error:', error);
                     alert('Failed to load penalty details');
                 });
+        }
+
+        function resolvePenalty() {
+            if (!currentPenaltyId) return;
+
+            if (confirm('Mark this penalty as resolved? This action cannot be undone.')) {
+                fetch(`/admin/penalties/${currentPenaltyId}/resolve`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Penalty marked as resolved');
+                        closePenaltyModal();
+                        location.reload();
+                    } else {
+                        alert('Failed to resolve penalty: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to resolve penalty');
+                });
+            }
         }
 
         function submitPenalty(event) {

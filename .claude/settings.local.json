@@ -30,7 +30,8 @@
       "Bash(DB_DATABASE=rentmate_test php artisan test:*)",
       "Bash(grep:*)",
       "Bash(php check_users.php:*)",
-      "Bash(php check_users_structure.php:*)"
+      "Bash(php check_users_structure.php:*)",
+      "Bash(php check_booking_data.php:*)"
     ],
     "deny": [],
     "ask": []

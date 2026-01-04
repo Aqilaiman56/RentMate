@@ -111,10 +111,6 @@
                 @endif
 
                 <div class="admin-actions">
-                    <button class="btn btn-warning" onclick="toggleAvailability({{ $item->ItemID }}, {{ $item->Availability ? 'true' : 'false' }})">
-                        <i class="fas fa-{{ $item->Availability ? 'ban' : 'check' }}"></i>
-                        {{ $item->Availability ? 'Mark Unavailable' : 'Mark Available' }}
-                    </button>
                     <button class="btn btn-danger" onclick="deleteListing({{ $item->ItemID }}, '{{ $item->ItemName }}')">
                         <i class="fas fa-trash"></i> Delete Listing
                     </button>
@@ -152,16 +148,6 @@
             <div class="stat-content">
                 <div class="stat-value">{{ $completedBookings }}</div>
                 <div class="stat-label">Completed</div>
-            </div>
-        </div>
-
-        <div class="stat-box">
-            <div class="stat-icon purple">
-                <i class="fas fa-money-bill-wave"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-value">RM {{ number_format($totalRevenue, 2) }}</div>
-                <div class="stat-label">Total Revenue</div>
             </div>
         </div>
     </div>
@@ -239,7 +225,18 @@
                                 </td>
                                 <td>{{ $booking->StartDate ? \Carbon\Carbon::parse($booking->StartDate)->format('M d, Y') : 'N/A' }}</td>
                                 <td>{{ $booking->EndDate ? \Carbon\Carbon::parse($booking->EndDate)->format('M d, Y') : 'N/A' }}</td>
-                                <td>RM {{ number_format($booking->DepositAmount ?? 0, 2) }}</td>
+                                <td>
+                                    @php
+                                        $rentalCost = 0;
+                                        if ($booking->TotalAmount) {
+                                            $rentalCost = $booking->TotalAmount;
+                                        } elseif ($booking->StartDate && $booking->EndDate && $item->PricePerDay) {
+                                            $days = \Carbon\Carbon::parse($booking->StartDate)->diffInDays(\Carbon\Carbon::parse($booking->EndDate));
+                                            $rentalCost = $days * $item->PricePerDay;
+                                        }
+                                    @endphp
+                                    RM {{ number_format($rentalCost, 2) }}
+                                </td>
                                 <td>
                                     <span class="status-badge status-{{ strtolower($booking->Status) }}">
                                         {{ $booking->Status }}
@@ -894,14 +891,6 @@
 <script>
     function changeMainImage(src) {
         document.getElementById('mainImage').src = src;
-    }
-
-    function toggleAvailability(id, currentStatus) {
-        const action = currentStatus ? 'mark as unavailable' : 'mark as available';
-        if (confirm(`Are you sure you want to ${action} this listing?`)) {
-            alert('Toggle availability functionality - to be implemented');
-            // TODO: Implement AJAX call to toggle availability
-        }
     }
 
     function deleteListing(id, name) {

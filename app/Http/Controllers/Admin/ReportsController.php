@@ -148,7 +148,7 @@ class ReportsController extends Controller
             // Notify the reporter that their report has been resolved
             \App\Models\Notification::create([
                 'UserID' => $report->ReportedByID,
-                'Type' => 'report_resolved',
+                'Type' => 'report',
                 'Title' => 'Report Resolved',
                 'Content' => 'Your report "' . $report->Subject . '" has been resolved by admin.' . ($request->apply_penalty ? ' A penalty has been applied.' : ''),
                 'RelatedID' => $report->ReportID,
@@ -156,6 +156,20 @@ class ReportsController extends Controller
                 'IsRead' => false,
                 'CreatedAt' => Carbon::now(),
             ]);
+
+            // Notify the reported user about the resolution
+            if ($report->ReportedUserID) {
+                \App\Models\Notification::create([
+                    'UserID' => $report->ReportedUserID,
+                    'Type' => 'report',
+                    'Title' => 'Report Against You Resolved',
+                    'Content' => 'The report "' . $report->Subject . '" has been resolved.' . ($request->apply_penalty ? ' A penalty of RM ' . number_format($request->penalty_amount, 2) . ' has been applied to your account.' : ''),
+                    'RelatedID' => $report->ReportID,
+                    'RelatedType' => 'report',
+                    'IsRead' => false,
+                    'CreatedAt' => Carbon::now(),
+                ]);
+            }
 
             DB::commit();
             return back()->with('success', 'Report resolved successfully' . ($request->apply_penalty ? ' with penalty applied' : ''));
@@ -182,7 +196,7 @@ class ReportsController extends Controller
         // Notify the reporter that their report has been dismissed
         \App\Models\Notification::create([
             'UserID' => $report->ReportedByID,
-            'Type' => 'report_dismissed',
+            'Type' => 'report',
             'Title' => 'Report Dismissed',
             'Content' => 'Your report "' . $report->Subject . '" has been dismissed by admin.',
             'RelatedID' => $report->ReportID,
@@ -190,6 +204,20 @@ class ReportsController extends Controller
             'IsRead' => false,
             'CreatedAt' => Carbon::now(),
         ]);
+
+        // Notify the reported user that the report was dismissed
+        if ($report->ReportedUserID) {
+            \App\Models\Notification::create([
+                'UserID' => $report->ReportedUserID,
+                'Type' => 'report',
+                'Title' => 'Report Against You Dismissed',
+                'Content' => 'The report "' . $report->Subject . '" filed against you has been dismissed by admin.',
+                'RelatedID' => $report->ReportID,
+                'RelatedType' => 'report',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now(),
+            ]);
+        }
 
         return back()->with('success', 'Report dismissed');
     }
@@ -238,7 +266,7 @@ class ReportsController extends Controller
             // Notify the reporter that their report has been resolved with user suspension
             \App\Models\Notification::create([
                 'UserID' => $report->ReportedByID,
-                'Type' => 'report_resolved',
+                'Type' => 'report',
                 'Title' => 'Report Resolved - User Suspended',
                 'Content' => 'Your report "' . $report->Subject . '" has been resolved. The reported user has been suspended.',
                 'RelatedID' => $report->ReportID,
@@ -250,7 +278,7 @@ class ReportsController extends Controller
             // Notify the suspended user
             \App\Models\Notification::create([
                 'UserID' => $report->ReportedUserID,
-                'Type' => 'account_suspended',
+                'Type' => 'report',
                 'Title' => 'Account Suspended',
                 'Content' => 'Your account has been suspended. Reason: ' . $request->suspension_reason,
                 'RelatedID' => $report->ReportID,
@@ -303,7 +331,7 @@ class ReportsController extends Controller
             // Notify the reporter that their report has been resolved with a warning
             \App\Models\Notification::create([
                 'UserID' => $report->ReportedByID,
-                'Type' => 'report_resolved',
+                'Type' => 'report',
                 'Title' => 'Report Resolved - Warning Issued',
                 'Content' => 'Your report "' . $report->Subject . '" has been resolved. A ' . $request->warning_level . ' warning has been issued.',
                 'RelatedID' => $report->ReportID,
@@ -315,7 +343,7 @@ class ReportsController extends Controller
             // Notify the warned user
             \App\Models\Notification::create([
                 'UserID' => $report->ReportedUserID,
-                'Type' => 'warning_issued',
+                'Type' => 'report',
                 'Title' => ucfirst($request->warning_level) . ' Warning Issued',
                 'Content' => $request->warning_message,
                 'RelatedID' => $report->ReportID,
@@ -372,7 +400,7 @@ class ReportsController extends Controller
             // Notify the reporter that their report has been resolved with deposit hold
             \App\Models\Notification::create([
                 'UserID' => $report->ReportedByID,
-                'Type' => 'report_resolved',
+                'Type' => 'report',
                 'Title' => 'Report Resolved - Deposit Held',
                 'Content' => 'Your report "' . $report->Subject . '" has been resolved. A deposit of RM ' . number_format($request->hold_amount, 2) . ' has been held.',
                 'RelatedID' => $report->ReportID,
@@ -384,7 +412,7 @@ class ReportsController extends Controller
             // Notify the user whose deposit is being held
             \App\Models\Notification::create([
                 'UserID' => $report->ReportedUserID,
-                'Type' => 'deposit_held',
+                'Type' => 'report',
                 'Title' => 'Deposit Held',
                 'Content' => 'A deposit of RM ' . number_format($request->hold_amount, 2) . ' has been held. Reason: ' . $request->hold_reason,
                 'RelatedID' => $report->ReportID,

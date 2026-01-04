@@ -31,9 +31,9 @@ class NotificationController extends Controller
         $notification = Notification::where('NotificationID', $id)
             ->where('UserID', auth()->id())
             ->firstOrFail();
-        
+
         $notification->markAsRead();
-        
+
         // Redirect based on notification type
         if ($notification->RelatedType === 'message') {
             $message = \App\Models\Message::find($notification->RelatedID);
@@ -46,10 +46,30 @@ class NotificationController extends Controller
         } elseif ($notification->RelatedType === 'payment') {
             return redirect()->route('payment.show', $notification->RelatedID);
         } elseif ($notification->RelatedType === 'report') {
-            return redirect()->route('user.report')->with('info', 'Your report has been submitted and is under review.');
+            // Show report summary instead of redirecting to report form
+            return redirect()->route('notifications.report.view', $notification->RelatedID);
         }
 
         return redirect()->route('notifications.index');
+    }
+
+    /**
+     * View report summary from notification
+     */
+    public function viewReport($reportId)
+    {
+        $report = \App\Models\Report::with(['reporter', 'reportedUser', 'booking.item', 'reviewer'])
+            ->findOrFail($reportId);
+
+        // Ensure the user is either the reporter or the reported user
+        if ($report->ReportedByID !== auth()->id() && $report->ReportedUserID !== auth()->id()) {
+            abort(403, 'Unauthorized access to this report');
+        }
+
+        // Determine if current user is the reporter or the one being reported
+        $isReporter = $report->ReportedByID === auth()->id();
+
+        return view('notifications.report-summary', compact('report', 'isReporter'));
     }
 
     /**

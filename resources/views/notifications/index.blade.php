@@ -124,6 +124,10 @@
         background: #fef3c7;
     }
 
+    .notification-icon.report {
+        background: #fee2e2;
+    }
+
     .notification-content {
         flex: 1;
         min-width: 0;
@@ -345,6 +349,9 @@
                                 @break
                             @case('review')
                                 <i class="fas fa-star"></i>
+                                @break
+                            @case('report')
+                                <i class="fas fa-exclamation-triangle"></i>
                                 @break
                             @default
                                 <i class="fas fa-bell"></i>

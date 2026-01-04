@@ -144,8 +144,8 @@
                         <a href="{{ route('admin.listings.show', $item->ItemID) }}" class="btn-action btn-view">
                             <i class="fas fa-eye"></i> View
                         </a>
-                        <button class="btn-action btn-action-btn" onclick="showActionModal({{ $item->ItemID }}, '{{ addslashes($item->ItemName) }}')">
-                            <i class="fas fa-cog"></i> Action
+                        <button class="btn-action btn-delete-only" onclick="showDeleteModal({{ $item->ItemID }}, '{{ addslashes($item->ItemName) }}')">
+                            <i class="fas fa-trash-alt"></i> Delete
                         </button>
                     </div>
                 </div>
@@ -164,34 +164,6 @@
             {{ $items->appends(request()->query())->links() }}
         </div>
     @endif
-
-    <!-- Action Modal -->
-    <div id="actionModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Listing Actions</h2>
-                <span class="close" onclick="closeActionModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p class="modal-description">Choose an action for this listing:</p>
-                <div class="action-buttons-grid">
-                    <button class="action-option btn-keep" onclick="keepListing()">
-                        <i class="fas fa-check-circle"></i>
-                        <span class="action-title">Keep Listing</span>
-                        <span class="action-desc">Maintain this listing as is</span>
-                    </button>
-                    <button class="action-option btn-delete" onclick="confirmDelete()">
-                        <i class="fas fa-trash-alt"></i>
-                        <span class="action-title">Delete Listing</span>
-                        <span class="action-desc">Permanently remove this listing</span>
-                    </button>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeActionModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="modal" style="display: none;">
@@ -624,13 +596,13 @@
             background: #fde68a;
         }
 
-        .btn-action-btn {
-            background: #fef3c7;
-            color: #92400e;
+        .btn-delete-only {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
-        .btn-action-btn:hover {
-            background: #fde68a;
+        .btn-delete-only:hover {
+            background: #fecaca;
         }
 
         /* Buttons */
@@ -756,82 +728,6 @@
 
         .close:hover {
             background: rgba(255, 255, 255, 0.3);
-        }
-
-        .action-buttons-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .action-option {
-            padding: 20px;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 8px;
-        }
-
-        .action-option:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .action-option i {
-            font-size: 32px;
-            margin-bottom: 4px;
-        }
-
-        .action-title {
-            font-size: 16px;
-            font-weight: 700;
-            display: block;
-        }
-
-        .action-desc {
-            font-size: 13px;
-            color: #6b7280;
-            display: block;
-        }
-
-        .btn-keep {
-            border-color: #10b981;
-        }
-
-        .btn-keep:hover {
-            border-color: #059669;
-            background: #d1fae5;
-        }
-
-        .btn-keep i {
-            color: #10b981;
-        }
-
-        .btn-keep .action-title {
-            color: #065f46;
-        }
-
-        .btn-delete {
-            border-color: #ef4444;
-        }
-
-        .btn-delete:hover {
-            border-color: #dc2626;
-            background: #fee2e2;
-        }
-
-        .btn-delete i {
-            color: #ef4444;
-        }
-
-        .btn-delete .action-title {
-            color: #991b1b;
         }
 
         .alert-danger {
@@ -1238,33 +1134,17 @@
             window.location.href = '{{ route('admin.listings.export') }}';
         }
 
-        function showActionModal(id, name) {
+        function showDeleteModal(id, name) {
             currentItemId = id;
             currentItemName = name;
-            document.getElementById('actionModal').style.display = 'flex';
-            document.getElementById('modalTitle').textContent = `Actions: ${name}`;
-        }
-
-        function closeActionModal() {
-            document.getElementById('actionModal').style.display = 'none';
-            currentItemId = null;
-            currentItemName = '';
-        }
-
-        function keepListing() {
-            closeActionModal();
-            // Optional: Show a success message
-            alert('Listing will be kept as is.');
-        }
-
-        function confirmDelete() {
-            closeActionModal();
             document.getElementById('deleteItemName').textContent = currentItemName;
             document.getElementById('deleteModal').style.display = 'flex';
         }
 
         function closeDeleteModal() {
             document.getElementById('deleteModal').style.display = 'none';
+            currentItemId = null;
+            currentItemName = '';
         }
 
         function deleteListing() {
@@ -1301,7 +1181,6 @@
         // Close modal on escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
-                closeActionModal();
                 closeDeleteModal();
             }
         });

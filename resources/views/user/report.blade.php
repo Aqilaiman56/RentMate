@@ -362,13 +362,14 @@
                 <label for="reportType" class="form-label required">Report Type</label>
                 <select id="reportType" name="ReportType" class="form-select" required>
                     <option value="">Select report type</option>
-                    <option value="item-damage">Item Damage</option>
-                    <option value="late-return">Late Return</option>
-                    <option value="dispute">Dispute</option>
-                    <option value="fraud">Fraud</option>
-                    <option value="harassment">Harassment</option>
-                    <option value="other">Other</option>
+                    <option value="fraud">Fraud (High Priority)</option>
+                    <option value="harassment">Harassment (High Priority)</option>
+                    <option value="item-damage">Item Damage (Medium Priority)</option>
+                    <option value="late-return">Late Return (Medium Priority)</option>
+                    <option value="dispute">Dispute (Low Priority)</option>
+                    <option value="other">Other (Low Priority)</option>
                 </select>
+                <p class="form-hint">Priority is automatically assigned based on report type to ensure urgent matters are handled quickly</p>
             </div>
 
             <div class="form-group">

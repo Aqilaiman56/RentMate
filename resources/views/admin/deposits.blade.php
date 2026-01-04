@@ -34,32 +34,36 @@
         <div class="stat-card">
             <div class="stat-icon blue">💰</div>
             <div class="stat-content">
-                <div class="stat-value">RM {{ number_format($totalDeposits, 2) }}</div>
+                <div class="stat-value">{{ $deposits->total() }}</div>
                 <div class="stat-label">Total Deposits</div>
+                <div class="stat-amount">RM {{ number_format($totalDeposits, 2) }}</div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon green">✓</div>
             <div class="stat-content">
-                <div class="stat-value">RM {{ number_format($refundedAmount, 2) }}</div>
+                <div class="stat-value">{{ $deposits->where('Status', 'refunded')->count() }}</div>
                 <div class="stat-label">Refunded</div>
+                <div class="stat-amount">RM {{ number_format($refundedAmount, 2) }}</div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon orange">⏳</div>
             <div class="stat-content">
-                <div class="stat-value">RM {{ number_format($heldAmount, 2) }}</div>
+                <div class="stat-value">{{ $deposits->where('Status', 'held')->count() }}</div>
                 <div class="stat-label">Held</div>
+                <div class="stat-amount">RM {{ number_format($heldAmount, 2) }}</div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon red">⚠️</div>
             <div class="stat-content">
-                <div class="stat-value">RM {{ number_format($forfeitedAmount, 2) }}</div>
+                <div class="stat-value">{{ $deposits->where('Status', 'forfeited')->count() }}</div>
                 <div class="stat-label">Forfeited</div>
+                <div class="stat-amount">RM {{ number_format($forfeitedAmount, 2) }}</div>
             </div>
         </div>
     </div>
@@ -374,6 +378,13 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        .stat-amount {
+            font-size: 12px;
+            color: #3b82f6;
+            font-weight: 600;
+            margin-top: 4px;
         }
 
         /* Table Controls */

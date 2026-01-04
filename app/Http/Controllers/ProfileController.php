@@ -211,13 +211,21 @@ class ProfileController extends Controller
             $itemId = $booking->ItemID ?? null;
         }
 
+        // Automatically set priority based on report type
+        $priority = match($validated['ReportType']) {
+            'fraud', 'harassment' => 'high',
+            'item-damage', 'late-return' => 'medium',
+            'dispute', 'other' => 'low',
+            default => 'medium'
+        };
+
         $report = \App\Models\Report::create([
             'ReportedByID' => auth()->id(),
             'ReportedUserID' => $validated['ReportedUserID'] ?? null,
             'BookingID' => $validated['BookingID'] ?? null,
             'ItemID' => $itemId,
             'ReportType' => $validated['ReportType'],
-            'Priority' => 'medium',
+            'Priority' => $priority,
             'Subject' => $validated['Subject'],
             'Description' => $validated['Description'],
             'EvidencePath' => $evidencePath,
@@ -228,7 +236,7 @@ class ProfileController extends Controller
         // Create notification for the user who submitted the report
         \App\Models\Notification::create([
             'UserID' => auth()->id(),
-            'Type' => 'report_submitted',
+            'Type' => 'report',
             'Title' => 'Report Submitted',
             'Content' => 'Your report "' . $validated['Subject'] . '" has been submitted successfully and is pending admin review.',
             'RelatedID' => $report->ReportID,
@@ -236,6 +244,20 @@ class ProfileController extends Controller
             'IsRead' => false,
             'CreatedAt' => now(),
         ]);
+
+        // Create notification for the reported user (if exists)
+        if ($validated['ReportedUserID']) {
+            \App\Models\Notification::create([
+                'UserID' => $validated['ReportedUserID'],
+                'Type' => 'report',
+                'Title' => 'Report Filed Against You',
+                'Content' => 'A report has been filed against you regarding: "' . $validated['Subject'] . '". Admin will review this matter.',
+                'RelatedID' => $report->ReportID,
+                'RelatedType' => 'report',
+                'IsRead' => false,
+                'CreatedAt' => now(),
+            ]);
+        }
 
         return Redirect::route('user.report')->with('success', 'Report submitted successfully. Admin will review it soon.');
     }

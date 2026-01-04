@@ -169,7 +169,6 @@
                         <th>User</th>
                         <th>Booking</th>
                         <th>Item</th>
-                        <th>Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -197,11 +196,10 @@
                                     {{ Str::limit($serviceFee->booking->item->ItemName ?? 'N/A', 30) }}
                                 </span>
                             </td>
-                            <td><span class="amount-badge small">RM {{ number_format($serviceFee->ServiceFeeAmount, 2) }}</span></td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 40px; color: #6b7280;">
+                            <td colspan="5" style="text-align: center; padding: 40px; color: #6b7280;">
                                 <p style="font-size: 16px; font-weight: 600;">No transactions in {{ $year }}</p>
                                 <p style="margin-top: 8px; font-size: 14px;">Service fee records will appear here when bookings are created</p>
                             </td>
