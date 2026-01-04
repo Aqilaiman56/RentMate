@@ -635,12 +635,15 @@
 
         .refund-card-actions {
             padding: 0 20px 20px 20px;
+            display: flex;
+            justify-content: center;
         }
 
         .btn-action-full {
-            width: 100%;
+            width: auto;
             justify-content: center;
-            padding: 12px 20px;
+            padding: 8px 16px;
+            font-size: 13px;
         }
 
         .empty-state {
@@ -1156,6 +1159,8 @@
 
             .refund-card-actions {
                 padding: 0 16px 16px 16px;
+                display: flex;
+                justify-content: center;
             }
 
             .empty-state {
@@ -1253,6 +1258,16 @@
                 font-size: 11px;
             }
 
+            /* Table controls */
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
             /* Refund Cards - Extra Small */
             .refund-card-header {
                 padding: 12px;
@@ -1305,11 +1320,14 @@
 
             .refund-card-actions {
                 padding: 0 12px 12px 12px;
+                display: flex;
+                justify-content: center;
             }
 
             .btn-action-full {
-                padding: 10px 16px;
-                font-size: 13px;
+                padding: 8px 14px;
+                font-size: 12px;
+                width: auto;
             }
 
             .table-header {

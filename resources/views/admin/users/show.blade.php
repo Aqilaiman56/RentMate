@@ -85,9 +85,6 @@
                         <i class="fas fa-ban"></i> Suspend User
                     </button>
                 @endif
-                <button class="btn btn-primary" onclick="resetPassword({{ $user->UserID }}, '{{ $user->UserName }}')">
-                    <i class="fas fa-key"></i> Reset Password
-                </button>
             </div>
         </div>
     </div>
@@ -689,31 +686,6 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('An error occurred while unsuspending the user');
-            });
-        }
-    }
-
-    function resetPassword(id, name) {
-        if (confirm(`Reset password for user "${name}"?\n\nA new password will be generated and displayed.`)) {
-            fetch(`/admin/users/${id}/reset-password`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`Password reset successfully for "${name}"\n\nNew Password: ${data.new_password}\n\nPlease save this password and send it to the user.`);
-                } else {
-                    alert('Error: ' + (data.message || 'Failed to reset password'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while resetting the password');
             });
         }
     }

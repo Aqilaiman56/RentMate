@@ -102,91 +102,96 @@
         </div>
     </form>
 
-    <!-- Deposits Table -->
-    <div class="table-card">
+    <!-- Deposits Cards Container -->
+    <div class="deposits-cards-container">
         <div class="table-header">
             <h3 class="table-title">Deposit Transactions</h3>
             <span class="table-count">Showing {{ $deposits->count() }} of {{ $deposits->total() }} deposits</span>
         </div>
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Transaction ID</th>
-                        <th>User</th>
-                        <th>Item</th>
-                        <th>Deposit Amount</th>
-                        <th>Booking Period</th>
-                        <th>Date Collected</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($deposits as $deposit)
-                        <tr>
-                            <td><span class="id-badge">#D{{ str_pad($deposit->DepositID, 3, '0', STR_PAD_LEFT) }}</span></td>
-                            <td>
-                                <div class="user-cell">
-                                    @if($deposit->booking->user->ProfileImage)
-                                        <img src="{{ asset('storage/' . $deposit->booking->user->ProfileImage) }}" 
-                                             alt="{{ $deposit->booking->user->UserName }}" 
-                                             class="user-avatar-img">
-                                    @else
-                                        <div class="user-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal', 'red', 'indigo'][$deposit->booking->user->UserID % 8] }}">
-                                            {{ strtoupper(substr($deposit->booking->user->UserName, 0, 2)) }}
-                                        </div>
-                                    @endif
-                                    <div class="user-info">
-                                        <div class="user-name">{{ $deposit->booking->user->UserName }}</div>
-                                        <div class="user-email">{{ $deposit->booking->user->Email }}</div>
+
+        @forelse($deposits as $deposit)
+            <div class="deposit-card" id="deposit-{{ $deposit->DepositID }}">
+                <!-- Card Header - User and Deposit Amount (Always Visible) -->
+                <div class="deposit-card-header" onclick="toggleDeposit({{ $deposit->DepositID }})">
+                    <div class="deposit-user-section">
+                        @if($deposit->booking->user->ProfileImage)
+                            <img src="{{ asset('storage/' . $deposit->booking->user->ProfileImage) }}"
+                                 alt="{{ $deposit->booking->user->UserName }}"
+                                 class="deposit-avatar-img">
+                        @else
+                            <div class="deposit-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal', 'red', 'indigo'][$deposit->booking->user->UserID % 8] }}">
+                                {{ strtoupper(substr($deposit->booking->user->UserName, 0, 2)) }}
+                            </div>
+                        @endif
+                        <div class="deposit-user-info">
+                            <div class="deposit-user-name">{{ $deposit->booking->user->UserName }}</div>
+                            <div class="deposit-user-email">{{ $deposit->booking->user->Email }}</div>
+                        </div>
+                    </div>
+                    <div class="deposit-header-right">
+                        <span class="amount-badge {{ $deposit->DepositAmount < 200 ? 'small' : ($deposit->DepositAmount < 600 ? 'medium' : 'large') }}">
+                            RM {{ number_format($deposit->DepositAmount, 2) }}
+                        </span>
+                        <i class="fas fa-chevron-down deposit-toggle-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Card Body - Details (Expandable) -->
+                <div class="deposit-card-body">
+                    <div class="deposit-details-grid">
+                        <div class="deposit-detail-item">
+                            <span class="deposit-detail-label">Item</span>
+                            <span class="deposit-detail-value">
+                                <div class="item-info-compact">
+                                    <div class="item-name">{{ $deposit->booking->item->ItemName }}</div>
+                                    <div class="item-owner">Owner: {{ $deposit->booking->item->user->UserName }}</div>
+                                </div>
+                            </span>
+                        </div>
+
+                        <div class="deposit-detail-item">
+                            <span class="deposit-detail-label">Booking Period</span>
+                            <span class="deposit-detail-value">
+                                <div class="period-info-compact">
+                                    <div class="period-dates">
+                                        {{ $deposit->booking->StartDate->format('M d') }} - {{ $deposit->booking->EndDate->format('M d, Y') }}
+                                    </div>
+                                    <div class="period-duration">
+                                        {{ $deposit->booking->StartDate->diffInDays($deposit->booking->EndDate) }} days
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <div class="item-cell">
-                                    <span class="item-name">{{ $deposit->booking->item->ItemName }}</span>
-                                    <span class="item-owner">Owner: {{ $deposit->booking->item->user->UserName }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="amount-badge {{ $deposit->DepositAmount < 200 ? 'small' : ($deposit->DepositAmount < 600 ? 'medium' : 'large') }}">
-                                    RM {{ number_format($deposit->DepositAmount, 2) }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="period-cell">
-                                    <span class="period-dates">
-                                        {{ $deposit->booking->StartDate->format('M d') }} - {{ $deposit->booking->EndDate->format('M d, Y') }}
-                                    </span>
-                                    <span class="period-duration">
-                                        {{ $deposit->booking->StartDate->diffInDays($deposit->booking->EndDate) }} days
-                                    </span>
-                                </div>
-                            </td>
-                            <td>{{ $deposit->DateCollected->format('M d, Y') }}</td>
-                            <td>
+                            </span>
+                        </div>
+
+                        <div class="deposit-detail-item">
+                            <span class="deposit-detail-label">Date Collected</span>
+                            <span class="deposit-detail-value">{{ $deposit->DateCollected->format('M d, Y') }}</span>
+                        </div>
+
+                        <div class="deposit-detail-item">
+                            <span class="deposit-detail-label">Status</span>
+                            <span class="deposit-detail-value">
                                 <span class="status-badge status-{{ $deposit->Status }}">
                                     {{ ucfirst($deposit->Status) }}
                                 </span>
-                            </td>
-                            <td>
-                                <button class="btn-action" onclick="viewDeposit({{ $deposit->DepositID }})">
-                                    <i class="fas fa-ellipsis-v"></i> Actions
-                                </button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" style="text-align: center; padding: 60px; color: #6b7280;">
-                                <p style="font-size: 18px; font-weight: 600;">No deposits found</p>
-                                <p style="margin-top: 10px;">Try adjusting your filters</p>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="deposit-card-actions">
+                        <button class="btn-action btn-action-full" onclick="event.stopPropagation(); viewDeposit({{ $deposit->DepositID }})">
+                            <i class="fas fa-ellipsis-v"></i> Actions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="empty-state">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                <p style="font-size: 18px; font-weight: 600; color: #374151; margin-bottom: 8px;">No deposits found</p>
+                <p style="color: #6b7280;">Try adjusting your filters</p>
+            </div>
+        @endforelse
     </div>
 
     <!-- Pagination -->
@@ -447,6 +452,204 @@
         .filter-select:focus {
             outline: none;
             border-color: #3b82f6;
+        }
+
+        /* Deposits Cards Container */
+        .deposits-cards-container {
+            margin: 0 20px;
+        }
+
+        .deposit-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .deposit-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .deposit-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            background: white;
+            transition: background 0.2s;
+        }
+
+        .deposit-card-header:hover {
+            background: #f9fafb;
+        }
+
+        .deposit-user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .deposit-avatar-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .deposit-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .deposit-avatar.blue { background: #3b82f6; }
+        .deposit-avatar.pink { background: #ec4899; }
+        .deposit-avatar.green { background: #10b981; }
+        .deposit-avatar.orange { background: #f97316; }
+        .deposit-avatar.purple { background: #a855f7; }
+        .deposit-avatar.teal { background: #14b8a6; }
+        .deposit-avatar.red { background: #ef4444; }
+        .deposit-avatar.indigo { background: #6366f1; }
+
+        .deposit-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .deposit-user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .deposit-user-email {
+            font-size: 13px;
+            color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .deposit-header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .deposit-toggle-icon {
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.3s;
+        }
+
+        .deposit-card.expanded .deposit-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .deposit-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #f9fafb;
+        }
+
+        .deposit-card.expanded .deposit-card-body {
+            max-height: 800px;
+        }
+
+        .deposit-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .deposit-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .deposit-detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .deposit-detail-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .item-info-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item-info-compact .item-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .item-info-compact .item-owner {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .period-info-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .period-info-compact .period-dates {
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        .period-info-compact .period-duration {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .deposit-card-actions {
+            padding: 0 20px 20px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-action-full {
+            width: auto;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            margin: 20px 0;
         }
 
         /* Table Card */
@@ -1069,6 +1272,48 @@
                 width: 100%;
             }
 
+            .deposits-cards-container {
+                margin: 0 16px;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 16px;
+            }
+
+            .deposit-card-header {
+                padding: 16px;
+            }
+
+            .deposit-avatar-img,
+            .deposit-avatar {
+                width: 44px;
+                height: 44px;
+                font-size: 16px;
+            }
+
+            .deposit-user-name {
+                font-size: 15px;
+            }
+
+            .deposit-user-email {
+                font-size: 12px;
+            }
+
+            .deposit-details-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .deposit-card-actions {
+                padding: 0 16px 16px 16px;
+                display: flex;
+                justify-content: center;
+            }
+
             .table-card {
                 margin: 0 16px;
             }
@@ -1160,10 +1405,12 @@
             .table-controls {
                 padding: 0 12px;
                 gap: 12px;
+                flex-direction: column;
+                align-items: stretch;
             }
 
             .search-box {
-                min-width: 100%;
+                max-width: 100%;
             }
 
             .search-input {
@@ -1174,6 +1421,66 @@
             .filter-select {
                 padding: 10px 14px;
                 font-size: 13px;
+            }
+
+            .deposits-cards-container {
+                margin: 0 12px;
+            }
+
+            .deposit-card-header {
+                padding: 12px;
+            }
+
+            .deposit-user-section {
+                gap: 12px;
+            }
+
+            .deposit-avatar-img,
+            .deposit-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+
+            .deposit-user-name {
+                font-size: 14px;
+            }
+
+            .deposit-user-email {
+                font-size: 11px;
+            }
+
+            .deposit-header-right {
+                gap: 10px;
+            }
+
+            .deposit-toggle-icon {
+                font-size: 16px;
+            }
+
+            .deposit-details-grid {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .deposit-detail-label {
+                font-size: 11px;
+            }
+
+            .deposit-detail-value {
+                font-size: 13px;
+            }
+
+            .deposit-card-actions {
+                padding: 0 12px 12px 12px;
+                display: flex;
+                justify-content: center;
+            }
+
+            .btn-action-full {
+                padding: 8px 14px;
+                font-size: 12px;
+                width: auto;
             }
 
             .table-card {
@@ -1296,6 +1603,75 @@
                 font-size: 12px;
             }
 
+            .deposits-cards-container {
+                margin: 0 10px;
+            }
+
+            .deposit-card {
+                border-radius: 10px;
+            }
+
+            .deposit-card-header {
+                padding: 10px;
+            }
+
+            .deposit-user-section {
+                gap: 10px;
+            }
+
+            .deposit-avatar-img,
+            .deposit-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+
+            .deposit-user-name {
+                font-size: 13px;
+            }
+
+            .deposit-user-email {
+                font-size: 10px;
+            }
+
+            .deposit-header-right {
+                gap: 8px;
+            }
+
+            .amount-badge {
+                padding: 4px 10px;
+                font-size: 12px;
+            }
+
+            .deposit-toggle-icon {
+                font-size: 14px;
+            }
+
+            .deposit-details-grid {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .deposit-detail-label {
+                font-size: 10px;
+            }
+
+            .deposit-detail-value {
+                font-size: 12px;
+            }
+
+            .deposit-card-actions {
+                padding: 0 10px 10px 10px;
+                display: flex;
+                justify-content: center;
+            }
+
+            .btn-action-full {
+                padding: 7px 12px;
+                font-size: 11px;
+                width: auto;
+            }
+
             .table-card {
                 margin: 0 10px;
                 border-radius: 10px;
@@ -1362,6 +1738,11 @@
     </style>
 
     <script>
+        function toggleDeposit(depositId) {
+            const card = document.getElementById('deposit-' + depositId);
+            card.classList.toggle('expanded');
+        }
+
         function viewDeposit(id) {
             fetch(`/admin/deposits/${id}`)
                 .then(response => response.json())

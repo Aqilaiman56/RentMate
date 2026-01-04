@@ -1006,6 +1006,12 @@
             .table-controls {
                 padding: 0 12px;
                 gap: 10px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
             }
 
             .search-input {

@@ -291,13 +291,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         return app(AdminUsersController::class)->unsuspend($id);
     })->name('users.unsuspend');
 
-    Route::post('/users/{id}/reset-password', function($id) {
-        if (!auth()->user()->IsAdmin) {
-            abort(403, 'Unauthorized access. Admin only.');
-        }
-        return app(AdminUsersController::class)->resetPassword($id);
-    })->name('users.resetPassword');
-
     Route::get('/users/{id}/activity-log', function($id) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');

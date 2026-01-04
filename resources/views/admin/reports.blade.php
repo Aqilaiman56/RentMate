@@ -231,19 +231,6 @@
         </div>
     </div>
 
-    <!-- View Penalty Details Modal -->
-    <div id="penaltyModal" class="modal" style="display: none;">
-        <div class="modal-content modal-lg">
-            <div class="modal-header">
-                <h2 id="penaltyModalTitle">Penalty Details</h2>
-                <span class="close" onclick="closePenaltyModal()">&times;</span>
-            </div>
-            <div class="modal-body" id="penaltyDetailsContent">
-                <!-- Content will be loaded dynamically -->
-            </div>
-        </div>
-    </div>
-
     <!-- Action Modal -->
     <div id="actionModal" class="modal" style="display: none;">
         <div class="modal-content modal-lg">
@@ -551,18 +538,7 @@
             to { opacity: 1; }
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            animation: fadeIn 0.3s ease-out;
-        }
+        
 
         .modal-content {
             background: white;
@@ -573,10 +549,11 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.3s ease-out;
-            position: absolute;
+            position: fixed;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
+            z-index: 9999;
             pointer-events: auto;
         }
 
@@ -586,11 +563,11 @@
 
         @keyframes slideUp {
             from {
-                transform: translate(-50%, calc(-50% + 20px));
+                transform: translate(-50%, -50%) translateY(20px);
                 opacity: 0;
             }
             to {
-                transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%) translateY(0);
                 opacity: 1;
             }
         }
@@ -1114,18 +1091,20 @@
         }
 
         .report-card-actions {
+            padding: 0 20px 20px 20px;
             display: flex;
-            gap: 12px;
-            padding: 20px 24px;
+            justify-content: center;
             border-top: 1px solid #e5e7eb;
             background: white;
             flex-wrap: wrap;
         }
 
         .report-action-btn {
-            padding: 10px 18px;
+            width: auto;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 13px;
             border-radius: 8px;
-            font-size: 14px;
             font-weight: 600;
             border: none;
             cursor: pointer;

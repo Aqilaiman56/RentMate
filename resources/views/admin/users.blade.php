@@ -277,37 +277,6 @@
     </div>
 </div>
 
-<!-- Password Reset Success Modal -->
-<div id="passwordModal" class="custom-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-key"></i> Password Reset Successful</h3>
-            <button class="modal-close" onclick="closeModal('passwordModal')">&times;</button>
-        </div>
-        <div class="modal-body">
-            <p class="modal-description">Password has been reset for <strong id="resetUserName"></strong></p>
-
-            <div class="password-display">
-                <label>New Password:</label>
-                <div class="password-box">
-                    <code id="newPassword"></code>
-                    <button class="copy-btn" onclick="copyPassword()">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
-                </div>
-            </div>
-
-            <div class="alert-warning">
-                <i class="fas fa-exclamation-triangle"></i>
-                Please save this password and send it to the user securely.
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" onclick="copyPasswordAndClose()"><i class="fas fa-copy"></i> Copy & Close</button>
-        </div>
-    </div>
-</div>
-
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="custom-modal">
     <div class="modal-content">
@@ -1213,8 +1182,9 @@
                 font-size: 22px;
             }
 
-            .header-description {
+            .page-description {
                 font-size: 13px;
+                padding: 0 12px;
             }
 
             .header-actions {
@@ -1298,13 +1268,82 @@
                 font-size: 13px;
             }
 
-            .data-table th,
-            .data-table td {
+            .users-container {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .user-card {
+                border-radius: 10px;
+            }
+
+            .user-card-header {
                 padding: 12px 14px;
+            }
+
+            .user-section {
+                gap: 10px;
+            }
+
+            .user-avatar,
+            .user-avatar-img {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+
+            .user-name {
+                font-size: 14px;
+            }
+
+            .user-email {
+                font-size: 11px;
+            }
+
+            .status-badges {
+                gap: 6px;
+            }
+
+            .status-badge {
+                padding: 4px 8px;
+                font-size: 10px;
+                gap: 4px;
+            }
+
+            .user-toggle-icon {
                 font-size: 12px;
             }
 
-            .data-table th {
+            .user-details-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 12px 14px;
+            }
+
+            .detail-label {
+                font-size: 10px;
+                gap: 4px;
+            }
+
+            .detail-value {
+                font-size: 12px;
+            }
+
+            .card-actions {
+                padding: 12px 14px;
+                padding-top: 0;
+                gap: 8px;
+            }
+
+            .action-btn {
+                padding: 8px 12px;
+                font-size: 11px;
+                gap: 6px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .action-btn i {
                 font-size: 11px;
             }
 
@@ -1312,6 +1351,50 @@
                 width: 32px;
                 height: 32px;
                 font-size: 13px;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                border-radius: 12px;
+            }
+
+            .modal-header {
+                padding: 16px 18px;
+            }
+
+            .modal-header h3 {
+                font-size: 16px;
+                gap: 8px;
+            }
+
+            .modal-close {
+                width: 28px;
+                height: 28px;
+                font-size: 24px;
+            }
+
+            .modal-body {
+                padding: 18px;
+            }
+
+            .modal-footer {
+                padding: 16px 18px;
+                flex-direction: column;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                padding: 10px 16px;
+            }
+
+            .form-control {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .pagination-container {
+                padding: 16px 12px;
             }
         }
 
@@ -1339,6 +1422,7 @@
 
             .page-description {
                 font-size: 12px;
+                padding: 0 10px;
             }
 
             .header-actions .btn {
@@ -1409,13 +1493,92 @@
                 font-size: 12px;
             }
 
-            .data-table th,
-            .data-table td {
+            .users-container {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .user-card {
+                border-radius: 8px;
+            }
+
+            .user-card-header {
                 padding: 10px 12px;
+            }
+
+            .user-section {
+                gap: 8px;
+            }
+
+            .user-avatar,
+            .user-avatar-img {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+
+            .user-name {
+                font-size: 13px;
+            }
+
+            .user-email {
+                font-size: 10px;
+            }
+
+            .user-header-right {
+                gap: 8px;
+            }
+
+            .status-badges {
+                gap: 4px;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+
+            .status-badge {
+                padding: 3px 7px;
+                font-size: 9px;
+                gap: 3px;
+            }
+
+            .user-toggle-icon {
                 font-size: 11px;
             }
 
-            .data-table th {
+            .user-details-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 10px 12px;
+            }
+
+            .detail-label {
+                font-size: 9px;
+                gap: 3px;
+            }
+
+            .detail-label i {
+                font-size: 10px;
+            }
+
+            .detail-value {
+                font-size: 11px;
+            }
+
+            .card-actions {
+                padding: 10px 12px;
+                padding-top: 0;
+                gap: 6px;
+            }
+
+            .action-btn {
+                padding: 7px 10px;
+                font-size: 10px;
+                gap: 5px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .action-btn i {
                 font-size: 10px;
             }
 
@@ -1427,6 +1590,81 @@
 
             .action-buttons {
                 gap: 6px;
+            }
+
+            .modal-content {
+                width: 100%;
+                max-width: 100%;
+                border-radius: 0;
+                max-height: 100vh;
+            }
+
+            .modal-header {
+                padding: 14px 16px;
+            }
+
+            .modal-header h3 {
+                font-size: 15px;
+                gap: 6px;
+            }
+
+            .modal-close {
+                width: 26px;
+                height: 26px;
+                font-size: 20px;
+            }
+
+            .modal-body {
+                padding: 16px;
+                max-height: calc(100vh - 140px);
+            }
+
+            .modal-footer {
+                padding: 14px 16px;
+            }
+
+            .modal-footer .btn {
+                padding: 9px 14px;
+                font-size: 12px;
+            }
+
+            .form-control {
+                padding: 9px 12px;
+                font-size: 12px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+            }
+
+            .modal-description {
+                font-size: 13px;
+            }
+
+            .password-box {
+                padding: 12px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .password-box code {
+                font-size: 16px;
+                text-align: center;
+            }
+
+            .copy-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .deletion-list li {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .pagination-container {
+                padding: 14px 10px;
             }
         }
 
@@ -1920,54 +2158,6 @@
                 console.error('Error:', error);
                 alert('An error occurred while unsuspending the user');
             });
-        }
-
-        function resetPassword(id, name) {
-            if (!confirm(`Reset password for user "${name}"?\n\nA new password will be generated and displayed.`)) {
-                return;
-            }
-
-            // Send AJAX request
-            fetch(`/admin/users/${id}/reset-password`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('resetUserName').textContent = name;
-                    document.getElementById('newPassword').textContent = data.new_password;
-                    currentUserName = name;
-                    openModal('passwordModal');
-                } else {
-                    alert('Error: ' + (data.message || 'Failed to reset password'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while resetting the password');
-            });
-        }
-
-        function copyPassword() {
-            const password = document.getElementById('newPassword').textContent;
-            navigator.clipboard.writeText(password).then(() => {
-                showSuccessToast('Password copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-                alert('Failed to copy password. Please copy it manually.');
-            });
-        }
-
-        function copyPasswordAndClose() {
-            copyPassword();
-            setTimeout(() => {
-                closeModal('passwordModal');
-            }, 500);
         }
 
         function viewActivityLog(id, name) {

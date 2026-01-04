@@ -341,36 +341,6 @@ class UsersController extends Controller
         return back()->with('success', 'User unsuspended successfully');
     }
 
-    /**
-     * Reset user password
-     */
-    public function resetPassword($id)
-    {
-        $user = User::where('UserID', $id)
-            ->where('IsAdmin', 0)
-            ->firstOrFail();
-
-        // Generate random password
-        $newPassword = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 12);
-
-        $user->update([
-            'Password' => Hash::make($newPassword),
-            'PasswordHash' => Hash::make($newPassword)
-        ]);
-
-        // In a real application, you would email this to the user
-        // For now, we'll return it in the response
-
-        if (request()->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Password reset successfully',
-                'new_password' => $newPassword
-            ]);
-        }
-
-        return back()->with('success', 'Password reset successfully. New password: ' . $newPassword);
-    }
 
     /**
      * Get user activity log
