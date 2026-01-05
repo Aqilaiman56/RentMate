@@ -20,7 +20,10 @@ class BookingObserver
      */
     public function updated(Booking $booking)
     {
-        $this->updateItemAvailability($booking);
+        // Only update item availability if status or date fields were changed
+        if ($booking->wasChanged(['Status', 'StartDate', 'EndDate'])) {
+            $this->updateItemAvailability($booking);
+        }
     }
 
     /**

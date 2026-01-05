@@ -125,6 +125,8 @@ class BookingController extends Controller
                 'EndDate' => $endDate,
                 'TotalAmount' => $totalAmount,
                 'DepositAmount' => $item->DepositAmount,
+                'ServiceFeeAmount' => 1.00,
+                'TotalPaid' => 0, // Will be updated after payment
                 'Status' => 'pending', // Changed to pending for payment flow
                 'BookingDate' => now()
             ]);
@@ -351,7 +353,7 @@ class BookingController extends Controller
      */
     public function cancel($id)
     {
-        $booking = Booking::findOrFail($id);
+        $booking = Booking::with(['deposit', 'item'])->findOrFail($id);
 
         // Only allow cancellation by the person who made the booking
         if ($booking->UserID !== auth()->id()) {
@@ -387,9 +389,9 @@ class BookingController extends Controller
                     'UserID' => $booking->UserID,
                     'RefundAmount' => $refundAmount,
                     'Status' => 'pending',
-                    'BankName' => $user->BankName,
-                    'BankAccountNumber' => $user->BankAccountNumber,
-                    'BankAccountHolderName' => $user->BankAccountHolderName,
+                    'BankName' => $user->BankName ?? 'Not provided',
+                    'BankAccountNumber' => $user->BankAccountNumber ?? 'Not provided',
+                    'BankAccountHolderName' => $user->BankAccountHolderName ?? 'Not provided',
                     'Notes' => 'Auto-added: Booking cancelled by renter',
                 ]);
             }
@@ -681,9 +683,9 @@ class BookingController extends Controller
                     'UserID' => $booking->UserID,
                     'RefundAmount' => $refundAmount,
                     'Status' => 'pending',
-                    'BankName' => $renter->BankName,
-                    'BankAccountNumber' => $renter->BankAccountNumber,
-                    'BankAccountHolderName' => $renter->BankAccountHolderName,
+                    'BankName' => $renter->BankName ?? 'Not provided',
+                    'BankAccountNumber' => $renter->BankAccountNumber ?? 'Not provided',
+                    'BankAccountHolderName' => $renter->BankAccountHolderName ?? 'Not provided',
                     'Notes' => 'Auto-added: Booking rejected by owner',
                 ]);
             }

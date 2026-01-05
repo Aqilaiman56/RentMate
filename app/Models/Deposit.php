@@ -17,13 +17,17 @@ class Deposit extends Model
         'DepositAmount',
         'Status',
         'DateCollected',
+        'DateRefunded',
         'RefundDate',
+        'RefundMethod',
+        'RefundReference',
         'Notes'
     ];
 
     protected $casts = [
         'DepositAmount' => 'decimal:2',
         'DateCollected' => 'date',
+        'DateRefunded' => 'datetime',
         'RefundDate' => 'date',
     ];
 

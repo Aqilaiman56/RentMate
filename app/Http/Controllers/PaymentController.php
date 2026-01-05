@@ -104,7 +104,7 @@ class PaymentController extends Controller
                 ->with('error', 'Payment record not found');
         }
 
-        $booking = Booking::with('item')->findOrFail($payment->BookingID);
+        $booking = Booking::with(['item', 'user'])->findOrFail($payment->BookingID);
 
         // Status: 1 = Successful, 2 = Pending, 3 = Failed
         if ($statusId == 1) {
@@ -117,6 +117,11 @@ class PaymentController extends Controller
                     'PaymentMethod' => 'ToyyibPay - FPX',
                     'PaymentDate' => now(),
                     'PaymentResponse' => json_encode($request->all())
+                ]);
+
+                // Update booking TotalPaid with the payment amount (deposit + service fee)
+                $booking->update([
+                    'TotalPaid' => $payment->Amount
                 ]);
 
                 // Keep booking as pending - owner needs to approve
@@ -213,7 +218,7 @@ class PaymentController extends Controller
      */
     public function checkStatus($bookingId)
     {
-        $booking = Booking::findOrFail($bookingId);
+        $booking = Booking::with('item')->findOrFail($bookingId);
 
         // Check authorization
         if ($booking->UserID !== auth()->id() && $booking->item->UserID !== auth()->id()) {

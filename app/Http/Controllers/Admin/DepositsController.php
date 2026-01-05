@@ -182,9 +182,9 @@ class DepositsController extends Controller
                 'UserID' => $user->UserID,
                 'RefundAmount' => $deposit->DepositAmount,
                 'Status' => 'pending',
-                'BankName' => $user->BankName,
-                'BankAccountNumber' => $user->BankAccountNumber,
-                'BankAccountHolderName' => $user->BankAccountHolderName,
+                'BankName' => $user->BankName ?? 'Not provided',
+                'BankAccountNumber' => $user->BankAccountNumber ?? 'Not provided',
+                'BankAccountHolderName' => $user->BankAccountHolderName ?? 'Not provided',
                 'Notes' => $request->input('notes', 'Refund initiated by admin'),
             ]);
 
