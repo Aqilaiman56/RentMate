@@ -44,7 +44,7 @@
         <div class="stat-card">
             <div class="stat-icon green">✓</div>
             <div class="stat-content">
-                <div class="stat-value">{{ $deposits->where('Status', 'refunded')->count() }}</div>
+                <div class="stat-value">{{ $refundedCount }}</div>
                 <div class="stat-label">Refunded</div>
                 <div class="stat-amount">RM {{ number_format($refundedAmount, 2) }}</div>
             </div>
@@ -1113,14 +1113,36 @@
         }
 
         .btn-modal-primary {
-            background: #10b981;
+            background: #3b82f6;
             color: white;
         }
 
         .btn-modal-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-modal-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-modal-success:hover {
             background: #059669;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-modal-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-modal-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
         }
 
         .btn-modal-secondary {
@@ -1132,10 +1154,65 @@
             background: #e5e7eb;
         }
 
-        .btn-modal-primary:disabled {
+        .btn-modal-primary:disabled,
+        .btn-modal-success:disabled,
+        .btn-modal-danger:disabled {
             background: #d1d5db;
             cursor: not-allowed;
             transform: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .alert-box {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
         }
 
         /* Responsive Breakpoints */
@@ -1776,6 +1853,24 @@
                                         <div class="detail-label">Date Collected</div>
                                         <div class="detail-value">${deposit.date_collected}</div>
                                     </div>
+                                    ${deposit.total_refunded && parseFloat(deposit.total_refunded) > 0 ? `
+                                        <div class="detail-item">
+                                            <div class="detail-label">Total Refunded</div>
+                                            <div class="detail-value" style="color: #10b981;">RM ${deposit.total_refunded}</div>
+                                        </div>
+                                    ` : ''}
+                                    ${deposit.total_forfeited && parseFloat(deposit.total_forfeited) > 0 ? `
+                                        <div class="detail-item">
+                                            <div class="detail-label">Total Forfeited</div>
+                                            <div class="detail-value" style="color: #ef4444;">RM ${deposit.total_forfeited}</div>
+                                        </div>
+                                    ` : ''}
+                                    ${(deposit.total_refunded && parseFloat(deposit.total_refunded) > 0) || (deposit.total_forfeited && parseFloat(deposit.total_forfeited) > 0) ? `
+                                        <div class="detail-item">
+                                            <div class="detail-label">Available Amount</div>
+                                            <div class="detail-value" style="color: #3b82f6; font-weight: 700;">RM ${deposit.available_amount}</div>
+                                        </div>
+                                    ` : ''}
                                     ${deposit.refund_date !== 'N/A' ? `
                                         <div class="detail-item">
                                             <div class="detail-label">Refund Date</div>
@@ -1892,11 +1987,50 @@
                                 </div>
                             ` : ''}
 
+                            ${deposit.forfeit_queue ? `
+                                <div class="detail-section">
+                                    <div class="detail-section-title">Forfeit Queue Status</div>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <div class="detail-label">Forfeit Status</div>
+                                            <div class="detail-value status">
+                                                <span class="status-badge status-${deposit.forfeit_queue.status.toLowerCase()}">${deposit.forfeit_queue.status}</span>
+                                            </div>
+                                        </div>
+                                        ${deposit.forfeit_queue.reference ? `
+                                            <div class="detail-item">
+                                                <div class="detail-label">Reference Number</div>
+                                                <div class="detail-value">${deposit.forfeit_queue.reference}</div>
+                                            </div>
+                                        ` : ''}
+                                        ${deposit.forfeit_queue.processed_at ? `
+                                            <div class="detail-item">
+                                                <div class="detail-label">Processed At</div>
+                                                <div class="detail-value">${deposit.forfeit_queue.processed_at}</div>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    <div style="margin-top: 16px; padding: 12px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px;">
+                                        <a href="/admin/forfeit-queue" style="color: #92400e; font-weight: 600; text-decoration: none;">
+                                            <i class="fas fa-external-link-alt"></i> View in Forfeit Queue
+                                        </a>
+                                    </div>
+                                </div>
+                            ` : ''}
+
                             <!-- Action Buttons -->
                             <div class="action-buttons-modal">
+                                ${deposit.status.toLowerCase() === 'held' || deposit.status.toLowerCase() === 'partial' ? `
+                                    <button class="btn-modal btn-modal-primary" onclick="showPartialRefundForm(${id}, '${deposit.available_amount || deposit.amount}')">
+                                        <i class="fas fa-coins"></i> Partial Refund
+                                    </button>
+                                    <button class="btn-modal btn-modal-danger" onclick="showForfeitForm(${id}, '${deposit.available_amount || deposit.amount}')">
+                                        <i class="fas fa-exclamation-triangle"></i> Forfeit to Owner
+                                    </button>
+                                ` : ''}
                                 ${deposit.status.toLowerCase() === 'held' ? `
-                                    <button class="btn-modal btn-modal-primary" onclick="processRefund(${id})">
-                                        <i class="fas fa-check-circle"></i> Process Refund
+                                    <button class="btn-modal btn-modal-success" onclick="processRefund(${id})">
+                                        <i class="fas fa-check-circle"></i> Full Refund
                                     </button>
                                 ` : ''}
                                 <button class="btn-modal btn-modal-secondary" onclick="closeDepositModal()">
@@ -1920,7 +2054,7 @@
         }
 
         function processRefund(depositId) {
-            if (confirm('Are you sure you want to process this refund?')) {
+            if (confirm('Are you sure you want to process a FULL refund for this deposit?')) {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/admin/deposits/${depositId}/refund`;
@@ -1935,6 +2069,125 @@
                 document.body.appendChild(form);
                 form.submit();
             }
+        }
+
+        function showPartialRefundForm(depositId, depositAmount) {
+            const modalContent = document.getElementById('depositModalContent');
+            const amount = parseFloat(depositAmount.replace(/,/g, ''));
+
+            const formHtml = `
+                <div class="alert-box alert-info">
+                    <i class="fas fa-info-circle"></i> Processing a partial refund will create a refund queue entry for the specified amount.
+                </div>
+
+                <form id="partialRefundForm" action="/admin/deposits/${depositId}/partial-refund" method="POST">
+                    <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+
+                    <div class="form-group">
+                        <label class="form-label" for="refund_amount">
+                            <i class="fas fa-money-bill-wave"></i> Refund Amount (RM)
+                        </label>
+                        <input type="number"
+                               id="refund_amount"
+                               name="refund_amount"
+                               class="form-input"
+                               step="0.01"
+                               min="0.01"
+                               max="${amount}"
+                               required
+                               placeholder="Enter refund amount">
+                        <small style="color: #6b7280; display: block; margin-top: 4px;">
+                            Maximum available: RM ${depositAmount}
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="notes">
+                            <i class="fas fa-sticky-note"></i> Notes (Optional)
+                        </label>
+                        <textarea id="notes"
+                                  name="notes"
+                                  class="form-textarea"
+                                  placeholder="Add any additional notes..."></textarea>
+                    </div>
+
+                    <div class="action-buttons-modal">
+                        <button type="submit" class="btn-modal btn-modal-primary">
+                            <i class="fas fa-check"></i> Submit Partial Refund
+                        </button>
+                        <button type="button" class="btn-modal btn-modal-secondary" onclick="viewDeposit(${depositId})">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                </form>
+            `;
+
+            modalContent.innerHTML = formHtml;
+        }
+
+        function showForfeitForm(depositId, depositAmount) {
+            const modalContent = document.getElementById('depositModalContent');
+            const amount = parseFloat(depositAmount.replace(/,/g, ''));
+
+            const formHtml = `
+                <div class="alert-box alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Forfeiting will transfer the specified amount to the item owner as compensation for damages or violations.
+                </div>
+
+                <form id="forfeitForm" action="/admin/deposits/${depositId}/forfeit" method="POST">
+                    <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+
+                    <div class="form-group">
+                        <label class="form-label" for="forfeit_amount">
+                            <i class="fas fa-dollar-sign"></i> Forfeit Amount (RM) *
+                        </label>
+                        <input type="number"
+                               id="forfeit_amount"
+                               name="forfeit_amount"
+                               class="form-input"
+                               step="0.01"
+                               min="0.01"
+                               max="${amount}"
+                               required
+                               placeholder="Enter forfeit amount">
+                        <small style="color: #6b7280; display: block; margin-top: 4px;">
+                            Maximum available: RM ${depositAmount}
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="reason">
+                            <i class="fas fa-clipboard-list"></i> Reason for Forfeit *
+                        </label>
+                        <textarea id="reason"
+                                  name="reason"
+                                  class="form-textarea"
+                                  required
+                                  placeholder="Explain why the deposit is being forfeited (e.g., item damage, late return, violation of terms)..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="notes_forfeit">
+                            <i class="fas fa-sticky-note"></i> Additional Notes (Optional)
+                        </label>
+                        <textarea id="notes_forfeit"
+                                  name="notes"
+                                  class="form-textarea"
+                                  placeholder="Add any additional notes..."></textarea>
+                    </div>
+
+                    <div class="action-buttons-modal">
+                        <button type="submit" class="btn-modal btn-modal-danger">
+                            <i class="fas fa-exclamation-circle"></i> Confirm Forfeit
+                        </button>
+                        <button type="button" class="btn-modal btn-modal-secondary" onclick="viewDeposit(${depositId})">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                </form>
+            `;
+
+            modalContent.innerHTML = formHtml;
         }
 
         // Close modal on escape key

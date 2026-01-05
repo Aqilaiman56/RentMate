@@ -384,6 +384,13 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         return app(AdminDepositsController::class)->forfeit($request, $id);
     })->name('deposits.forfeit');
 
+    Route::post('/deposits/{id}/partial-refund', function($id, Request $request) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(AdminDepositsController::class)->partialRefund($request, $id);
+    })->name('deposits.partial-refund');
+
     // Refund Queue Management
     Route::get('/refund-queue', function(Request $request) {
         if (!auth()->user()->IsAdmin) {

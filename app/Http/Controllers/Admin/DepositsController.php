@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Deposit;
 use App\Models\Booking;
 use App\Models\RefundQueue;
+use App\Models\ForfeitQueue;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -84,7 +85,8 @@ class DepositsController extends Controller
 
         // Calculate statistics
         $totalDeposits = Deposit::sum('DepositAmount') ?? 0;
-        $refundedAmount = Deposit::where('Status', 'refunded')->sum('DepositAmount') ?? 0;
+        $refundedAmount = RefundQueue::where('Status', 'completed')->sum('RefundAmount') ?? 0;
+        $refundedCount = RefundQueue::where('Status', 'completed')->count();
         $heldAmount = Deposit::where('Status', 'held')->sum('DepositAmount') ?? 0;
         $forfeitedAmount = Deposit::where('Status', 'forfeited')->sum('DepositAmount') ?? 0;
         $totalCount = Deposit::count();
@@ -93,6 +95,7 @@ class DepositsController extends Controller
             'deposits',
             'totalDeposits',
             'refundedAmount',
+            'refundedCount',
             'heldAmount',
             'forfeitedAmount',
             'totalCount'
@@ -112,6 +115,20 @@ class DepositsController extends Controller
         // Check if there's a refund queue entry
         $refundQueue = RefundQueue::where('DepositID', $id)->first();
 
+        // Check if there's a forfeit queue entry
+        $forfeitQueue = ForfeitQueue::where('DepositID', $id)->first();
+
+        // Calculate totals
+        $totalRefunded = RefundQueue::where('DepositID', $id)
+            ->whereIn('Status', ['completed', 'pending', 'processing'])
+            ->sum('RefundAmount');
+
+        $totalForfeited = ForfeitQueue::where('DepositID', $id)
+            ->whereIn('Status', ['completed', 'pending', 'processing'])
+            ->sum('ForfeitAmount');
+
+        $availableAmount = $deposit->DepositAmount - $totalRefunded - $totalForfeited;
+
         return response()->json([
             'success' => true,
             'deposit' => [
@@ -121,6 +138,9 @@ class DepositsController extends Controller
                 'date_collected' => $deposit->DateCollected->format('M d, Y'),
                 'refund_date' => $deposit->RefundDate ? $deposit->RefundDate->format('M d, Y') : 'N/A',
                 'notes' => $deposit->Notes ?? 'No notes',
+                'total_refunded' => number_format($totalRefunded, 2),
+                'total_forfeited' => number_format($totalForfeited, 2),
+                'available_amount' => number_format($availableAmount, 2),
                 'user' => [
                     'name' => $deposit->booking->user->UserName,
                     'email' => $deposit->booking->user->Email,
@@ -143,6 +163,11 @@ class DepositsController extends Controller
                     'status' => ucfirst($refundQueue->Status),
                     'reference' => $refundQueue->RefundReference,
                     'processed_at' => $refundQueue->ProcessedAt ? $refundQueue->ProcessedAt->format('M d, Y g:i A') : null,
+                ] : null,
+                'forfeit_queue' => $forfeitQueue ? [
+                    'status' => ucfirst($forfeitQueue->Status),
+                    'reference' => $forfeitQueue->ForfeitReference,
+                    'processed_at' => $forfeitQueue->ProcessedAt ? $forfeitQueue->ProcessedAt->format('M d, Y g:i A') : null,
                 ] : null,
             ]
         ]);
@@ -203,27 +228,148 @@ class DepositsController extends Controller
     }
 
     /**
-     * Forfeit a deposit
+     * Process partial refund for a deposit
+     */
+    public function partialRefund(Request $request, $id)
+    {
+        $request->validate([
+            'refund_amount' => 'required|numeric|min:0.01',
+        ]);
+
+        try {
+            $deposit = Deposit::with('booking.user')->findOrFail($id);
+
+            // Check if can be refunded
+            if (!in_array($deposit->Status, ['held', 'partial'])) {
+                return back()->with('error', 'This deposit cannot be refunded (Status: ' . $deposit->Status . ')');
+            }
+
+            $refundAmount = $request->input('refund_amount');
+
+            // Calculate total already refunded
+            $totalRefunded = RefundQueue::where('DepositID', $id)
+                ->whereIn('Status', ['completed', 'pending', 'processing'])
+                ->sum('RefundAmount');
+
+            // Check if refund amount is valid
+            if (($totalRefunded + $refundAmount) > $deposit->DepositAmount) {
+                return back()->with('error', 'Refund amount exceeds available deposit. Available: RM ' . number_format($deposit->DepositAmount - $totalRefunded, 2));
+            }
+
+            // Check if user has bank details
+            $user = $deposit->booking->user;
+            if (!$user->BankName || !$user->BankAccountNumber || !$user->BankAccountHolderName) {
+                return back()->with('error', 'User has not provided bank account details. Cannot process refund.');
+            }
+
+            DB::beginTransaction();
+
+            // Create refund queue entry
+            $refundQueue = RefundQueue::create([
+                'DepositID' => $deposit->DepositID,
+                'BookingID' => $deposit->BookingID,
+                'UserID' => $user->UserID,
+                'RefundAmount' => $refundAmount,
+                'Status' => 'pending',
+                'BankName' => $user->BankName,
+                'BankAccountNumber' => $user->BankAccountNumber,
+                'BankAccountHolderName' => $user->BankAccountHolderName,
+                'Notes' => $request->input('notes', 'Partial refund initiated by admin'),
+            ]);
+
+            // Update deposit status to partial if not fully refunded
+            $remainingAmount = $deposit->DepositAmount - ($totalRefunded + $refundAmount);
+            if ($remainingAmount > 0) {
+                $deposit->Status = 'partial';
+                $deposit->Notes = 'Partial refund - Ref: #RQ' . str_pad($refundQueue->RefundQueueID, 4, '0', STR_PAD_LEFT) . '. Remaining: RM ' . number_format($remainingAmount, 2);
+            } else {
+                $deposit->Notes = 'Full refund queued - Ref: #RQ' . str_pad($refundQueue->RefundQueueID, 4, '0', STR_PAD_LEFT);
+            }
+            $deposit->save();
+
+            DB::commit();
+
+            return redirect()->route('admin.refund-queue')->with('success', 'Partial refund request created successfully. Please process the bank transfer.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to create partial refund request: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Forfeit a deposit and queue payment to item owner
      */
     public function forfeit(Request $request, $id)
     {
+        $request->validate([
+            'forfeit_amount' => 'required|numeric|min:0.01',
+            'reason' => 'required|string|max:500',
+        ]);
+
         try {
-            $deposit = Deposit::findOrFail($id);
-            
-            if ($deposit->Status !== 'held') {
-                return back()->with('error', 'Can only forfeit held deposits');
+            $deposit = Deposit::with('booking.user', 'booking.item.user')->findOrFail($id);
+
+            if (!in_array($deposit->Status, ['held', 'partial'])) {
+                return back()->with('error', 'Can only forfeit held or partial deposits');
             }
-            
+
+            $forfeitAmount = $request->input('forfeit_amount');
+
+            // Calculate total already forfeited
+            $totalForfeited = ForfeitQueue::where('DepositID', $id)
+                ->whereIn('Status', ['completed', 'pending', 'processing'])
+                ->sum('ForfeitAmount');
+
+            // Calculate total already refunded
+            $totalRefunded = RefundQueue::where('DepositID', $id)
+                ->whereIn('Status', ['completed', 'pending', 'processing'])
+                ->sum('RefundAmount');
+
+            // Check if forfeit amount is valid
+            $availableAmount = $deposit->DepositAmount - $totalForfeited - $totalRefunded;
+            if ($forfeitAmount > $availableAmount) {
+                return back()->with('error', 'Forfeit amount exceeds available deposit. Available: RM ' . number_format($availableAmount, 2));
+            }
+
+            // Get item owner
+            $owner = $deposit->booking->item->user;
+            if (!$owner->BankName || !$owner->BankAccountNumber || !$owner->BankAccountHolderName) {
+                return back()->with('error', 'Item owner has not provided bank account details. Cannot process forfeit payment.');
+            }
+
             DB::beginTransaction();
-            
-            $deposit->Status = 'forfeited';
-            $deposit->Notes = $request->input('reason', 'Forfeited by admin');
+
+            // Create forfeit queue entry
+            $forfeitQueue = ForfeitQueue::create([
+                'DepositID' => $deposit->DepositID,
+                'BookingID' => $deposit->BookingID,
+                'OwnerUserID' => $owner->UserID,
+                'RenterUserID' => $deposit->booking->user->UserID,
+                'ForfeitAmount' => $forfeitAmount,
+                'Status' => 'pending',
+                'BankName' => $owner->BankName,
+                'BankAccountNumber' => $owner->BankAccountNumber,
+                'BankAccountHolderName' => $owner->BankAccountHolderName,
+                'Reason' => $request->input('reason'),
+                'Notes' => $request->input('notes', 'Forfeit initiated by admin'),
+            ]);
+
+            // Update deposit status
+            $remainingAmount = $deposit->DepositAmount - $totalForfeited - $forfeitAmount - $totalRefunded;
+            if ($remainingAmount > 0) {
+                $deposit->Status = 'partial';
+                $deposit->Notes = 'Partial forfeit - Ref: #FQ' . str_pad($forfeitQueue->ForfeitQueueID, 4, '0', STR_PAD_LEFT) . '. Remaining: RM ' . number_format($remainingAmount, 2);
+            } else {
+                $deposit->Status = 'forfeited';
+                $deposit->Notes = 'Forfeited - Ref: #FQ' . str_pad($forfeitQueue->ForfeitQueueID, 4, '0', STR_PAD_LEFT) . '. Reason: ' . $request->input('reason');
+            }
             $deposit->save();
-            
+
             DB::commit();
-            
-            return back()->with('success', 'Deposit forfeited successfully');
-            
+
+            return redirect()->route('admin.forfeit-queue')->with('success', 'Forfeit payment queued successfully. Please process the bank transfer to item owner.');
+
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Failed to forfeit deposit: ' . $e->getMessage());
