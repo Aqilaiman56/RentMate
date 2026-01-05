@@ -8,10 +8,11 @@
             </button>
             <h1 class="header-title">Deposits Overview</h1>
         </div>
-        <div class="header-actions">
+        <div class="header-actions" style="gap: 12px;">
             <a href="{{ route('admin.deposits.export') }}" class="btn btn-secondary">
                 <i class="fas fa-download"></i> <span class="btn-text">Export Data</span>
             </a>
+            @include('admin.partials.header-actions', ['notificationCount' => $notificationCount ?? 0])
         </div>
     </div>
 

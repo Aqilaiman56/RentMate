@@ -8,10 +8,11 @@
             </button>
             <h1 class="header-title">Reports & Complaints</h1>
         </div>
-        <div class="header-actions">
+        <div class="header-actions" style="gap: 12px;">
             <a href="{{ route('admin.reports.export') }}" class="btn btn-secondary">
                 Export Reports
             </a>
+            @include('admin.partials.header-actions', ['notificationCount' => $notificationCount ?? 0])
         </div>
     </div>
 
@@ -142,16 +143,10 @@
                             <div class="report-detail-label">Reporter</div>
                             <div class="report-detail-value">
                                 <div class="report-reporter-info">
-                                    @if($report->reporter->ProfileImage)
-                                        <img src="{{ asset('storage/' . $report->reporter->ProfileImage) }}"
-                                             alt="{{ $report->reporter->UserName }}"
-                                             class="report-small-avatar-img">
-                                    @else
-                                        <div class="report-small-avatar {{ ['blue', 'pink', 'green', 'orange', 'purple', 'teal', 'red', 'indigo'][$report->reporter->UserID % 8] }}">
-                                            {{ strtoupper(substr($report->reporter->UserName, 0, 2)) }}
-                                        </div>
-                                    @endif
-                                    <span>{{ $report->reporter->UserName }}</span>
+                                    <div class="report-small-avatar gray">
+                                        <i class="fas fa-user-secret"></i>
+                                    </div>
+                                    <span style="color: #6b7280; font-style: italic;">Anonymous</span>
                                 </div>
                             </div>
                         </div>
@@ -356,29 +351,7 @@
                         <div class="alert-success">
                             <div>
                                 <strong>Resolve Report</strong>
-                                <p>Mark this report as resolved and optionally apply a penalty.</p>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="apply_penalty" id="applyPenalty" onchange="togglePenaltyAmount()">
-                                <span>Apply Penalty to Reported User</span>
-                            </label>
-                        </div>
-
-                        <div id="penaltyAmountFields" style="display: none;">
-                            <div class="form-group">
-                                <label class="form-label">
-                                    Penalty Amount (RM)
-                                </label>
-                                <input type="number" name="penalty_amount" class="form-control" step="0.01" min="0" placeholder="0.00">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">
-                                    Penalty Reason
-                                </label>
-                                <textarea name="penalty_description" class="form-control" rows="3" placeholder="Explain the reason for this penalty..."></textarea>
+                                <p>Mark this report as resolved. Use the "Issue Penalty" button to apply penalties separately.</p>
                             </div>
                         </div>
                     </div>
@@ -1085,6 +1058,7 @@
         .report-small-avatar.teal { background: #14b8a6; }
         .report-small-avatar.red { background: #ef4444; }
         .report-small-avatar.indigo { background: #6366f1; }
+        .report-small-avatar.gray { background: #9ca3af; }
 
         .report-small-avatar-img {
             object-fit: cover;
@@ -1276,8 +1250,7 @@
                                     <div style="display: grid; gap: 12px;">
                                         <div style="padding: 12px; background: #f9fafb; border-radius: 8px;">
                                             <span style="font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Reporter:</span>
-                                            <span>${report.reporter.name}</span><br>
-                                            <span style="color: #6b7280; font-size: 13px;">${report.reporter.email}</span>
+                                            <span style="color: #6b7280; font-style: italic;"><i class="fas fa-user-secret"></i> Anonymous</span>
                                         </div>
                                         <div style="padding: 12px; background: #fee2e2; border-radius: 8px;">
                                             <span style="font-weight: 600; color: #991b1b; display: block; margin-bottom: 4px;">Reported User:</span>
@@ -1397,11 +1370,6 @@
         function toggleCustomDate() {
             const duration = document.getElementById('suspensionDuration').value;
             document.getElementById('customDateField').style.display = duration === 'custom' ? 'block' : 'none';
-        }
-
-        function togglePenaltyAmount() {
-            const applyPenalty = document.getElementById('applyPenalty').checked;
-            document.getElementById('penaltyAmountFields').style.display = applyPenalty ? 'block' : 'none';
         }
 
         document.getElementById('actionForm')?.addEventListener('submit', function(e) {

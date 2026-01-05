@@ -8,10 +8,11 @@
             </button>
             <h1 class="header-title">Service Fee Management</h1>
         </div>
-        <div class="header-actions">
+        <div class="header-actions" style="gap: 12px;">
             <a href="{{ route('admin.service-fees.export', ['year' => $year]) }}" class="btn btn-secondary">
                 <i class="fas fa-download"></i> Export {{ $year }} Data
             </a>
+            @include('admin.partials.header-actions', ['notificationCount' => $notificationCount ?? 0])
         </div>
     </div>
 

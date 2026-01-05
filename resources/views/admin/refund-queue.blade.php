@@ -8,6 +8,7 @@
             </button>
             <h1 class="header-title">Refund Queue</h1>
         </div>
+        @include('admin.partials.header-actions', ['notificationCount' => $notificationCount ?? 0])
     </div>
 
     <p class="page-description">Process pending deposit refunds to users' bank accounts</p>

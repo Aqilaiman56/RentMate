@@ -405,18 +405,12 @@
             <div class="info-item full-width">
                 <span class="info-label">Reported By</span>
                 <div class="user-info-card">
-                    @if($report->reporter->ProfileImage)
-                        <img src="{{ asset('storage/' . $report->reporter->ProfileImage) }}"
-                             alt="{{ $report->reporter->UserName }}"
-                             class="user-avatar">
-                    @else
-                        <div class="user-avatar-placeholder">
-                            {{ strtoupper(substr($report->reporter->UserName, 0, 2)) }}
-                        </div>
-                    @endif
+                    <div class="user-avatar-placeholder" style="background: #9ca3af;">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
                     <div class="user-details">
-                        <div class="user-name">{{ $report->reporter->UserName }}</div>
-                        <div class="user-email">{{ $report->reporter->Email }}</div>
+                        <div class="user-name" style="color: #6b7280; font-style: italic;">Anonymous</div>
+                        <div class="user-email" style="color: #9ca3af;">Identity protected for privacy</div>
                     </div>
                 </div>
             </div>

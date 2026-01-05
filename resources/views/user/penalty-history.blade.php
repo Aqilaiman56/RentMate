@@ -357,8 +357,8 @@
                         </div>
                         @if($penalty->reportedBy)
                             <div class="meta-item">
-                                <i class="fas fa-user"></i>
-                                <span>Reported by: {{ $penalty->reportedBy->UserName }}</span>
+                                <i class="fas fa-user-secret"></i>
+                                <span style="color: #6b7280; font-style: italic;">Reported by: Anonymous</span>
                             </div>
                         @endif
                         @if($penalty->booking)

@@ -54,15 +54,18 @@
         /* Profile Section */
         .profile-section {
             position: relative;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 8px;
+            gap: 8px;
+            padding: 11px 14px;
+            border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.2s;
             background: white;
             border: 2px solid #E5E7EB;
+            height: 44px;
+            white-space: nowrap;
+            transform: translateY(-4px);
         }
 
         .profile-section:hover {
@@ -74,6 +77,7 @@
             font-weight: 500;
             font-size: 14px;
             color: #374151;
+            line-height: 1;
         }
 
         /* Dropdown Menu */
@@ -145,14 +149,19 @@
             position: relative;
             background: white;
             border: 2px solid #E5E7EB;
-            font-size: 20px;
+            font-size: 16px;
             cursor: pointer;
-            padding: 10px 14px;
+            padding: 11px 14px;
             border-radius: 10px;
             transition: all 0.3s;
             color: #374151;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 44px;
+            min-width: 44px;
+            transform: translateY(-4px);
         }
 
         .notification-btn:hover {
@@ -162,7 +171,7 @@
         }
 
         .notification-btn:active {
-            transform: scale(0.95);
+            transform: translateY(-4px) scale(0.95);
         }
 
         .notification-badge {
@@ -172,21 +181,14 @@
             background: #dc3545;
             color: white;
             border-radius: 50%;
-            min-width: 20px;
-            height: 20px;
+            min-width: 22px;
+            height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 11px;
-            font-weight: bold;
-            padding: 0 5px;
-            animation: pulse 2s infinite;
-            border: 2px solid white;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            font-weight: 700;
+            padding: 0 4px;
         }
 
         /* Responsive Styles */
@@ -243,12 +245,15 @@
             }
 
             .notification-btn {
-                padding: 8px 12px;
-                font-size: 18px;
+                padding: 10px 12px !important;
+                font-size: 16px !important;
+                height: 40px !important;
+                min-width: 40px !important;
             }
 
             .profile-section {
-                padding: 6px 10px;
+                padding: 10px 12px !important;
+                height: 40px !important;
             }
 
             .profile-name {
@@ -271,12 +276,15 @@
             }
 
             .notification-btn {
-                padding: 6px 10px;
-                font-size: 16px;
+                padding: 8px 10px !important;
+                font-size: 16px !important;
+                height: 36px !important;
+                min-width: 36px !important;
             }
 
             .profile-section {
-                padding: 5px 8px;
+                padding: 8px 10px !important;
+                height: 36px !important;
             }
 
             .profile-name {

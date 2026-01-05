@@ -8,6 +8,7 @@
             </button>
             <h1 class="header-title">Users Management</h1>
         </div>
+        @include('admin.partials.header-actions', ['notificationCount' => $notificationCount ?? 0])
     </div>
 
     <p class="page-description">Manage all registered users, account actions, view profiles</p>

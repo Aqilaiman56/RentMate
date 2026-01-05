@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Penalty;
 use App\Models\Report;
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -112,6 +113,18 @@ class PenaltyController extends Controller
             'ReviewedByAdminID' => Auth::id(),
             'AdminNotes' => 'Penalty issued: RM ' . number_format($validated['PenaltyAmount'], 2),
             'DateResolved' => now(),
+        ]);
+
+        // Send notification to the penalized user
+        Notification::create([
+            'UserID' => $report->ReportedUserID,
+            'Type' => 'penalty',
+            'Title' => 'Penalty Payment Required',
+            'Content' => 'You have been issued a penalty of RM ' . number_format($validated['PenaltyAmount'], 2) . '. Reason: ' . $validated['Description'] . '. Please make the payment as soon as possible.',
+            'RelatedID' => $penalty->PenaltyID,
+            'RelatedType' => 'penalty',
+            'IsRead' => false,
+            'CreatedAt' => now(),
         ]);
 
         return response()->json([
