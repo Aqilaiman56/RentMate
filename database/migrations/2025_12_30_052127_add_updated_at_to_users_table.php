@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            // Add UpdatedAt column after CreatedAt
-            $table->timestamp('UpdatedAt')->nullable()->after('CreatedAt');
-        });
+        // UpdatedAt column is now added in create_users_table migration
+        // This migration is no longer needed
     }
 
     /**
@@ -22,8 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('UpdatedAt');
-        });
+        // Nothing to rollback
     }
 };

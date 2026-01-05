@@ -12,9 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('BankName', 100)->nullable()->after('PhoneNumber');
-            $table->string('BankAccountNumber', 50)->nullable()->after('BankName');
-            $table->string('BankAccountHolderName', 100)->nullable()->after('BankAccountNumber');
+            // These columns now added in create_users_table migration
+            if (!Schema::hasColumn('users', 'BankName')) {
+                $table->string('BankName', 100)->nullable()->after('PhoneNumber');
+            }
+            if (!Schema::hasColumn('users', 'BankAccountNumber')) {
+                $table->string('BankAccountNumber', 50)->nullable()->after('BankName');
+            }
+            if (!Schema::hasColumn('users', 'BankAccountHolderName')) {
+                $table->string('BankAccountHolderName', 100)->nullable()->after('BankAccountNumber');
+            }
         });
     }
 

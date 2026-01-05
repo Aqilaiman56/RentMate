@@ -12,10 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('IsSuspended')->default(false);
-            $table->timestamp('SuspendedUntil')->nullable();
-            $table->text('SuspensionReason')->nullable();
-            $table->unsignedBigInteger('SuspendedByAdminID')->nullable();
+            // These columns now added in create_users_table migration
+            if (!Schema::hasColumn('users', 'IsSuspended')) {
+                $table->boolean('IsSuspended')->default(false);
+            }
+            if (!Schema::hasColumn('users', 'SuspendedUntil')) {
+                $table->timestamp('SuspendedUntil')->nullable();
+            }
+            if (!Schema::hasColumn('users', 'SuspensionReason')) {
+                $table->text('SuspensionReason')->nullable();
+            }
+            if (!Schema::hasColumn('users', 'SuspendedByAdminID')) {
+                $table->unsignedBigInteger('SuspendedByAdminID')->nullable();
+            }
         });
     }
 

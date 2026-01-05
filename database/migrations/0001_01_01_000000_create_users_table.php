@@ -13,16 +13,30 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id('UserID');
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->string('UserName');
+            $table->string('Email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('PasswordHash');
+            $table->string('PhoneNumber')->nullable();
+            $table->string('Location')->nullable();
+            $table->string('ProfileImage')->nullable();
+            $table->string('UserType')->nullable();
+            $table->boolean('IsAdmin')->default(0);
+            $table->boolean('IsSuspended')->default(0);
+            $table->timestamp('SuspendedUntil')->nullable();
+            $table->text('SuspensionReason')->nullable();
+            $table->unsignedBigInteger('SuspendedByAdminID')->nullable();
+            $table->string('BankName')->nullable();
+            $table->string('BankAccountNumber')->nullable();
+            $table->string('BankAccountHolderName')->nullable();
+            $table->string('role')->default('user');
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestamp('CreatedAt')->useCurrent();
+            $table->timestamp('UpdatedAt')->useCurrent()->useCurrentOnUpdate();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
+            $table->string('Email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });

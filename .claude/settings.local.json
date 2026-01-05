@@ -31,7 +31,9 @@
       "Bash(grep:*)",
       "Bash(php check_users.php:*)",
       "Bash(php check_users_structure.php:*)",
-      "Bash(php check_booking_data.php:*)"
+      "Bash(php check_booking_data.php:*)",
+      "Bash(composer require:*)",
+      "Bash(php:*)"
     ],
     "deny": [],
     "ask": []

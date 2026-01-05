@@ -12,17 +12,16 @@ class ItemSeeder extends Seeder
 {
     public function run()
     {
-        // Make sure you have at least one user
-        $user = User::where('IsAdmin', 0)->first();
-        
+        // Make sure you have at least one non-admin user
+        $user = User::where('role', 'user')->first();
+
         if (!$user) {
             // Create a sample user if none exists
             $user = User::create([
-                'UserName' => 'Sample User',
-                'Email' => 'sample@example.com',
-                'PasswordHash' => bcrypt('password'),
-                'UserType' => 'Lender',
-                'IsAdmin' => 0
+                'name' => 'Sample User',
+                'email' => 'sample@example.com',
+                'password' => bcrypt('password'),
+                'role' => 'user'
             ]);
         }
 

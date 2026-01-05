@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('PhoneNumber', 20)->nullable()->after('Email');
-            $table->string('Location', 255)->nullable()->after('PhoneNumber');
+            // These columns now added in create_users_table migration
+            if (!Schema::hasColumn('users', 'PhoneNumber')) {
+                $table->string('PhoneNumber', 20)->nullable()->after('Email');
+            }
+            if (!Schema::hasColumn('users', 'Location')) {
+                $table->string('Location', 255)->nullable()->after('PhoneNumber');
+            }
         });
     }
 
