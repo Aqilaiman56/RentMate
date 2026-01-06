@@ -1131,12 +1131,12 @@
 
                         <div class="form-group">
                             <label class="form-label" for="start_date">Start Date</label>
-                            <input type="date" id="start_date" name="start_date" class="form-input" min="{{ date('Y-m-d') }}" required readonly>
+                            <input type="date" id="start_date" name="start_date" class="form-input" min="{{ date('Y-m-d') }}" required>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label" for="end_date">End Date</label>
-                            <input type="date" id="end_date" name="end_date" class="form-input" min="{{ date('Y-m-d') }}" required readonly>
+                            <input type="date" id="end_date" name="end_date" class="form-input" min="{{ date('Y-m-d') }}" required>
                         </div>
 
                         <div class="total-calculation" id="totalCalculation" style="display: none;">
@@ -1391,8 +1391,69 @@
         renderCalendar();
     });
 
-    document.getElementById('start_date').addEventListener('change', calculateTotal);
-    document.getElementById('end_date').addEventListener('change', calculateTotal);
+    // Handle manual date input changes
+    document.getElementById('start_date').addEventListener('change', function(e) {
+        const dateStr = e.target.value;
+        if (dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Check if date is in the past
+            if (date < today) {
+                alert('Start date cannot be in the past.');
+                e.target.value = '';
+                selectedStartDate = null;
+                renderCalendar();
+                return;
+            }
+
+            // Check if date is unavailable
+            if (unavailableDates.includes(dateStr)) {
+                alert('This date is not available. Please select another date.');
+                e.target.value = '';
+                selectedStartDate = null;
+                renderCalendar();
+                return;
+            }
+
+            selectedStartDate = date;
+            selectedEndDate = null;
+            document.getElementById('end_date').value = '';
+            renderCalendar();
+        }
+        calculateTotal();
+    });
+
+    document.getElementById('end_date').addEventListener('change', function(e) {
+        const dateStr = e.target.value;
+        if (dateStr && selectedStartDate) {
+            const date = new Date(dateStr + 'T00:00:00');
+
+            // Check if end date is before start date
+            if (date <= selectedStartDate) {
+                alert('End date must be after start date.');
+                e.target.value = '';
+                selectedEndDate = null;
+                renderCalendar();
+                return;
+            }
+
+            // Check if any unavailable dates in range
+            const hasUnavailable = checkUnavailableInRange(selectedStartDate, date);
+            if (hasUnavailable) {
+                alert('Cannot select date range with unavailable dates. Please choose different dates.');
+                e.target.value = '';
+                selectedEndDate = null;
+                renderCalendar();
+                return;
+            }
+
+            selectedEndDate = date;
+            renderCalendar();
+        }
+        calculateTotal();
+    });
 
 
     function calculateTotal() {

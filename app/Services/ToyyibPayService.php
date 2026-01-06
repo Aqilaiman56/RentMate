@@ -41,27 +41,36 @@ class ToyyibPayService
         }
 
         try {
+            $params = [
+                'userSecretKey' => $this->secretKey,
+                'categoryCode' => $this->categoryCode,
+                'billName' => $bookingData['bill_name'],
+                'billDescription' => $bookingData['bill_description'],
+                'billPriceSetting' => 1, // 1 = Fixed price
+                'billPayorInfo' => 1, // 1 = Required
+                'billAmount' => $bookingData['amount'] * 100, // Amount in cents
+                'billReturnUrl' => config('toyyibpay.callback_url'),
+                'billCallbackUrl' => config('toyyibpay.callback_url'),
+                'billExternalReferenceNo' => $bookingData['booking_id'],
+                'billTo' => $bookingData['payer_name'],
+                'billEmail' => $bookingData['payer_email'],
+                'billPhone' => $bookingData['payer_phone'] ?? '',
+                'billSplitPayment' => 0,
+                'billSplitPaymentArgs' => '',
+                'billPaymentChannel' => '0', // 0 = FPX, 1 = Credit Card, 2 = Both
+                'billContentEmail' => 'Thank you for your payment!',
+                'billChargeToCustomer' => 1, // 1 = Charge to customer
+            ];
+
+            Log::info('ToyyibPay Create Bill Request', [
+                'bill_description_length' => strlen($bookingData['bill_description']),
+                'bill_description' => $bookingData['bill_description'],
+                'amount' => $bookingData['amount'],
+                'booking_id' => $bookingData['booking_id']
+            ]);
+
             $response = $this->client->post($this->apiUrl . 'index.php/api/createBill', [
-                'form_params' => [
-                    'userSecretKey' => $this->secretKey,
-                    'categoryCode' => $this->categoryCode,
-                    'billName' => $bookingData['bill_name'],
-                    'billDescription' => $bookingData['bill_description'],
-                    'billPriceSetting' => 1, // 1 = Fixed price
-                    'billPayorInfo' => 1, // 1 = Required
-                    'billAmount' => $bookingData['amount'] * 100, // Amount in cents
-                    'billReturnUrl' => config('toyyibpay.callback_url'),
-                    'billCallbackUrl' => config('toyyibpay.callback_url'),
-                    'billExternalReferenceNo' => $bookingData['booking_id'],
-                    'billTo' => $bookingData['payer_name'],
-                    'billEmail' => $bookingData['payer_email'],
-                    'billPhone' => $bookingData['payer_phone'] ?? '',
-                    'billSplitPayment' => 0,
-                    'billSplitPaymentArgs' => '',
-                    'billPaymentChannel' => '0', // 0 = FPX, 1 = Credit Card, 2 = Both
-                    'billContentEmail' => 'Thank you for your payment!',
-                    'billChargeToCustomer' => 1, // 1 = Charge to customer
-                ]
+                'form_params' => $params
             ]);
 
             $responseBody = $response->getBody()->getContents();

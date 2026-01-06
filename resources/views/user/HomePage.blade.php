@@ -302,7 +302,7 @@
 
 
 <!-- Clear Filter Button -->
-@if(request('category') || request('search'))
+@if(request('search'))
     <a href="{{ route('user.HomePage') }}" class="clear-filter"><i class="fa-solid fa-xmark"></i> Clear Filters</a>
 @endif
 

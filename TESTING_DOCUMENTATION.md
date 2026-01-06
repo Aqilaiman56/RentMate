@@ -279,100 +279,100 @@
 
 ### Table 2.1: Authentication Workflow Integration Tests
 
-| No. | Module | Test Case | Expected Result | Status |
-|-----|--------|-----------|----------------|--------|
-| 1 | Authentication | Register → Verify Email → Login | User successfully registers, verifies email, and logs in | Pending |
-| 2 | Authentication | Login with invalid credentials | Error message: "Invalid email or password" | Pending |
-| 3 | Authentication | Login with suspended account | User logged out, message: "Your account has been suspended" | Pending |
-| 4 | Authentication | Password reset flow | User receives reset link, resets password, logs in with new password | Pending |
-| 5 | Authentication | Logout functionality | User session destroyed, redirected to login | Pending |
+| Criteria ID | Integrated Modules | Testing Criteria | Expected Outcome |
+|-------------|-------------------|------------------|------------------|
+| INT-AUTH-01 | User Model, Auth Controller, Middleware, Email Service | User registers with valid credentials → Email verification sent → User clicks verification link → User logs in successfully | User account created with verified email status, session established, redirected to dashboard |
+| INT-AUTH-02 | Auth Controller, User Model, Session Management | User attempts login with invalid email or incorrect password | System displays error message "Invalid email or password", no session created, user remains on login page |
+| INT-AUTH-03 | Auth Controller, User Model, CheckSuspension Middleware | Suspended user attempts to login with valid credentials | User session immediately terminated, logged out, redirected to login with message "Your account has been suspended until [date] for [reason]" |
+| INT-AUTH-04 | Auth Controller, User Model, Email Service, Password Reset | User requests password reset → Receives email → Clicks reset link → Submits new password → Logs in with new password | Password reset token generated and emailed, token validated, password updated in database, user successfully authenticates with new credentials |
+| INT-AUTH-05 | Auth Controller, Session Management | Authenticated user clicks logout button | User session destroyed, authentication cookies cleared, redirected to login page, cannot access protected routes |
 
 ### Table 2.2: Item Listing Workflow Integration Tests
 
-| No. | Module | Test Case | Expected Result | Status |
-|-----|--------|-----------|----------------|--------|
-| 1 | Item Listing | Create item → Upload images → Publish | Item created with images, visible in public listings | Pending |
-| 2 | Item Listing | Edit item → Update pricing → Save | Item details updated successfully | Pending |
-| 3 | Item Listing | Delete item (with bookings) | Error: "Cannot delete item with active bookings" | Pending |
-| 4 | Item Listing | Delete item (no bookings) | Item deleted successfully | Pending |
-| 5 | Item Listing | View public item (not logged in) | Item details displayed without booking option | Pending |
-| 6 | Item Listing | View item (logged in) | Item details with availability calendar and booking option | Pending |
+| Criteria ID | Integrated Modules | Testing Criteria | Expected Outcome |
+|-------------|-------------------|------------------|------------------|
+| INT-ITEM-01 | ItemController, Item Model, ItemImage Model, Category Model, Location Model, File Storage | User creates new item → Uploads 5 images → Selects category and location → Sets price and deposit → Publishes listing | Item record created in database, images stored and linked to item, item appears in public listings with correct details, availability set to true |
+| INT-ITEM-02 | ItemController, Item Model, Booking Model | Item owner edits existing item → Updates pricing from RM50 to RM75 → Changes description → Saves changes | Item details updated in database, new pricing displayed on item page, existing bookings retain original pricing, changes visible immediately |
+| INT-ITEM-03 | ItemController, Item Model, Booking Model | User attempts to delete item that has active or pending bookings | System prevents deletion, displays error "Cannot delete item with active bookings", item remains in database unchanged |
+| INT-ITEM-04 | ItemController, Item Model, ItemImage Model, File Storage | User deletes item with no bookings | Item soft-deleted or removed from database, associated images deleted from storage, item no longer appears in listings |
+| INT-ITEM-05 | HomeController, Item Model, Category Model, Location Model | Unauthenticated visitor views item details page | Item details, images, pricing, and description displayed, availability calendar visible, booking button hidden or shows "Login to book" |
+| INT-ITEM-06 | HomeController, ItemController, Item Model, Booking Model | Authenticated user views item details | Item details displayed with interactive availability calendar showing booked dates, booking form enabled with date selection, price calculation updates dynamically |
 
 ### Table 2.3: Booking Workflow Integration Tests
 
-| No. | Module | Test Case | Expected Result | Status |
-|-----|--------|-----------|----------------|--------|
-| 1 | Booking | Select dates → Create booking → Payment → Approval → Complete → Refund | Full booking lifecycle completes successfully | Pending |
-| 2 | Booking | Book overlapping dates (same item) | Error: "Item not available for selected dates" | Pending |
-| 3 | Booking | Book own item | Error: "You cannot book your own item" | Pending |
-| 4 | Booking | Book when quantity exhausted | Error: "No available quantity for these dates" | Pending |
-| 5 | Booking | Cancel pending booking | Booking cancelled, deposit refunded | Pending |
-| 6 | Booking | Owner approves booking | Status changes to Approved, notifications sent | Pending |
-| 7 | Booking | Owner rejects booking | Status changes to Rejected, deposit refunded | Pending |
-| 8 | Booking | Mark booking complete | Status changes to Completed, deposit eligible for refund | Pending |
+| Criteria ID | Integrated Modules | Testing Criteria | Expected Outcome |
+|-------------|-------------------|------------------|------------------|
+| INT-BOOK-01 | BookingController, PaymentController, ToyyibPayService, Booking Model, Payment Model, Deposit Model, Item Model, Notification Model | User selects dates → Creates booking → Completes payment → Owner approves → Rental period ends → Owner confirms return → Admin processes refund | Complete workflow: Booking created (Status=Pending), Payment successful, Booking approved (Status=Approved), Booking marked complete (Status=Completed), Deposit refunded (Status=Refunded), notifications sent at each stage |
+| INT-BOOK-02 | BookingController, Item Model, Booking Model | User attempts to book item for dates that overlap with confirmed booking | System validates availability, displays error "Item not available for selected dates", booking not created, user redirected to select different dates |
+| INT-BOOK-03 | BookingController, Item Model, User Model | User attempts to book their own listed item | System checks ItemOwnerID against current UserID, prevents booking creation, displays error "You cannot book your own item" |
+| INT-BOOK-04 | BookingController, Item Model, Booking Model | User attempts to book item when AvailableQuantity=0 for selected dates | System calculates booked quantity, determines no availability, displays error "No available quantity for these dates", suggests alternative dates |
+| INT-BOOK-05 | BookingController, Booking Model, Deposit Model, Payment Model | User cancels pending booking before payment or approval | Booking Status updated to Cancelled, if deposit held then Deposit Status=Refunded added to RefundQueue, booking removed from active list |
+| INT-BOOK-06 | BookingController, Booking Model, Notification Model, User Model | Item owner views pending booking → Approves booking request | Booking Status changed from Pending to Approved, notification sent to renter, item AvailableQuantity updated, booking appears in owner's confirmed bookings |
+| INT-BOOK-07 | BookingController, Booking Model, Deposit Model, Notification Model | Item owner rejects booking request | Booking Status changed to Rejected, Deposit Status=Refunded if payment made, notification sent to renter with rejection reason, item availability restored |
+| INT-BOOK-08 | BookingController, Booking Model, Deposit Model | Owner marks booking as complete after item return | Booking Status updated to Completed, ReturnConfirmed set to true, Deposit becomes eligible for refund, booking moved to completed history |
 
 ### Table 2.4: Payment Integration Tests
 
-| No. | Module | Test Case | Expected Result | Status |
-|-----|--------|-----------|----------------|--------|
-| 1 | Payment | Create booking → ToyyibPay bill created → Payment callback (success) | Payment marked successful, booking confirmed | Pending |
-| 2 | Payment | Payment callback (failed) | Payment marked failed, booking remains pending | Pending |
-| 3 | Payment | Test mode payment | Test bill code generated, payment URL returned | Pending |
-| 4 | Payment | Check payment status | Correct payment status retrieved from database | Pending |
-| 5 | Payment | Payment history for booking | All payment attempts listed chronologically | Pending |
+| Criteria ID | Integrated Modules | Testing Criteria | Expected Outcome |
+|-------------|-------------------|------------------|------------------|
+| INT-PAY-01 | PaymentController, ToyyibPayService, Payment Model, Booking Model, External ToyyibPay API | User creates booking → System calls ToyyibPayService.createBill() → Generates bill code → User completes payment on ToyyibPay → Callback received with success status | Payment record created with BillCode, external API call successful, payment URL returned, callback updates Payment Status=Successful, TransactionID stored, PaymentDate recorded, Booking confirmed |
+| INT-PAY-02 | PaymentController, ToyyibPayService, Payment Model, Booking Model | User initiates payment → ToyyibPay callback returns failed status with error details | Payment Status updated to Failed, PaymentResponse contains error message, Booking remains Pending, user notified to retry payment, original booking preserved |
+| INT-PAY-03 | ToyyibPayService, Payment Model | System configured in test mode → User creates booking requiring payment | ToyyibPayService detects test mode, generates test bill code with "TEST-" prefix, returns mock payment URL, no actual API call made, test data logged |
+| INT-PAY-04 | PaymentController, Payment Model, Booking Model | User or admin checks payment status for specific booking | System queries Payment table by BookingID, retrieves current Status (Pending/Successful/Failed), displays TransactionID if successful, shows PaymentDate and Amount |
+| INT-PAY-05 | PaymentController, Payment Model, Booking Model | User views booking details page showing payment history | All payment attempts for booking retrieved chronologically, displays BillCode, Status, Amount, TransactionID, PaymentDate for each attempt, shows retry option if all failed |
 
 ### Table 2.5: Deposit Management Workflow Tests
 
-| No. | Module | Test Case | Expected Result | Status |
-|-----|--------|-----------|----------------|--------|
-| 1 | Deposit | Booking created → Deposit held | Deposit status=held, amount collected | Pending |
-| 2 | Deposit | Admin refunds deposit | Deposit status=refunded, refund queue created | Pending |
-| 3 | Deposit | Admin forfeits deposit | Deposit status=forfeited, notes added | Pending |
-| 4 | Deposit | Partial refund | Deposit status=partial, partial amount refunded | Pending |
-| 5 | Deposit | Process refund queue | Refunds marked as processing → completed | Pending |
+| Criteria ID | Integrated Modules | Testing Criteria | Expected Outcome |
+|-------------|-------------------|------------------|------------------|
+| INT-DEP-01 | BookingController, Booking Model, Deposit Model, Item Model | User completes booking creation including deposit payment | Deposit record created with BookingID, DepositAmount equal to Item.DepositAmount, Status=Held, DateCollected=now, linked to booking |
+| INT-DEP-02 | Admin Controller, Deposit Model, RefundQueue Model, Booking Model | Admin reviews completed booking → Approves deposit refund → Processes refund | Deposit Status changed to Refunded, RefundQueue record created with Status=Pending, RefundAmount recorded, DateRefunded timestamp set, user notified of refund processing |
+| INT-DEP-03 | Admin Controller, Deposit Model, Report Model, Penalty Model | Admin reviews report → Determines user at fault → Forfeits deposit | Deposit Status updated to Forfeited, AdminNotes contains reason, no RefundQueue entry created, forfeited amount may apply to penalty or compensation |
+| INT-DEP-04 | Admin Controller, Deposit Model, RefundQueue Model, Penalty Model | Admin processes partial deposit refund due to minor damage | Deposit Status=Partial, partial RefundAmount calculated (e.g., 50% of deposit), RefundQueue created for partial amount, remaining amount logged with reason |
+| INT-DEP-05 | Admin Controller, RefundQueue Model, Deposit Model | Admin accesses refund queue → Marks refunds as processing → Completes refund transactions | RefundQueue records updated: Status changes Pending → Processing → Completed, ProcessedDate recorded, Deposit records reflect final status, users notified of completion |
 
 ### Table 2.6: Review & Rating Integration Tests
 
-| No. | Module | Test Case | Expected Result | Status |
-|-----|--------|-----------|----------------|--------|
-| 1 | Reviews | Complete booking → Submit review → Update item rating | Review saved, item average rating recalculated | Pending |
-| 2 | Reviews | Review with images | Review saved with image paths | Pending |
-| 3 | Reviews | Duplicate review prevention | Error: "You have already reviewed this item" | Pending |
-| 4 | Reviews | View item reviews | All reviews displayed, sorted by most recent | Pending |
+| Criteria ID | Integrated Modules | Testing Criteria | Expected Outcome |
+|-------------|-------------------|------------------|------------------|
+| INT-REV-01 | BookingController, Review Model, Item Model, User Model | User completes booking (Status=Completed) → Submits review with 5-star rating and comment → Item rating recalculated | Review record created with UserID, ItemID, Rating=5, Comment text, DatePosted=now, Item.getAverageRatingAttribute() recalculated from all reviews, new average displayed on item page |
+| INT-REV-02 | Review Controller, Review Model, File Storage | User submits review → Uploads image of rented item | Review saved with ReviewImage path stored in database, image file saved to storage, image displayed alongside review on item page |
+| INT-REV-03 | Review Controller, Review Model, Booking Model | User attempts to submit second review for same item from same booking | System checks existing reviews for UserID + ItemID combination, prevents duplicate, displays error "You have already reviewed this item", original review remains unchanged |
+| INT-REV-04 | ItemController, Review Model, User Model | User views item details page reviews section | All reviews for item retrieved using Review.recent() scope, sorted by DatePosted descending, displays reviewer name, rating, comment, image, date posted |
 
 ### Table 2.7: Reporting & Penalty Workflow Tests
 
-| No. | Module | Test Case | Expected Result | Status |
-|-----|--------|-----------|----------------|--------|
-| 1 | Reporting | User reports another user → Admin reviews → Create penalty | Report created, penalty issued, user notified | Pending |
-| 2 | Reporting | Admin suspends user from report | User suspended, suspension reason set | Pending |
-| 3 | Reporting | Admin holds deposit from report | Deposit status changed to held | Pending |
-| 4 | Reporting | Admin dismisses report | Report status=dismissed, no penalty created | Pending |
-| 5 | Reporting | Resolve penalty | Penalty marked as resolved | Pending |
+| Criteria ID | Integrated Modules | Testing Criteria | Expected Outcome |
+|-------------|-------------------|------------------|------------------|
+| INT-REP-01 | Report Controller, Report Model, Penalty Model, User Model, Admin Controller, Notification Model | User reports another user for violation → Admin reviews report with evidence → Admin approves and creates penalty → Penalized user notified | Report created (Status=Pending, ReportType, Subject, Evidence), Admin changes Status=Resolved, Penalty record created with PenaltyAmount, DateReported, ResolvedStatus=false, notification sent to both parties |
+| INT-REP-02 | Admin Controller, Report Model, User Model, Penalty Model | Admin reviews user report → Decides to suspend reported user → Sets suspension duration and reason | User.IsSuspended=true, User.SuspendedUntil=date set, User.SuspensionReason stored, Report.Status=Resolved, Penalty created if applicable, suspended user cannot login (CheckSuspension middleware blocks) |
+| INT-REP-03 | Admin Controller, Report Model, Deposit Model, Booking Model | Admin reviews late return report → Decides to hold deposit pending investigation | Related Booking's Deposit Status updated to Held, Report linked to BookingID, AdminNotes added explaining hold reason, deposit refund queue entry removed if exists |
+| INT-REP-04 | Admin Controller, Report Model | Admin reviews report → Determines insufficient evidence → Dismisses report | Report Status=Dismissed, AdminNotes contain dismissal reason, no Penalty created, ResolvedByAdminID recorded, no action taken against reported user, reporter notified |
+| INT-REP-05 | Admin Controller, Penalty Model, User Model | Admin or system marks penalty as resolved after payment or completion | Penalty.ResolvedStatus changed to true, ResolvedDate recorded, related Report updated if needed, user notified of resolution |
 
 ### Table 2.8: Messaging System Integration Tests
 
-| No. | Module | Test Case | Expected Result | Status |
-|-----|--------|-----------|----------------|--------|
-| 1 | Messaging | Send message → Receiver views → Mark as read | Message delivered, IsRead=true | Pending |
-| 2 | Messaging | View conversation | All messages between two users displayed chronologically | Pending |
-| 3 | Messaging | Unread message count | Correct count of unread messages returned | Pending |
-| 4 | Messaging | Message about item | Message linked to specific item | Pending |
+| Criteria ID | Integrated Modules | Testing Criteria | Expected Outcome |
+|-------------|-------------------|------------------|------------------|
+| INT-MSG-01 | MessageController, Message Model, User Model, Notification Model | User A sends message to User B about specific item → User B views message → Marks as read | Message created with SenderID, ReceiverID, ItemID, MessageContent, IsRead=false, SentAt=now; User B retrieves message, views content, IsRead updated to true |
+| INT-MSG-02 | MessageController, Message Model, User Model | User views conversation with another user | System uses Message.conversation() scope to retrieve all messages between two users, ordered by SentAt ascending, displays threaded conversation with sender/receiver clearly identified |
+| INT-MSG-03 | MessageController, Message Model | User checks unread message count in notification badge | System counts messages where ReceiverID=current user AND IsRead=false, returns accurate count, updates dynamically when messages marked read |
+| INT-MSG-04 | MessageController, Message Model, Item Model | User sends inquiry about specific item from item details page | Message created with ItemID populated, recipient is item owner (Item.UserID), message includes item context, item details displayed in conversation thread |
 
 ### Table 2.9: Admin Operations Integration Tests
 
-| No. | Module | Test Case | Expected Result | Status |
-|-----|--------|-----------|----------------|--------|
-| 1 | Admin | Suspend user account | User suspended, cannot login, receives suspension message | Pending |
-| 2 | Admin | Unsuspend user account | User IsSuspended=false, can login again | Pending |
-| 3 | Admin | Reset user password | Password reset, user notified | Pending |
-| 4 | Admin | Delete user account | User and related data deleted | Pending |
-| 5 | Admin | Export users to CSV | CSV file generated with all user data | Pending |
-| 6 | Admin | Export deposits to CSV | CSV file generated with deposit data | Pending |
-| 7 | Admin | Export reports to CSV | CSV file generated with report data | Pending |
-| 8 | Admin | View dashboard statistics | Correct counts for users, listings, bookings, reports | Pending |
+| Criteria ID | Integrated Modules | Testing Criteria | Expected Outcome |
+|-------------|-------------------|------------------|------------------|
+| INT-ADM-01 | Admin Controller, User Model, CheckSuspension Middleware, Notification Model | Admin suspends user account with reason "Multiple policy violations" and 30-day duration | User.IsSuspended=true, User.SuspendedUntil=current date + 30 days, User.SuspensionReason stored, suspended user cannot login (middleware redirects with suspension message), user receives notification |
+| INT-ADM-02 | Admin Controller, User Model | Admin unsuspends previously suspended user account | User.IsSuspended=false, User.SuspendedUntil=null, User.SuspensionReason cleared or archived, user can login successfully, suspension notification cleared |
+| INT-ADM-03 | Admin Controller, User Model, Email Service | Admin resets user password from admin panel | New password generated or admin sets temporary password, User.PasswordHash updated, user receives email notification with reset instructions or temporary credentials |
+| INT-ADM-04 | Admin Controller, User Model, Booking Model, Item Model, Review Model, Message Model | Admin deletes user account including all related data | User record soft-deleted or removed, associated Bookings handled (cancelled or preserved for history), Items de-listed, Messages archived, Reviews may be anonymized, referential integrity maintained |
+| INT-ADM-05 | Admin Controller, User Model, Export Service | Admin exports all users data to CSV file | System queries all User records, formats data (UserID, UserName, Email, DateJoined, IsAdmin, IsSuspended), generates CSV file with headers, file downloads successfully |
+| INT-ADM-06 | Admin Controller, Deposit Model, RefundQueue Model, Export Service | Admin exports deposit transactions to CSV | System retrieves Deposits with related Booking and User data, formats columns (DepositID, BookingID, Amount, Status, DateCollected, RefundDate), generates CSV, downloads successfully |
+| INT-ADM-07 | Admin Controller, Report Model, User Model, Export Service | Admin exports all reports to CSV for analysis | System queries Reports with Reporter and ReportedUser data, includes Status, ReportType, DateReported, DateResolved, generates CSV with all fields, downloads successfully |
+| INT-ADM-08 | Admin Controller, User Model, Item Model, Booking Model, Report Model | Admin views dashboard statistics page | System aggregates: total users count, active listings count, pending/approved/completed bookings count, pending reports count, revenue statistics, displays accurate real-time data |
 
-**Total Integration Tests Planned: 60+**
+**Total Integration Tests Planned: 51 Test Cases**
 
 ---
 

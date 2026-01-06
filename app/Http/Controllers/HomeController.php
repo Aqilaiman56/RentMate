@@ -33,6 +33,11 @@ class HomeController extends Controller
         // Unavailable items will still appear in search results
         $query = Item::with(['location', 'category', 'user', 'images'])
             ->where('Availability', true);
+
+        // Exclude items owned by the current user
+        if (auth()->check()) {
+            $query->where('items.UserID', '!=', auth()->id());
+        }
         
         // Filter by category if selected
         if ($request->has('category') && $request->category != '') {

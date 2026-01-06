@@ -54,10 +54,17 @@ class PaymentController extends Controller
         ]);
 
         // Prepare data for ToyyibPay
+        // Note: ToyyibPay has a 100 character limit for billDescription
+        $itemName = strlen($booking->item->ItemName) > 40
+            ? substr($booking->item->ItemName, 0, 37) . '...'
+            : $booking->item->ItemName;
+
+        $billDescription = 'Deposit for ' . $itemName . ' (' . $booking->StartDate->format('d M') . '-' . $booking->EndDate->format('d M Y') . ')';
+
         $billData = [
             'booking_id' => $booking->BookingID,
             'bill_name' => 'Security Deposit - Booking #' . $booking->BookingID,
-            'bill_description' => 'Security deposit for ' . $booking->item->ItemName . ' (Rental: ' . $booking->StartDate->format('d M') . ' - ' . $booking->EndDate->format('d M Y') . '). Rental fee to be paid directly to owner.',
+            'bill_description' => substr($billDescription, 0, 100),
             'amount' => $totalAmount,
             'payer_name' => $booking->user->UserName,
             'payer_email' => $booking->user->Email,
