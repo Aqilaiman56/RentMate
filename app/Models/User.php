@@ -41,8 +41,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $hidden = [
         'password',
-        'remember_token'
     ];
+
+    // Disable remember_token since it doesn't exist in the database
+    protected $rememberTokenName = null;
 
     protected $casts = [
         'email_verified_at' => 'datetime',
