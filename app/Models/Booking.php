@@ -19,6 +19,7 @@ class Booking extends Model
     protected $fillable = [
         'UserID',
         'ItemID',
+        'Quantity',
         'StartDate',
         'EndDate',
         'TotalAmount',

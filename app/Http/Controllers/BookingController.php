@@ -24,10 +24,17 @@ class BookingController extends Controller
         $validated = $request->validate([
             'item_id' => 'required|exists:items,ItemID',
             'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date'
+            'end_date' => 'required|date|after:start_date',
+            'quantity' => 'nullable|integer|min:1'
         ]);
 
         $item = Item::with(['user', 'location', 'category', 'images'])->findOrFail($validated['item_id']);
+        $quantity = $validated['quantity'] ?? 1;
+
+        // Validate quantity doesn't exceed available units
+        if ($quantity > $item->Quantity) {
+            return back()->with('error', 'You cannot book more units than available.');
+        }
 
         // Check if item is available
         if (!$item->Availability) {
@@ -54,7 +61,7 @@ class BookingController extends Controller
         }
 
         // Calculate amounts
-        $rentalAmount = $item->PricePerDay * $days;
+        $rentalAmount = $item->PricePerDay * $days * $quantity;
         $depositAmount = $item->DepositAmount;
         $serviceFeeAmount = 1.00;
         $totalAmount = $depositAmount + $serviceFeeAmount;
@@ -65,6 +72,7 @@ class BookingController extends Controller
             'start_date' => $startDate,
             'end_date' => $endDate,
             'days' => $days,
+            'quantity' => $quantity,
             'rental_amount' => $rentalAmount,
             'deposit_amount' => $depositAmount,
             'service_fee_amount' => $serviceFeeAmount,
@@ -82,10 +90,17 @@ class BookingController extends Controller
         $validated = $request->validate([
             'item_id' => 'required|exists:items,ItemID',
             'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date'
+            'end_date' => 'required|date|after:start_date',
+            'quantity' => 'nullable|integer|min:1'
         ]);
 
         $item = Item::findOrFail($validated['item_id']);
+        $quantity = $validated['quantity'] ?? 1;
+
+        // Validate quantity doesn't exceed available units
+        if ($quantity > $item->Quantity) {
+            return back()->with('error', 'You cannot book more units than available.');
+        }
 
         // Check if item is available
         if (!$item->Availability) {
@@ -112,7 +127,7 @@ class BookingController extends Controller
         }
 
         // Calculate total amount
-        $totalAmount = $item->PricePerDay * $days;
+        $totalAmount = $item->PricePerDay * $days * $quantity;
 
         try {
             DB::beginTransaction();
@@ -121,6 +136,7 @@ class BookingController extends Controller
             $booking = Booking::create([
                 'UserID' => auth()->id(),
                 'ItemID' => $item->ItemID,
+                'Quantity' => $quantity,
                 'StartDate' => $startDate,
                 'EndDate' => $endDate,
                 'TotalAmount' => $totalAmount,
@@ -181,10 +197,17 @@ class BookingController extends Controller
         $validated = $request->validate([
             'item_id' => 'required|exists:items,ItemID',
             'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date'
+            'end_date' => 'required|date|after:start_date',
+            'quantity' => 'nullable|integer|min:1'
         ]);
 
         $item = Item::findOrFail($validated['item_id']);
+        $quantity = $validated['quantity'] ?? 1;
+
+        // Validate quantity doesn't exceed available units
+        if ($quantity > $item->Quantity) {
+            return back()->with('error', 'You cannot book more units than available.');
+        }
 
         // Check if item is available
         if (!$item->Availability) {
@@ -211,7 +234,7 @@ class BookingController extends Controller
         }
 
         // Calculate total amount
-        $totalAmount = $item->PricePerDay * $days;
+        $totalAmount = $item->PricePerDay * $days * $quantity;
 
         try {
             DB::beginTransaction();
@@ -220,6 +243,7 @@ class BookingController extends Controller
             $booking = Booking::create([
                 'UserID' => auth()->id(),
                 'ItemID' => $item->ItemID,
+                'Quantity' => $quantity,
                 'StartDate' => $startDate,
                 'EndDate' => $endDate,
                 'TotalAmount' => $totalAmount,
