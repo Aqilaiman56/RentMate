@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             fn ($host) => str_ends_with($host, '.ngrok-free.dev'),
         ]);
 
+        // Exclude payment callback from CSRF verification (external API callback)
+        $middleware->validateCsrfTokens(except: [
+            'payment/callback',
+        ]);
+
         // Add CheckSuspension middleware to web group
         $middleware->web(append: [
             \App\Http\Middleware\CheckSuspension::class,

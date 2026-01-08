@@ -279,15 +279,24 @@ class BookingController extends Controller
             ]);
 
             // Prepare data for ToyyibPay
+            // Note: ToyyibPay has a 100 character limit for billDescription
             $dateRange = '';
             if ($booking->StartDate && $booking->EndDate) {
-                $dateRange = ' (Rental: ' . $booking->StartDate->format('d M') . ' - ' . $booking->EndDate->format('d M Y') . ')';
+                $dateRange = ' (' . $booking->StartDate->format('d M') . '-' . $booking->EndDate->format('d M Y') . ')';
             }
+
+            // Shorten item name if needed to fit within 100 char limit
+            $maxItemNameLength = 100 - strlen('Deposit: ' . $dateRange);
+            $itemName = strlen($item->ItemName) > $maxItemNameLength
+                ? substr($item->ItemName, 0, $maxItemNameLength - 3) . '...'
+                : $item->ItemName;
+
+            $billDescription = 'Deposit: ' . $itemName . $dateRange;
 
             $billData = [
                 'booking_id' => $booking->BookingID,
                 'bill_name' => 'Security Deposit - Booking #' . $booking->BookingID,
-                'bill_description' => 'Security deposit for ' . $item->ItemName . $dateRange . '. Rental fee to be paid directly to owner.',
+                'bill_description' => substr($billDescription, 0, 100),
                 'amount' => $totalAmount,
                 'payer_name' => auth()->user()->UserName,
                 'payer_email' => auth()->user()->Email,

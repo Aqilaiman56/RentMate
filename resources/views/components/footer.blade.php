@@ -48,18 +48,6 @@
                 </ul>
             </div>
 
-            <!-- Support -->
-            <div class="footer-column">
-                <h4 class="footer-title">Support</h4>
-                <ul class="footer-links">
-                    <li><a href="#">Help Center</a></li>
-                    <li><a href="#">Safety Tips</a></li>
-                    <li><a href="#">Trust & Safety</a></li>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">FAQs</a></li>
-                </ul>
-            </div>
-
             <!-- Company -->
             <div class="footer-column">
                 <h4 class="footer-title">Company</h4>
@@ -119,7 +107,7 @@
 
     .footer-top {
         display: grid;
-        grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
+        grid-template-columns: 2fr 1fr 1fr 1.5fr;
         gap: 40px;
         padding-bottom: 40px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);

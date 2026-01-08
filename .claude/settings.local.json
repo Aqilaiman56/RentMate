@@ -33,7 +33,9 @@
       "Bash(php check_users_structure.php:*)",
       "Bash(php check_booking_data.php:*)",
       "Bash(composer require:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "Bash(where:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
