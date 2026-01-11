@@ -406,6 +406,13 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         return app(\App\Http\Controllers\Admin\RefundQueueController::class)->markProcessing($id);
     })->name('refund-queue.processing');
 
+    Route::post('/refund-queue/{id}/auto-complete', function($id) {
+        if (!auth()->user()->IsAdmin) {
+            abort(403, 'Unauthorized access. Admin only.');
+        }
+        return app(\App\Http\Controllers\Admin\RefundQueueController::class)->autoComplete($id);
+    })->name('refund-queue.auto-complete');
+
     Route::post('/refund-queue/{id}/complete', function($id, Request $request) {
         if (!auth()->user()->IsAdmin) {
             abort(403, 'Unauthorized access. Admin only.');

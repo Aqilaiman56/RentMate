@@ -133,6 +133,41 @@ class RefundQueueController extends Controller
     }
 
     /**
+     * Auto-complete refund with automatically generated reference
+     */
+    public function autoComplete($id)
+    {
+        try {
+            $refund = RefundQueue::with(['deposit', 'booking', 'user'])->findOrFail($id);
+
+            // Validation
+            if (!in_array($refund->Status, ['pending', 'processing'])) {
+                return back()->with('error', 'This refund has already been processed.');
+            }
+
+            // Auto-complete the refund using model method
+            $refund->autoComplete(auth()->id());
+
+            // Send notification to user
+            Notification::create([
+                'UserID' => $refund->UserID,
+                'Type' => 'payment',
+                'Title' => '💰 Deposit Refund Processed',
+                'Content' => 'Your deposit of RM ' . number_format($refund->RefundAmount, 2) . ' has been refunded to your bank account. Reference: ' . $refund->RefundReference . '. Please allow 1-3 business days for the transfer to complete.',
+                'RelatedID' => $refund->BookingID,
+                'RelatedType' => 'Booking',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now()
+            ]);
+
+            return redirect()->back()->with('success', 'Refund processed automatically! Reference: ' . $refund->RefundReference);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to process refund: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Mark refund as failed
      */
     public function markFailed(Request $request, $id)
