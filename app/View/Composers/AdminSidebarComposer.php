@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Models\Penalty;
 use App\Models\Booking;
 use App\Models\Deposit;
+use App\Models\RefundQueue;
 
 class AdminSidebarComposer
 {
@@ -28,6 +29,7 @@ class AdminSidebarComposer
                 'totalReports' => Penalty::count(),
                 'totalPenalties' => Penalty::whereNotNull('PenaltyAmount')->where('PenaltyAmount', '>', 0)->count(),
                 'serviceFeeCount' => Booking::whereIn('Status', ['completed', 'approved'])->count(),
+                'pendingRefunds' => RefundQueue::where('Status', 'pending')->count(),
             ]);
         }
     }

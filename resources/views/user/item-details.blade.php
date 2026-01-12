@@ -1678,6 +1678,51 @@
                 }
             });
         }
+
+        // Restore booking data from sessionStorage if user just logged in
+        const pendingBooking = sessionStorage.getItem('pendingBooking');
+        if (pendingBooking) {
+            try {
+                const bookingData = JSON.parse(pendingBooking);
+                // Check if this is the same item
+                if (bookingData.item_id == itemId) {
+                    // Restore the dates
+                    if (bookingData.start_date) {
+                        document.getElementById('start_date').value = bookingData.start_date;
+                        selectedStartDate = new Date(bookingData.start_date);
+                    }
+                    if (bookingData.end_date) {
+                        document.getElementById('end_date').value = bookingData.end_date;
+                        selectedEndDate = new Date(bookingData.end_date);
+                    }
+                    // Restore quantity if available
+                    if (bookingData.quantity) {
+                        const quantityInput = document.getElementById('quantity');
+                        if (quantityInput) {
+                            quantityInput.value = bookingData.quantity;
+                            updateQuantityButtons();
+                        }
+                    }
+                    // Recalculate totals
+                    calculateTotal();
+                    // Update calendar display
+                    renderCalendar();
+                    // Clear the stored data
+                    sessionStorage.removeItem('pendingBooking');
+
+                    // Scroll to booking form
+                    setTimeout(() => {
+                        const bookingCard = document.querySelector('.booking-card');
+                        if (bookingCard) {
+                            bookingCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 500);
+                }
+            } catch (e) {
+                console.error('Error restoring booking data:', e);
+                sessionStorage.removeItem('pendingBooking');
+            }
+        }
     });
 
 </script>

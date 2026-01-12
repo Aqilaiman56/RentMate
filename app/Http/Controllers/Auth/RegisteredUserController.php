@@ -17,9 +17,12 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('auth.register');
+        // Check if there's an item parameter (user coming from booking)
+        $itemId = $request->query('item');
+
+        return view('auth.register', ['itemId' => $itemId]);
     }
 
     /**
@@ -59,6 +62,11 @@ class RegisteredUserController extends Controller
 
             // For normal users, show registration success page (do NOT log them in)
             // They must verify email before they can login
-            return view('auth.registration-success', ['email' => $user->Email]);
+            // Pass itemId if user came from booking
+            $itemId = $request->query('item');
+            return view('auth.registration-success', [
+                'email' => $user->Email,
+                'itemId' => $itemId
+            ]);
     }
 }

@@ -88,8 +88,7 @@ class RefundQueueController extends Controller
     public function complete(Request $request, $id)
     {
         $request->validate([
-            'refund_reference' => 'required|string|max:100',
-            'proof_of_transfer' => 'nullable|image|mimes:jpeg,png,jpg,pdf|max:5120',
+            'proof_of_transfer' => 'required|image|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
 
         try {
@@ -101,15 +100,16 @@ class RefundQueueController extends Controller
                 return back()->with('error', 'Can only complete pending or processing refunds');
             }
 
-            // Upload proof of transfer if provided
-            $proofPath = null;
-            if ($request->hasFile('proof_of_transfer')) {
-                $proofPath = $request->file('proof_of_transfer')->store('refund_proofs', 'public');
-            }
+            // Upload proof of transfer
+            $proofPath = $request->file('proof_of_transfer')->store('refund_proofs', 'public');
+
+            // Generate automatic refund reference
+            $refundReference = RefundQueue::generateRefundReference($refund->RefundQueueID);
 
             // Update refund queue
             $refund->Status = 'completed';
-            $refund->RefundReference = $request->refund_reference;
+            $refund->RefundReference = $refundReference;
+            $refund->RefundMethod = 'manual';
             $refund->ProofOfTransfer = $proofPath;
             $refund->ProcessedAt = Carbon::now();
             $refund->ProcessedBy = auth()->id();
@@ -119,12 +119,25 @@ class RefundQueueController extends Controller
             $deposit = $refund->deposit;
             $deposit->Status = 'refunded';
             $deposit->RefundDate = Carbon::now();
-            $deposit->Notes = 'Refunded via bank transfer - Ref: ' . $request->refund_reference;
+            $deposit->RefundReference = $refundReference;
+            $deposit->Notes = 'Refunded via bank transfer - Ref: ' . $refundReference;
             $deposit->save();
+
+            // Send notification to user
+            Notification::create([
+                'UserID' => $refund->UserID,
+                'Type' => 'payment',
+                'Title' => '💰 Deposit Refund Processed',
+                'Content' => 'Your deposit of RM ' . number_format($refund->RefundAmount, 2) . ' has been refunded to your bank account. Reference: ' . $refundReference . '. Please allow 1-3 business days for the transfer to complete.',
+                'RelatedID' => $refund->BookingID,
+                'RelatedType' => 'Booking',
+                'IsRead' => false,
+                'CreatedAt' => Carbon::now()
+            ]);
 
             DB::commit();
 
-            return back()->with('success', 'Refund completed successfully!');
+            return back()->with('success', 'Refund completed successfully! Reference: ' . $refundReference);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -132,40 +145,6 @@ class RefundQueueController extends Controller
         }
     }
 
-    /**
-     * Auto-complete refund with automatically generated reference
-     */
-    public function autoComplete($id)
-    {
-        try {
-            $refund = RefundQueue::with(['deposit', 'booking', 'user'])->findOrFail($id);
-
-            // Validation
-            if (!in_array($refund->Status, ['pending', 'processing'])) {
-                return back()->with('error', 'This refund has already been processed.');
-            }
-
-            // Auto-complete the refund using model method
-            $refund->autoComplete(auth()->id());
-
-            // Send notification to user
-            Notification::create([
-                'UserID' => $refund->UserID,
-                'Type' => 'payment',
-                'Title' => '💰 Deposit Refund Processed',
-                'Content' => 'Your deposit of RM ' . number_format($refund->RefundAmount, 2) . ' has been refunded to your bank account. Reference: ' . $refund->RefundReference . '. Please allow 1-3 business days for the transfer to complete.',
-                'RelatedID' => $refund->BookingID,
-                'RelatedType' => 'Booking',
-                'IsRead' => false,
-                'CreatedAt' => Carbon::now()
-            ]);
-
-            return redirect()->back()->with('success', 'Refund processed automatically! Reference: ' . $refund->RefundReference);
-
-        } catch (\Exception $e) {
-            return back()->with('error', 'Failed to process refund: ' . $e->getMessage());
-        }
-    }
 
     /**
      * Mark refund as failed

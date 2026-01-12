@@ -73,7 +73,7 @@
                     <p>Sign up to get started</p>
                 </div>
 
-                <form method="POST" action="{{ route('register') }}" class="gorent-form">
+                <form method="POST" action="{{ route('register') }}{{ isset($itemId) && $itemId ? '?item=' . $itemId : '' }}" class="gorent-form">
                     @csrf
 
                     <!-- Name -->
@@ -156,9 +156,17 @@
 
                     <!-- Login Link -->
                     <div class="gorent-login-section">
-                        <a href="{{ route('login') }}" class="gorent-login-link">Already have an account? Login</a>
+                        <a href="{{ route('login') }}{{ isset($itemId) && $itemId ? '?item=' . $itemId : '' }}" class="gorent-login-link">Already have an account? Login</a>
                     </div>
                 </form>
+
+                @if(isset($itemId) && $itemId)
+                    <div style="margin-top: 1rem; padding: 1rem; background: #EBF8FF; border-left: 4px solid #4A5FDC; border-radius: 8px;">
+                        <p style="font-size: 0.9rem; color: #2C5282;">
+                            <i class="fas fa-info-circle"></i> After registration and email verification, login to complete your booking.
+                        </p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

@@ -233,13 +233,9 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Bank Transfer Reference Number *</label>
-                        <input type="text" name="refund_reference" class="form-input" required placeholder="e.g., TRF2023101234567">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Proof of Transfer (Optional)</label>
-                        <input type="file" name="proof_of_transfer" class="form-input" accept="image/*,.pdf">
-                        <small class="form-hint">Upload bank transfer receipt (JPG, PNG, PDF - Max 5MB)</small>
+                        <label class="form-label">Proof of Transfer *</label>
+                        <input type="file" name="proof_of_transfer" class="form-input" accept="image/*,.pdf" required>
+                        <small class="form-hint">Upload bank transfer receipt (JPG, PNG, PDF - Max 5MB). Refund will be completed upon upload.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -289,12 +285,6 @@
                     Choose an action for Refund <strong id="actionRefundId"></strong>
                 </p>
                 <div class="action-buttons-grid">
-                    <button id="btnAutoComplete" class="action-option btn-auto-complete" onclick="autoCompleteRefund()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
-                        <i class="fas fa-magic"></i>
-                        <span class="action-title">Auto Process Refund</span>
-                        <span class="action-desc">Automatic reference generation</span>
-                    </button>
-
                     <button id="btnProcessing" class="action-option btn-processing" onclick="markAsProcessing()">
                         <i class="fas fa-spinner"></i>
                         <span class="action-title">Mark as Processing</span>
@@ -302,9 +292,9 @@
                     </button>
 
                     <button id="btnComplete" class="action-option btn-complete" onclick="showCompleteModal()">
-                        <i class="fas fa-hand-paper"></i>
-                        <span class="action-title">Manual Complete</span>
-                        <span class="action-desc">Enter reference manually</span>
+                        <i class="fas fa-check-circle"></i>
+                        <span class="action-title">Complete Refund</span>
+                        <span class="action-desc">Upload proof to complete</span>
                     </button>
 
                     <button id="btnFailed" class="action-option btn-failed" onclick="showFailedModal()">
@@ -1937,27 +1927,6 @@
 
             // Show the action modal
             document.getElementById('actionModal').style.display = 'block';
-        }
-
-        function autoCompleteRefund() {
-            if (currentRefundId && (currentRefundStatus === 'pending' || currentRefundStatus === 'processing')) {
-                if (confirm('Process refund automatically? A unique reference will be auto-generated.')) {
-                    // Close action modal
-                    closeModal('actionModal');
-
-                    // Create and submit form
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/admin/refund-queue/${currentRefundId}/auto-complete`;
-                    const csrf = document.createElement('input');
-                    csrf.type = 'hidden';
-                    csrf.name = '_token';
-                    csrf.value = '{{ csrf_token() }}';
-                    form.appendChild(csrf);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            }
         }
 
         function markAsProcessing() {

@@ -14,9 +14,12 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('auth.login');
+        // Check if there's an item parameter (user coming from booking)
+        $itemId = $request->query('item');
+
+        return view('auth.login', ['itemId' => $itemId]);
     }
 
     /**
@@ -62,7 +65,28 @@ class AuthenticatedSessionController extends Controller
         return redirect()->route('admin.dashboard');
     }
 
-    // Redirect normal user to user home page
+    // Check if user came from booking a specific item
+    $itemId = $request->query('item');
+    if ($itemId) {
+        // Redirect to authenticated item details page to continue booking
+        return redirect()->route('item.details', ['id' => $itemId]);
+    }
+
+    // Get the intended URL and check if it's an API endpoint
+    $intendedUrl = $request->session()->get('url.intended');
+    if ($intendedUrl && (str_contains($intendedUrl, '/api/') || str_contains($intendedUrl, 'unavailable-dates'))) {
+        // Clear the intended URL if it's an API endpoint
+        $request->session()->forget('url.intended');
+        return redirect('/homepage');
+    }
+
+    // Redirect normal user to homepage (or intended URL, but not if it's the welcome page)
+    $intended = $request->session()->get('url.intended');
+    if (!$intended || $intended === url('/')) {
+        // If no intended URL or intended URL is the welcome page, go to homepage
+        return redirect('/homepage');
+    }
+
     return redirect()->intended('/homepage');
 }
 
@@ -76,6 +100,9 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
+
+        // Clear any intended URL to prevent redirect to API endpoints
+        $request->session()->forget('url.intended');
 
         return redirect('/');
     }

@@ -66,7 +66,7 @@
                 <!-- Session Status -->
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form method="POST" action="{{ route('login') }}" class="gorent-form">
+                <form method="POST" action="{{ route('login') }}{{ isset($itemId) && $itemId ? '?item=' . $itemId : '' }}" class="gorent-form" id="loginForm">
                     @csrf
 
                     <!-- Username/Email -->
@@ -123,10 +123,18 @@
                     <!-- Create Account -->
                     <div class="gorent-signup-section">
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="gorent-signup-link">Create Account</a>
+                            <a href="{{ route('register') }}{{ isset($itemId) && $itemId ? '?item=' . $itemId : '' }}" class="gorent-signup-link">Create Account</a>
                         @endif
                     </div>
                 </form>
+
+                @if(isset($itemId) && $itemId)
+                    <div style="margin-top: 1rem; padding: 1rem; background: #EBF8FF; border-left: 4px solid #4A5FDC; border-radius: 8px;">
+                        <p style="font-size: 0.9rem; color: #2C5282;">
+                            <i class="fas fa-info-circle"></i> After login, you'll be redirected to complete your booking.
+                        </p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

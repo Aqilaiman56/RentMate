@@ -479,6 +479,18 @@
             box-shadow: 0 4px 12px rgba(68, 97, 242, 0.3);
         }
 
+        .quantity-btn:hover:not(:disabled) {
+            background: #4461F2;
+            color: white;
+            border-color: #4461F2;
+            transform: scale(1.05);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .availability-badge {
             display: inline-flex;
             align-items: center;
@@ -1149,9 +1161,32 @@
                                 <input type="date" id="end_date" name="end_date" class="form-input" min="{{ date('Y-m-d') }}" required readonly>
                             </div>
 
+                            @if($item->Quantity > 1)
+                            <div class="form-group">
+                                <label class="form-label" for="quantity">Number of Units</label>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <button type="button" class="quantity-btn" id="decreaseQty" style="width: 40px; height: 40px; border: 1.5px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; font-size: 1.125rem; font-weight: 600; transition: all 0.2s;">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </button>
+                                    <input type="number" id="quantity" name="quantity" class="form-input" value="1" min="1" max="{{ $item->Quantity }}" required readonly style="text-align: center; width: 40px; height: 40px; padding: 0; margin: 0; font-weight: 600; font-size: 1rem; line-height: 38px; box-sizing: border-box;">
+                                    <button type="button" class="quantity-btn" id="increaseQty" style="width: 40px; height: 40px; border: 1.5px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; font-size: 1.125rem; font-weight: 600; transition: all 0.2s;">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                    <span style="color: #6b7280; font-size: 0.875rem; margin-left: 0.5rem;">
+                                        (Max: {{ $item->Quantity }} units available)
+                                    </span>
+                                </div>
+                                <small style="display: block; margin-top: 0.5rem; color: #6b7280; font-size: 0.75rem;">
+                                    <i class="fa-solid fa-info-circle"></i> Deposit and booking fee stay the same regardless of units
+                                </small>
+                            </div>
+                            @else
+                            <input type="hidden" id="quantity" name="quantity" value="1">
+                            @endif
+
                             <div class="total-calculation" id="totalCalculation" style="display: none;">
                                 <div class="calc-row">
-                                    <span>Rental (RM {{ number_format($item->PricePerDay, 2) }} × <span id="numDays">0</span> days)</span>
+                                    <span>Rental (RM {{ number_format($item->PricePerDay, 2) }} × <span id="numDays">0</span> days × <span id="numUnits">1</span> <span id="unitLabel">unit</span>)</span>
                                     <span id="rentalTotal">RM 0.00</span>
                                 </div>
                                 <div class="calc-row" style="color: #f59e0b; font-weight: 600;">
@@ -1252,8 +1287,8 @@
             <h2 class="modal-title">Sign in Required</h2>
             <p class="modal-text">To complete your booking and reserve this item, please create an account or log in to your existing account.</p>
             <div class="modal-buttons">
-                <a href="{{ route('register') }}" class="modal-btn modal-btn-primary">Create Account</a>
-                <a href="{{ route('login') }}" class="modal-btn modal-btn-secondary">Log In</a>
+                <a href="{{ route('register', ['item' => $item->ItemID]) }}" class="modal-btn modal-btn-primary">Create Account</a>
+                <a href="{{ route('login', ['item' => $item->ItemID]) }}" class="modal-btn modal-btn-secondary">Log In</a>
                 <button class="modal-close" onclick="closeModal()">Continue Browsing</button>
             </div>
         </div>
@@ -1264,6 +1299,7 @@
         const depositAmount = {{ $item->DepositAmount }};
         const serviceFeeAmount = 1.00;
         const itemId = {{ $item->ItemID }};
+        const maxQuantity = {{ $item->Quantity }};
 
         let unavailableDates = [];
         let currentMonth = new Date();
@@ -1415,13 +1451,17 @@
         function calculateTotal() {
             const startDate = new Date(document.getElementById('start_date').value);
             const endDate = new Date(document.getElementById('end_date').value);
+            const quantityInput = document.getElementById('quantity');
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
 
             if (startDate && endDate && endDate > startDate) {
                 const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-                const rentalTotal = pricePerDay * days;
+                const rentalTotal = pricePerDay * days * quantity;
                 const payOnline = depositAmount + serviceFeeAmount;
 
                 document.getElementById('numDays').textContent = days;
+                document.getElementById('numUnits').textContent = quantity;
+                document.getElementById('unitLabel').textContent = quantity > 1 ? 'units' : 'unit';
                 document.getElementById('rentalTotal').textContent = 'RM ' + rentalTotal.toFixed(2);
                 document.getElementById('payToOwner').textContent = 'RM ' + rentalTotal.toFixed(2);
                 document.getElementById('payOnline').textContent = 'RM ' + payOnline.toFixed(2);
@@ -1431,10 +1471,75 @@
             }
         }
 
+        // Quantity controls
+        const decreaseBtn = document.getElementById('decreaseQty');
+        const increaseBtn = document.getElementById('increaseQty');
+        const quantityInput = document.getElementById('quantity');
+
+        if (decreaseBtn && increaseBtn && quantityInput) {
+            decreaseBtn.addEventListener('click', function() {
+                let currentQty = parseInt(quantityInput.value);
+                if (currentQty > 1) {
+                    quantityInput.value = currentQty - 1;
+                    calculateTotal();
+                    updateQuantityButtons();
+                }
+            });
+
+            increaseBtn.addEventListener('click', function() {
+                let currentQty = parseInt(quantityInput.value);
+                if (currentQty < maxQuantity) {
+                    quantityInput.value = currentQty + 1;
+                    calculateTotal();
+                    updateQuantityButtons();
+                }
+            });
+
+            quantityInput.addEventListener('change', function() {
+                let value = parseInt(this.value);
+                if (isNaN(value) || value < 1) {
+                    this.value = 1;
+                } else if (value > maxQuantity) {
+                    this.value = maxQuantity;
+                }
+                calculateTotal();
+                updateQuantityButtons();
+            });
+        }
+
+        function updateQuantityButtons() {
+            if (!quantityInput || !decreaseBtn || !increaseBtn) return;
+
+            const currentQty = parseInt(quantityInput.value);
+
+            if (currentQty <= 1) {
+                decreaseBtn.disabled = true;
+                decreaseBtn.style.opacity = '0.5';
+                decreaseBtn.style.cursor = 'not-allowed';
+            } else {
+                decreaseBtn.disabled = false;
+                decreaseBtn.style.opacity = '1';
+                decreaseBtn.style.cursor = 'pointer';
+            }
+
+            if (currentQty >= maxQuantity) {
+                increaseBtn.disabled = true;
+                increaseBtn.style.opacity = '0.5';
+                increaseBtn.style.cursor = 'not-allowed';
+            } else {
+                increaseBtn.disabled = false;
+                increaseBtn.style.opacity = '1';
+                increaseBtn.style.cursor = 'pointer';
+            }
+        }
+
         // Initialize calendar on page load
         document.addEventListener('DOMContentLoaded', function() {
             fetchUnavailableDates();
             initializeDescriptionToggle();
+            if (quantityInput) {
+                updateQuantityButtons();
+            }
         });
 
         // Description toggle functionality
@@ -1471,6 +1576,17 @@
         // Handle form submission
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
+
+            // Save booking data to sessionStorage before showing auth modal
+            const quantityInput = document.getElementById('quantity');
+            const bookingData = {
+                item_id: {{ $item->ItemID }},
+                start_date: document.getElementById('start_date').value,
+                end_date: document.getElementById('end_date').value,
+                quantity: quantityInput ? parseInt(quantityInput.value) : 1
+            };
+            sessionStorage.setItem('pendingBooking', JSON.stringify(bookingData));
+
             showModal();
         });
 

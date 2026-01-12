@@ -16,11 +16,11 @@ class WelcomeController extends Controller
         // Get all categories for the category filter
         $categories = Category::all();
         $selectedCategory = null;
-        
-        // Start building the query - Show all items when searching (including unavailable)
-        // Search results display all items so users can see unavailable items
-        $query = Item::with(['category', 'location', 'images']);
-        
+
+        // Start building the query - Only show available items
+        $query = Item::with(['category', 'location', 'images'])
+                     ->where('Availability', true);
+
         // Handle category filter
         if ($request->has('category') && $request->category != '') {
             $selectedCategory = Category::find($request->category);

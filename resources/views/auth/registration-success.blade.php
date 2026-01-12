@@ -83,8 +83,16 @@
                     </div>
                 </div>
 
+                @if(isset($itemId) && $itemId)
+                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <p style="font-size: 0.9rem; color: #78350F; margin: 0;">
+                            <i class="fas fa-shopping-cart"></i> <strong>Don't forget your booking!</strong> After verifying your email and logging in, you'll be redirected to complete your item booking.
+                        </p>
+                    </div>
+                @endif
+
                 <div class="gorent-actions">
-                    <a href="{{ route('login') }}" class="gorent-btn-primary">
+                    <a href="{{ route('login') }}{{ isset($itemId) && $itemId ? '?item=' . $itemId : '' }}" class="gorent-btn-primary">
                         <i class="fas fa-sign-in-alt"></i>
                         Proceed to Login
                     </a>
@@ -96,7 +104,7 @@
 
                 <div class="gorent-help-section">
                     <p>Didn't receive the email?</p>
-                    <a href="{{ route('login') }}" class="gorent-link">
+                    <a href="{{ route('login') }}{{ isset($itemId) && $itemId ? '?item=' . $itemId : '' }}" class="gorent-link">
                         Go to login and resend verification email
                     </a>
                 </div>
