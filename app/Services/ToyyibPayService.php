@@ -54,7 +54,7 @@ class ToyyibPayService
                 'billExternalReferenceNo' => $bookingData['booking_id'],
                 'billTo' => $bookingData['payer_name'],
                 'billEmail' => $bookingData['payer_email'],
-                'billPhone' => $bookingData['payer_phone'] ?? '',
+                'billPhone' => !empty($bookingData['payer_phone']) ? $bookingData['payer_phone'] : '0000000000',
                 'billSplitPayment' => 0,
                 'billSplitPaymentArgs' => '',
                 'billPaymentChannel' => '0', // 0 = FPX, 1 = Credit Card, 2 = Both

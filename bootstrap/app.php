@@ -14,8 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->trustHosts(at: [
             'localhost',
-            'irrevocable-tinkly-clemmie.ngrok-free.dev',
-            fn ($host) => str_ends_with($host, '.ngrok-free.dev'),
+    	    '152.42.239.115',
+            'gorentums.me',
+            'www.gorentums.me',
+            '*.ngrok-free.dev',
         ]);
 
         // Exclude payment callback from CSRF verification (external API callback)
