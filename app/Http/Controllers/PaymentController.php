@@ -348,4 +348,31 @@ class PaymentController extends Controller
 
         return view('payments.history', compact('booking', 'payments'));
     }
+
+    /**
+     * Payment callback from ToyyibPay (alternative method)
+     */
+    public function callback(Request $request)
+    {
+        $billcode = $request->input('billcode');
+        $statusId = $request->input('status_id');
+        $transactionId = $request->input('transaction_id');
+        $bookingId = $request->input('order_id');
+
+        // Update payment status in database
+        $payment = Payment::where('BillCode', $billcode)->first();
+        if ($payment) {
+            $payment->update([
+                'PaymentStatus' => $statusId,
+                'TransactionID' => $transactionId,
+                'UpdatedAt' => now()
+            ]);
+        }
+
+        // Get the payment ID for redirect
+        $paymentId = $payment ? $payment->PaymentID : $bookingId;
+
+        // Redirect to production URL
+        return redirect("https://gorentums.me/payment/{$paymentId}");
+    }
 }
