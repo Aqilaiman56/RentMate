@@ -58,10 +58,12 @@
 
     .images-grid.count-1 {
         grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
     }
 
     .images-grid.count-2 {
         grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
     }
 
     .images-grid.count-3 {
@@ -71,6 +73,12 @@
 
     .images-grid.count-3 .grid-image:first-child {
         grid-row: 1 / 3;
+        aspect-ratio: 1 / 1.2;
+    }
+
+    .images-grid.count-3 .grid-image:nth-child(2),
+    .images-grid.count-3 .grid-image:nth-child(3) {
+        aspect-ratio: 1.5 / 1;
     }
 
     .images-grid.count-4 {
@@ -80,6 +88,13 @@
 
     .images-grid.count-4 .grid-image:first-child {
         grid-row: 1 / 4;
+        aspect-ratio: 1 / 1.5;
+    }
+
+    .images-grid.count-4 .grid-image:nth-child(2),
+    .images-grid.count-4 .grid-image:nth-child(3),
+    .images-grid.count-4 .grid-image:nth-child(4) {
+        aspect-ratio: 1.5 / 1;
     }
 
     .grid-image {
@@ -97,27 +112,19 @@
     }
 
     .images-grid.count-1 .grid-image {
-        height: 550px;
+        aspect-ratio: 5 / 4;
     }
 
     .images-grid.count-2 .grid-image {
-        height: 550px;
+        aspect-ratio: 1 / 1;
     }
 
     .images-grid.count-3 .grid-image {
-        height: 268px;
-    }
-
-    .images-grid.count-3 .grid-image:first-child {
-        height: 550px;
+        aspect-ratio: auto;
     }
 
     .images-grid.count-4 .grid-image {
-        height: 176px;
-    }
-
-    .images-grid.count-4 .grid-image:first-child {
-        height: 550px;
+        aspect-ratio: auto;
     }
 
     .wishlist-btn {

@@ -140,11 +140,13 @@
         /* Single image */
         .images-grid.count-1 {
             grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
         }
 
         /* Two images side by side */
         .images-grid.count-2 {
             grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr;
         }
 
         /* Three images: 1 large + 2 small on right */
@@ -155,6 +157,12 @@
 
         .images-grid.count-3 .grid-image:first-child {
             grid-row: 1 / 3;
+            aspect-ratio: 1 / 1.2;
+        }
+
+        .images-grid.count-3 .grid-image:nth-child(2),
+        .images-grid.count-3 .grid-image:nth-child(3) {
+            aspect-ratio: 1.5 / 1;
         }
 
         /* Four images: 1 large + 3 small on right */
@@ -165,6 +173,13 @@
 
         .images-grid.count-4 .grid-image:first-child {
             grid-row: 1 / 4;
+            aspect-ratio: 1 / 1.5;
+        }
+
+        .images-grid.count-4 .grid-image:nth-child(2),
+        .images-grid.count-4 .grid-image:nth-child(3),
+        .images-grid.count-4 .grid-image:nth-child(4) {
+            aspect-ratio: 1.5 / 1;
         }
 
         .grid-image {
@@ -173,6 +188,7 @@
             object-fit: cover;
             cursor: pointer;
             transition: transform 0.3s;
+            display: block;
         }
 
         .grid-image:hover {
@@ -180,27 +196,19 @@
         }
 
         .images-grid.count-1 .grid-image {
-            height: 500px;
+            aspect-ratio: 5 / 4;
         }
 
         .images-grid.count-2 .grid-image {
-            height: 500px;
+            aspect-ratio: 1 / 1;
         }
 
         .images-grid.count-3 .grid-image {
-            height: 245px;
-        }
-
-        .images-grid.count-3 .grid-image:first-child {
-            height: 500px;
+            aspect-ratio: auto;
         }
 
         .images-grid.count-4 .grid-image {
-            height: 160px;
-        }
-
-        .images-grid.count-4 .grid-image:first-child {
-            height: 500px;
+            aspect-ratio: auto;
         }
 
         .item-header {
@@ -974,6 +982,45 @@
 
             .modal-content {
                 padding: 30px 20px;
+            }
+
+            .auth-buttons {
+                gap: 8px;
+                flex-shrink: 1;
+            }
+
+            .auth-buttons .btn {
+                padding: 8px 14px;
+                font-size: 12px;
+                border-radius: 20px;
+            }
+
+            .auth-buttons .btn-login {
+                border-width: 1.5px;
+            }
+
+            .auth-buttons .btn-register {
+                border-width: 1.5px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .header {
+                padding: 12px 15px;
+                gap: 10px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .auth-buttons {
+                gap: 6px;
+            }
+
+            .auth-buttons .btn {
+                padding: 6px 10px;
+                font-size: 11px;
             }
         }
     </style>

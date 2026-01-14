@@ -26,6 +26,7 @@
         flex-direction: column;
         height: 100vh;
         max-width: 100%;
+        width: 100%;
     }
 
     .chat-header {
@@ -226,11 +227,13 @@
     .chat-messages {
         flex: 1;
         background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-        padding: 30px 25px;
+        padding: 30px 25px 20px 25px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 16px;
+        min-height: 0;
+        -webkit-overflow-scrolling: touch;
     }
 
     .message {
@@ -331,10 +334,13 @@
     .chat-input-container {
         background: white;
         border-radius: 0;
-        padding: 20px 30px;
+        padding: 16px 20px;
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
         flex-shrink: 0;
         border-top: 1px solid #e5e7eb;
+        width: 100%;
+        position: relative;
+        z-index: 100;
     }
 
     .chat-input-form {
@@ -345,13 +351,15 @@
 
     .chat-input {
         flex: 1;
-        padding: 14px 20px;
+        padding: 12px 18px;
         border: 2px solid #e5e7eb;
         border-radius: 30px;
         font-size: 15px;
         outline: none;
         transition: all 0.3s;
         background: #f9fafb;
+        max-height: 100px;
+        resize: none;
     }
 
     .chat-input:focus {
@@ -480,11 +488,12 @@
         }
 
         .chat-input-container {
-            padding: 16px;
+            padding: 12px 12px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
         }
 
         .chat-messages {
-            padding: 16px 12px;
+            padding: 16px 12px 16px 12px;
         }
 
         .message {
@@ -502,7 +511,15 @@
         }
 
         .send-btn {
-            padding: 12px 24px;
+            padding: 12px 20px;
+            font-size: 14px;
+            min-width: fit-content;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            padding: 10px 16px;
+            font-size: 14px;
         }
     }
 </style>
