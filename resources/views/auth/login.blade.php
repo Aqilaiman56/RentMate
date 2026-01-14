@@ -127,14 +127,6 @@
                         @endif
                     </div>
                 </form>
-
-                @if(isset($itemId) && $itemId)
-                    <div style="margin-top: 1rem; padding: 1rem; background: #EBF8FF; border-left: 4px solid #4A5FDC; border-radius: 8px;">
-                        <p style="font-size: 0.9rem; color: #2C5282;">
-                            <i class="fas fa-info-circle"></i> After login, you'll be redirected to complete your booking.
-                        </p>
-                    </div>
-                @endif
             </div>
         </div>
     </div>

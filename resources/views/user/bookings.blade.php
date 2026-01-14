@@ -30,6 +30,25 @@
         color: #6b7280;
     }
 
+    .alert {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
     .bookings-grid {
         display: grid;
         gap: 20px;
@@ -43,11 +62,27 @@
         display: flex;
         gap: 20px;
         transition: transform 0.2s;
+        cursor: pointer;
     }
 
     .booking-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .booking-card-header {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .booking-card-left {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        flex: 1;
+        min-width: 0;
     }
 
     .booking-image {
@@ -56,25 +91,14 @@
         border-radius: 12px;
         object-fit: cover;
         flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
-    .booking-content {
+    .booking-card-info {
         flex: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
-    }
-
-    .booking-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 10px;
-    }
-
-    .booking-id {
-        font-size: 12px;
-        color: #9ca3af;
-        font-weight: 600;
     }
 
     .booking-title {
@@ -85,9 +109,9 @@
     }
 
     .booking-dates {
-        font-size: 14px;
+        font-size: 13px;
         color: #6b7280;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     .booking-meta {
@@ -95,21 +119,26 @@
         gap: 15px;
         margin-bottom: 15px;
         flex-wrap: wrap;
+        font-size: 12px;
+        color: #6b7280;
     }
 
     .meta-item {
         display: flex;
         align-items: center;
         gap: 5px;
-        font-size: 13px;
-        color: #6b7280;
     }
 
-    .booking-footer {
-        margin-top: auto;
+    .booking-card-header-right {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .booking-price-header {
+        text-align: right;
+        min-width: 120px;
     }
 
     .booking-price {
@@ -118,27 +147,13 @@
         color: #4461F2;
     }
 
-    .view-btn {
-        background: #4461F2;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-
-    .view-btn:hover {
-        background: #3651E2;
-    }
-
     .status-badge {
         display: inline-block;
         padding: 6px 12px;
         border-radius: 15px;
         font-size: 12px;
         font-weight: 600;
+        margin-top: 4px;
     }
 
     .status-pending {
@@ -164,6 +179,165 @@
     .status-rejected {
         background: #fee2e2;
         color: #991b1b;
+    }
+
+    .expand-icon {
+        font-size: 20px;
+        color: #6b7280;
+        transition: transform 0.3s;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .booking-card.expanded .expand-icon {
+        transform: rotate(180deg);
+    }
+
+    .booking-card-content {
+        display: none;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e5e7eb;
+        grid-column: 1 / -1;
+        animation: expandDown 0.3s ease-out;
+    }
+
+    .booking-card.expanded {
+        flex-direction: column;
+    }
+
+    .booking-card.expanded .booking-card-content {
+        display: block;
+    }
+
+    @keyframes expandDown {
+        from {
+            opacity: 0;
+            max-height: 0;
+        }
+        to {
+            opacity: 1;
+            max-height: 500px;
+        }
+    }
+
+    .booking-details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .detail-item {
+        padding: 12px;
+        background: #f9fafb;
+        border-radius: 8px;
+    }
+
+    .detail-label {
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 600;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+
+    .detail-value {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+    }
+
+    .waiting-approval {
+        background: #fef3c7;
+        border: 1px solid #fbbf24;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .waiting-approval i {
+        color: #f59e0b;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .waiting-approval-text {
+        flex: 1;
+    }
+
+    .waiting-approval-title {
+        font-weight: 600;
+        color: #92400e;
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
+    .waiting-approval-desc {
+        font-size: 12px;
+        color: #78350f;
+    }
+
+    .booking-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .view-btn {
+        background: #4461F2;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .view-btn:hover {
+        background: #3651E2;
+    }
+
+    .review-btn {
+        background: #10b981;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .review-btn:hover {
+        background: #059669;
+    }
+
+    .reviewed-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #d1fae5;
+        color: #065f46;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
     }
 
     .empty-state {
@@ -209,93 +383,9 @@
         transform: translateY(-2px);
     }
 
-    .alert {
-        padding: 16px 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        font-size: 14px;
-    }
-
-    .alert-success {
-        background: #d1fae5;
-        color: #065f46;
-        border: 1px solid #a7f3d0;
-    }
-
-    .alert-error {
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-    }
-
-    .review-btn {
-        background: #10b981;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.2s;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .review-btn:hover {
-        background: #059669;
-    }
-
-    .waiting-approval {
-        background: #fef3c7;
-        border: 1px solid #fbbf24;
-        border-radius: 8px;
-        padding: 12px 16px;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .waiting-approval i {
-        color: #f59e0b;
-        font-size: 18px;
-    }
-
-    .waiting-approval-text {
-        flex: 1;
-    }
-
-    .waiting-approval-title {
-        font-weight: 600;
-        color: #92400e;
-        font-size: 13px;
-        margin-bottom: 2px;
-    }
-
-    .waiting-approval-desc {
-        font-size: 12px;
-        color: #78350f;
-    }
-
-    .reviewed-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: #d1fae5;
-        color: #065f46;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
-    }
-
-    /* Review Modal */
     .modal {
         display: none;
-        position: centered fixed;
+        position: fixed;
         z-index: 1000;
         left: 0;
         top: 0;
@@ -321,12 +411,8 @@
         overflow-y: auto;
         animation: slideUp 0.3s;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+    }
 
-    /* Custom scrollbar for modal */
     .modal-content::-webkit-scrollbar {
         width: 8px;
     }
@@ -461,7 +547,6 @@
         cursor: not-allowed;
     }
 
-    /* Pagination Styles */
     .pagination-wrapper {
         margin-top: 30px;
     }
@@ -473,6 +558,25 @@
 
         .booking-card {
             flex-direction: column;
+            gap: 0;
+        }
+
+        .booking-card-header {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .booking-card-left {
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .booking-card-header-right {
+            width: 100%;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
         }
 
         .booking-image {
@@ -480,15 +584,43 @@
             height: 200px;
         }
 
-        .booking-footer {
-            flex-direction: column;
+        .booking-card-info {
+            width: 100%;
+        }
+
+        .booking-title {
+            font-size: 16px;
+        }
+
+        .booking-dates {
+            font-size: 12px;
+        }
+
+        .booking-meta {
+            font-size: 11px;
             gap: 10px;
-            align-items: stretch;
+        }
+
+        .booking-price-header {
+            text-align: left;
+        }
+
+        .booking-price {
+            font-size: 18px;
+        }
+
+        .booking-details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .booking-actions {
+            flex-direction: column;
+            width: 100%;
         }
 
         .view-btn,
         .review-btn {
-            text-align: center;
+            width: 100%;
             justify-content: center;
         }
 
@@ -522,38 +654,59 @@
     @if($bookings->count() > 0)
         <div class="bookings-grid">
             @foreach($bookings as $booking)
-                <div class="booking-card">
+                <div class="booking-card" onclick="toggleBooking(this)">
                     @php
                         $firstImage = $booking->item->images ? $booking->item->images->first() : null;
                     @endphp
-                    @if($firstImage)
-                        <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
-                             alt="{{ $booking->item->ItemName }}"
-                             class="booking-image"
-                             onerror="this.src='https://via.placeholder.com/150'">
-                    @else
-                        <img src="https://via.placeholder.com/150"
-                             alt="{{ $booking->item->ItemName }}"
-                             class="booking-image">
-                    @endif
 
-                    <div class="booking-content">
-                        <div class="booking-header">
-                            <div>
+                    <!-- Card Header (Always Visible) -->
+                    <div class="booking-card-header">
+                        <div class="booking-card-left">
+                            @if($firstImage)
+                                <img src="{{ asset('storage/' . $firstImage->ImagePath) }}"
+                                     alt="{{ $booking->item->ItemName }}"
+                                     class="booking-image"
+                                     onerror="this.src='https://via.placeholder.com/100'">
+                            @else
+                                <img src="https://via.placeholder.com/100"
+                                     alt="{{ $booking->item->ItemName }}"
+                                     class="booking-image">
+                            @endif
+
+                            <div class="booking-card-info">
                                 <h3 class="booking-title">{{ $booking->item->ItemName }}</h3>
+                                <div class="booking-dates">
+                                    <i class="fas fa-calendar"></i> {{ $booking->StartDate->format('d M Y') }} - {{ $booking->EndDate->format('d M Y') }}
+                                </div>
+                                <div class="booking-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ $booking->item->location->LocationName ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>{{ $booking->BookingDate ? $booking->BookingDate->diffForHumans() : 'N/A' }}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <span class="status-badge status-{{ strtolower($booking->Status) }}">
-                                {{ ucfirst($booking->Status) }}
-                            </span>
                         </div>
 
-                        <div class="booking-dates">
-                            <i class="fas fa-calendar"></i> {{ $booking->StartDate->format('d M Y') }} - {{ $booking->EndDate->format('d M Y') }}
-                            <span style="color: #9ca3af;">({{ $booking->StartDate->diffInDays($booking->EndDate) }} days)</span>
+                        <div class="booking-card-header-right">
+                            <div class="booking-price-header">
+                                <div class="booking-price">RM {{ number_format($booking->TotalAmount + $booking->DepositAmount, 2) }}</div>
+                                <div class="status-badge status-{{ strtolower($booking->Status) }}">
+                                    {{ ucfirst($booking->Status) }}
+                                </div>
+                            </div>
+                            <div class="expand-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
                         </div>
+                    </div>
 
+                    <!-- Card Content (Hidden by default) -->
+                    <div class="booking-card-content" onclick="event.stopPropagation()">
                         @if($booking->Status === 'pending' && $booking->payment && $booking->payment->Status === 'successful')
-                            <!-- Show waiting for approval message -->
                             <div class="waiting-approval">
                                 <i class="fas fa-hourglass-half"></i>
                                 <div class="waiting-approval-text">
@@ -563,52 +716,51 @@
                             </div>
                         @endif
 
-                        <div class="booking-meta">
-                            <div class="meta-item">
-                                <span><i class="fas fa-map-marker-alt"></i></span>
-                                <span>{{ $booking->item->location->LocationName ?? 'N/A' }}</span>
+                        <div class="booking-details-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Duration</div>
+                                <div class="detail-value">{{ $booking->StartDate->diffInDays($booking->EndDate) }} days</div>
                             </div>
-                            <div class="meta-item">
-                                <span><i class="fas fa-clock"></i></span>
-                                <span>Booked {{ $booking->BookingDate ? $booking->BookingDate->diffForHumans() : 'N/A' }}</span>
-                            </div>
-                            @if($booking->payment)
-                                <div class="meta-item">
-                                    <span><i class="fas fa-credit-card"></i></span>
-                                    <span>{{ $booking->payment->Status === 'successful' ? 'Paid' : 'Pending Payment' }}</span>
+                            <div class="detail-item">
+                                <div class="detail-label">Payment Status</div>
+                                <div class="detail-value">
+                                    @if($booking->payment)
+                                        <span style="color: {{ $booking->payment->Status === 'successful' ? '#10b981' : '#f59e0b' }};">
+                                            {{ ucfirst($booking->payment->Status) }}
+                                        </span>
+                                    @else
+                                        <span style="color: #ef4444;">No Payment</span>
+                                    @endif
                                 </div>
-                            @endif
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Rental Amount</div>
+                                <div class="detail-value">RM {{ number_format($booking->TotalAmount, 2) }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Deposit Amount</div>
+                                <div class="detail-value">RM {{ number_format($booking->DepositAmount, 2) }}</div>
+                            </div>
                         </div>
 
-                        <div class="booking-footer">
-                            <div>
-                                <div class="booking-price">
-                                    RM {{ number_format($booking->TotalAmount + $booking->DepositAmount, 2) }}
-                                </div>
-                                <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
-                                    <span>Rental: RM {{ number_format($booking->TotalAmount, 2) }}</span> |
-                                    <span>Deposit: RM {{ number_format($booking->DepositAmount, 2) }}</span>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <a href="{{ route('booking.show', $booking->BookingID) }}" class="view-btn">
-                                    View Details
-                                </a>
-                                @if($booking->Status === 'completed')
-                                    @php
-                                        $hasReviewed = $booking->item->reviews->where('UserID', auth()->id())->isNotEmpty();
-                                    @endphp
-                                    @if(!$hasReviewed)
-                                        <button type="button" class="review-btn" onclick="openReviewModal({{ $booking->item->ItemID }}, '{{ $booking->item->ItemName }}')">
-                                            <i class="fas fa-star"></i> Add Review
-                                        </button>
-                                    @else
-                                        <span class="reviewed-badge">
-                                            <i class="fas fa-check-circle"></i> Reviewed
-                                        </span>
-                                    @endif
+                        <div class="booking-actions">
+                            <a href="{{ route('booking.show', $booking->BookingID) }}" class="view-btn">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                            @if($booking->Status === 'completed')
+                                @php
+                                    $hasReviewed = $booking->item->reviews->where('UserID', auth()->id())->isNotEmpty();
+                                @endphp
+                                @if(!$hasReviewed)
+                                    <button type="button" class="review-btn" onclick="openReviewModal({{ $booking->item->ItemID }}, '{{ $booking->item->ItemName }}')">
+                                        <i class="fas fa-star"></i> Add Review
+                                    </button>
+                                @else
+                                    <span class="reviewed-badge">
+                                        <i class="fas fa-check-circle"></i> Reviewed
+                                    </span>
                                 @endif
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -703,6 +855,10 @@
 
 @push('scripts')
 <script>
+    function toggleBooking(element) {
+        element.classList.toggle('expanded');
+    }
+
     let selectedRating = 0;
 
     function openReviewModal(itemId, itemName) {
