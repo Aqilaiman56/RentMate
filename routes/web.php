@@ -146,8 +146,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/payment/history/{bookingId}', [PaymentController::class, 'history'])->name('payment.history');
 });
 
-// Payment callback (no auth required)
-Route::post('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+// Payment callback (no auth required) - Accept both GET and POST from toyyibPay
+Route::match(['get', 'post'], '/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 
 // Payment status page (accessible without auth for callback redirects)
 Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
