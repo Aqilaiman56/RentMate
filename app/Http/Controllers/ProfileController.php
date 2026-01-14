@@ -94,7 +94,7 @@ class ProfileController extends Controller
             'BankName' => 'nullable|string|max:100',
             'BankAccountNumber' => 'nullable|string|max:50',
             'BankAccountHolderName' => 'nullable|string|max:100',
-            'ProfileImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'ProfileImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:15360'
         ], [
             'UserName.regex' => 'Username can only contain letters and numbers (no spaces or special characters).',
             'Location.exists' => 'Please select a valid location from the list.'

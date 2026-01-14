@@ -70,6 +70,7 @@
         display: flex;
         gap: 10px;
         align-items: center;
+        justify-content: flex-end;
     }
 
     .notifications-list {

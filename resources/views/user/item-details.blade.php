@@ -88,6 +88,8 @@
         object-fit: cover;
         cursor: pointer;
         transition: transform 0.2s;
+        display: block;
+        flex-shrink: 0;
     }
 
     .grid-image:hover {

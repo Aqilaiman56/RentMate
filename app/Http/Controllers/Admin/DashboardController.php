@@ -125,7 +125,7 @@ class DashboardController extends Controller
             'UserName' => 'required|string|max:255',
             'Email' => 'required|email|unique:users,Email,' . $admin->UserID . ',UserID',
             'PhoneNumber' => 'nullable|string|max:20',
-            'ProfileImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'ProfileImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:15360'
         ]);
 
         // Handle profile image upload

@@ -472,10 +472,16 @@
             background-color: #F3F4F6;
         }
 
-        /* Hide mobile search toggle on desktop */
+        /* Hide mobile search toggle on desktop and show search container */
         @media (min-width: 769px) {
             .mobile-search-toggle {
                 display: none !important;
+            }
+
+            /* On desktop, always show the search container regardless of collapsed class */
+            .header-search-container,
+            .header-search-container.collapsed {
+                display: block !important;
             }
         }
 
@@ -600,7 +606,22 @@
             }
 
             .auth-buttons {
-                flex-wrap: wrap;
+                gap: 8px;
+                flex-shrink: 1;
+            }
+
+            .auth-buttons .btn {
+                padding: 8px 14px;
+                font-size: 12px;
+                border-radius: 20px;
+            }
+
+            .auth-buttons .btn-login {
+                border-width: 1.5px;
+            }
+
+            .auth-buttons .btn-register {
+                border-width: 1.5px;
             }
 
             .hero-title {
@@ -666,6 +687,32 @@
             .footer-content {
                 grid-template-columns: 1fr;
                 gap: 30px;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 400px) {
+            .header {
+                padding: 12px 15px;
+                gap: 10px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .auth-buttons {
+                gap: 6px;
+            }
+
+            .auth-buttons .btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            .mobile-search-toggle {
+                padding: 0.375rem;
+                font-size: 1rem;
             }
         }
     </style>

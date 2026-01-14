@@ -121,7 +121,7 @@ class ItemController extends Controller
             'DepositAmount' => 'required|numeric|min:0|max:9999.99',
             'PricePerDay' => 'required|numeric|min:0|max:9999.99',
             'images' => 'required|array|min:1|max:4',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:15360',
             'Quantity' => 'required|integer|min:1|max:10',
             'Availability' => 'nullable|boolean'
         ], [
@@ -191,7 +191,7 @@ class ItemController extends Controller
             'DepositAmount' => 'required|numeric|min:0|max:9999.99',
             'PricePerDay' => 'required|numeric|min:0|max:9999.99',
             'images' => 'nullable|array|min:1|max:4',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:15360',
             'Quantity' => 'required|integer|min:1|max:10',
             'Availability' => 'nullable|boolean'
         ], [
@@ -297,7 +297,7 @@ class ItemController extends Controller
             'ItemID' => 'required|exists:items,ItemID',
             'Rating' => 'required|integer|min:1|max:5',
             'Comment' => 'required|string|max:1000',
-            'ReviewImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'ReviewImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:15360'
         ]);
 
         // Check if user has booked this item

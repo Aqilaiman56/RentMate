@@ -54,10 +54,16 @@
             gap: 0.5rem;
         }
 
-        /* Hide mobile search toggle on desktop */
+        /* Hide mobile search toggle on desktop and show search container */
         @media (min-width: 769px) {
             .mobile-search-toggle {
                 display: none !important;
+            }
+
+            /* On desktop, always show the search container regardless of collapsed class */
+            .header-search-container,
+            .header-search-container.collapsed {
+                display: block !important;
             }
         }
 
@@ -382,6 +388,49 @@
                 display: none;
             }
 
+            /* Profile section mobile fixes */
+            .profile-section {
+                padding: 0.375rem;
+                gap: 0;
+            }
+
+            .profile-pic {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                min-height: 36px;
+                flex-shrink: 0;
+                aspect-ratio: 1 / 1;
+            }
+
+            .profile-section #dropdownCaret {
+                display: none;
+            }
+
+            /* Profile dropdown mobile positioning */
+            .profile-section .dropdown-menu {
+                position: fixed;
+                top: 60px;
+                right: 10px;
+                left: 10px;
+                bottom: auto;
+                max-width: none;
+                width: auto;
+                min-width: unset;
+                max-height: calc(100vh - 80px);
+                overflow-y: auto;
+                z-index: 1050;
+            }
+
+            .header-icons {
+                gap: 0.5rem;
+            }
+
+            .icon-btn {
+                padding: 0.375rem;
+                font-size: 1.1rem;
+            }
+
             .main-content {
                 padding: 1.25rem;
             }
@@ -392,6 +441,56 @@
                 left: 1.25rem;
                 right: 1.25rem;
                 max-height: 60vh;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 400px) {
+            .app-header {
+                padding: 0.75rem 1rem;
+                gap: 0.5rem;
+            }
+
+            .logo {
+                font-size: 1.25rem;
+            }
+
+            .profile-pic {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                min-height: 32px;
+            }
+
+            .header-icons {
+                gap: 0.25rem;
+            }
+
+            .icon-btn {
+                padding: 0.25rem;
+                font-size: 1rem;
+            }
+
+            .notification-badge {
+                min-width: 16px;
+                height: 16px;
+                font-size: 0.6rem;
+            }
+
+            .profile-section .dropdown-menu {
+                top: 55px;
+                right: 8px;
+                left: 8px;
+            }
+
+            .profile-section .dropdown-item {
+                padding: 0.625rem 0.875rem;
+                font-size: 0.8rem;
+            }
+
+            .profile-section .dropdown-item i {
+                width: 18px;
+                font-size: 1rem;
             }
         }
     </style>
