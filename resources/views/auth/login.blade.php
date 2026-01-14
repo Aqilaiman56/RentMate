@@ -69,7 +69,7 @@
                 <form method="POST" action="{{ route('login') }}{{ isset($itemId) && $itemId ? '?item=' . $itemId : '' }}" class="gorent-form" id="loginForm">
                     @csrf
 
-                    <!-- Username/Email -->
+                    <!-- Email -->
                     <div class="gorent-form-group">
                         <label for="email" class="gorent-label">Email</label>
                         <input id="email" 
@@ -79,8 +79,8 @@
                                value="{{ old('email') }}" 
                                required 
                                autofocus 
-                               autocomplete="username"
-                               placeholder="Username">
+                               autocomplete="Email"
+                               placeholder="Email Address">
                         <x-input-error :messages="$errors->get('email')" class="gorent-error" />
                     </div>
 
