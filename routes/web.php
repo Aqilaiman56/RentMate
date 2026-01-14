@@ -141,7 +141,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');
-    Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
     Route::get('/payment/status/{bookingId}', [PaymentController::class, 'checkStatus'])->name('payment.status');
     Route::post('/payment/{id}/refund', [PaymentController::class, 'refund'])->name('payment.refund');
     Route::get('/payment/history/{bookingId}', [PaymentController::class, 'history'])->name('payment.history');
@@ -150,8 +149,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Payment callback (no auth required)
 Route::post('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 
-// Test payment page (for testing during ToyyibPay verification)
-Route::get('/payment/test/{bill_code}', [PaymentController::class, 'testPayment'])->name('payment.test');
+// Payment status page (accessible without auth for callback redirects)
+Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
 
 /*
 |--------------------------------------------------------------------------
