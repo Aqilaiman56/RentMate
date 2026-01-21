@@ -32,12 +32,6 @@ class AuthenticatedSessionController extends Controller
 
     $user = auth()->user();
 
-    // Check if email is verified (non-admin users only)
-    if (!$user->IsAdmin && !$user->hasVerifiedEmail()) {
-        // Redirect to verification notice page
-        return redirect()->route('verification.notice');
-    }
-
     // Check if user is suspended (non-admin users only)
     if (!$user->IsAdmin && $user->isCurrentlySuspended()) {
         Auth::guard('web')->logout();
