@@ -121,6 +121,14 @@
         background: #d1fae5;
     }
 
+    .notification-icon.booking_ending {
+        background: #fef3c7;
+    }
+
+    .notification-icon.handover_reminder {
+        background: #dbeafe;
+    }
+
     .notification-icon.review {
         background: #fef3c7;
     }
@@ -347,6 +355,12 @@
                                 @break
                             @case('booking')
                                 <i class="fas fa-calendar-check"></i>
+                                @break
+                            @case('booking_ending')
+                                <i class="fas fa-clock"></i>
+                                @break
+                            @case('handover_reminder')
+                                <i class="fas fa-handshake"></i>
                                 @break
                             @case('review')
                                 <i class="fas fa-star"></i>

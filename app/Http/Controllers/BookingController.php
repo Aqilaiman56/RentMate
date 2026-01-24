@@ -748,4 +748,107 @@ class BookingController extends Controller
             return back()->with('error', 'Failed to reject booking. Please try again.');
         }
     }
+
+    /**
+     * Confirm item handover (both owner and renter must confirm)
+     */
+    public function confirmHandover($id)
+    {
+        $booking = Booking::with(['item', 'user'])->findOrFail($id);
+        $userId = auth()->id();
+        $isOwner = $booking->item->UserID === $userId;
+        $isRenter = $booking->UserID === $userId;
+
+        // Only owner or renter can confirm handover
+        if (!$isOwner && !$isRenter) {
+            abort(403, 'You are not authorized to confirm this handover.');
+        }
+
+        // Check if booking is confirmed and start date has arrived
+        if (!$booking->canConfirmHandover()) {
+            return back()->with('error', 'Handover can only be confirmed for approved bookings on or after the start date.');
+        }
+
+        DB::beginTransaction();
+        try {
+            if ($isOwner && !$booking->OwnerHandoverConfirmed) {
+                $booking->update(['OwnerHandoverConfirmed' => true]);
+
+                // Notify renter that owner confirmed
+                if (!$booking->RenterHandoverConfirmed) {
+                    Notification::create([
+                        'UserID' => $booking->UserID,
+                        'Type' => 'booking',
+                        'Title' => '📦 Owner Confirmed Handover',
+                        'Content' => 'The owner has confirmed handing over "' . $booking->item->ItemName . '". Please confirm that you have received the item.',
+                        'RelatedID' => $booking->BookingID,
+                        'RelatedType' => 'booking',
+                        'CreatedAt' => now()
+                    ]);
+                }
+            }
+
+            if ($isRenter && !$booking->RenterHandoverConfirmed) {
+                $booking->update(['RenterHandoverConfirmed' => true]);
+
+                // Notify owner that renter confirmed
+                if (!$booking->OwnerHandoverConfirmed) {
+                    Notification::create([
+                        'UserID' => $booking->item->UserID,
+                        'Type' => 'booking',
+                        'Title' => '📦 Renter Confirmed Receipt',
+                        'Content' => $booking->user->UserName . ' has confirmed receiving "' . $booking->item->ItemName . '". Please confirm that you handed over the item.',
+                        'RelatedID' => $booking->BookingID,
+                        'RelatedType' => 'booking',
+                        'CreatedAt' => now()
+                    ]);
+                }
+            }
+
+            // Refresh booking to get updated values
+            $booking->refresh();
+
+            // If both have confirmed, update status to ongoing
+            if ($booking->isHandoverComplete()) {
+                $booking->update([
+                    'Status' => 'ongoing',
+                    'HandoverConfirmedAt' => now()
+                ]);
+
+                // Notify both parties
+                Notification::create([
+                    'UserID' => $booking->UserID,
+                    'Type' => 'booking',
+                    'Title' => '✅ Handover Complete - Rental Started',
+                    'Content' => 'Both parties have confirmed the handover for "' . $booking->item->ItemName . '". Your rental is now officially active until ' . $booking->EndDate->format('d M Y') . '.',
+                    'RelatedID' => $booking->BookingID,
+                    'RelatedType' => 'booking',
+                    'CreatedAt' => now()
+                ]);
+
+                Notification::create([
+                    'UserID' => $booking->item->UserID,
+                    'Type' => 'booking',
+                    'Title' => '✅ Handover Complete - Rental Started',
+                    'Content' => 'Both parties have confirmed the handover for "' . $booking->item->ItemName . '". The rental is now active until ' . $booking->EndDate->format('d M Y') . '.',
+                    'RelatedID' => $booking->BookingID,
+                    'RelatedType' => 'booking',
+                    'CreatedAt' => now()
+                ]);
+            }
+
+            DB::commit();
+
+            $message = $booking->isHandoverComplete()
+                ? 'Handover confirmed! The rental is now active.'
+                : 'Your handover confirmation has been recorded. Waiting for the other party to confirm.';
+
+            return back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Handover confirmation error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to confirm handover. Please try again.');
+        }
+    }
 }

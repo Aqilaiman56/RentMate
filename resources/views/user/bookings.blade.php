@@ -181,6 +181,11 @@
         color: #991b1b;
     }
 
+    .status-ongoing {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
     .expand-icon {
         font-size: 20px;
         color: #6b7280;

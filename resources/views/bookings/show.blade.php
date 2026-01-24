@@ -401,6 +401,116 @@
         background: #059669;
     }
 
+    .handover-section {
+        background: #f0f9ff;
+        border: 2px solid #3b82f6;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .handover-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .handover-status {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .handover-party {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 15px;
+        background: white;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .handover-party-name {
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .handover-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .handover-confirmed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .handover-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .handover-btn {
+        width: 100%;
+        background: #3b82f6;
+        color: white;
+        padding: 14px;
+        border-radius: 10px;
+        border: none;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .handover-btn:hover {
+        background: #2563eb;
+    }
+
+    .handover-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    .handover-complete-banner {
+        background: #d1fae5;
+        border: 2px solid #10b981;
+        border-radius: 12px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .handover-complete-banner h3 {
+        color: #065f46;
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .handover-complete-banner p {
+        color: #047857;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .status-ongoing {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
     @media (max-width: 968px) {
         .booking-grid {
             grid-template-columns: 1fr;
@@ -639,7 +749,7 @@
                         </form>
                     @endif
 
-                @elseif($booking->Status === 'confirmed')
+                @elseif(in_array($booking->Status, ['confirmed', 'Confirmed']))
                     <div class="payment-success">
                         <i class="fas fa-check-circle"></i> Deposit Payment Completed - Booking Confirmed
                     </div>
@@ -657,6 +767,94 @@
                             <div class="payment-info-row">
                                 <span>Payment Method:</span>
                                 <span>{{ $booking->payment->PaymentMethod }}</span>
+                            </div>
+                            <div class="payment-info-row">
+                                <span>Amount Paid:</span>
+                                <span>RM {{ number_format($booking->payment->Amount, 2) }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Handover Section --}}
+                    @if($booking->canConfirmHandover())
+                        <div class="handover-section">
+                            <h3 class="handover-title">
+                                <i class="fas fa-handshake"></i> Item Handover Confirmation
+                            </h3>
+
+                            <div class="handover-status">
+                                <div class="handover-party">
+                                    <span class="handover-party-name">
+                                        <i class="fas fa-user-tag"></i> Owner ({{ $booking->item->user->UserName }})
+                                    </span>
+                                    <span class="handover-badge {{ $booking->OwnerHandoverConfirmed ? 'handover-confirmed' : 'handover-pending' }}">
+                                        {{ $booking->OwnerHandoverConfirmed ? 'Confirmed' : 'Pending' }}
+                                    </span>
+                                </div>
+                                <div class="handover-party">
+                                    <span class="handover-party-name">
+                                        <i class="fas fa-user"></i> Renter ({{ $booking->user->UserName }})
+                                    </span>
+                                    <span class="handover-badge {{ $booking->RenterHandoverConfirmed ? 'handover-confirmed' : 'handover-pending' }}">
+                                        {{ $booking->RenterHandoverConfirmed ? 'Confirmed' : 'Pending' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            @php
+                                $isOwner = $booking->item->UserID === auth()->id();
+                                $isRenter = $booking->UserID === auth()->id();
+                                $alreadyConfirmed = ($isOwner && $booking->OwnerHandoverConfirmed) || ($isRenter && $booking->RenterHandoverConfirmed);
+                            @endphp
+
+                            @if(!$alreadyConfirmed)
+                                <form action="{{ route('booking.confirmHandover', $booking->BookingID) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="handover-btn" onclick="return confirm('{{ $isOwner ? 'Confirm that you have handed over the item to the renter?' : 'Confirm that you have received the item from the owner?' }}')">
+                                        <i class="fas fa-check-circle"></i>
+                                        {{ $isOwner ? 'Confirm Item Handed Over' : 'Confirm Item Received' }}
+                                    </button>
+                                </form>
+                            @else
+                                <div class="rental-notice" style="background: #d1fae5; border-left: 4px solid #10b981;">
+                                    <p><strong><i class="fas fa-check"></i> You have confirmed!</strong> Waiting for the other party to confirm the handover.</p>
+                                </div>
+                            @endif
+                        </div>
+                    @elseif(now()->lt($booking->StartDate))
+                        <div class="rental-notice">
+                            <p><strong><i class="fas fa-calendar-day"></i> Handover on Start Date:</strong> The item handover can be confirmed starting {{ $booking->StartDate->format('d M Y') }}. Both you and the {{ $booking->item->UserID === auth()->id() ? 'renter' : 'owner' }} must confirm the handover for the rental to become active.</p>
+                        </div>
+                    @endif
+
+                    @if($booking->item->UserID === auth()->id() && now()->gte($booking->EndDate))
+                        <form action="{{ route('booking.complete', $booking->BookingID) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="complete-btn" onclick="return confirm('Mark this booking as completed and refund the deposit?')">
+                                <i class="fas fa-check"></i> Complete Booking & Refund Deposit
+                            </button>
+                        </form>
+                    @endif
+
+                @elseif(in_array($booking->Status, ['ongoing', 'Ongoing']))
+                    <div class="handover-complete-banner">
+                        <h3><i class="fas fa-check-circle"></i> Rental Active</h3>
+                        <p>Item handover confirmed on {{ $booking->HandoverConfirmedAt ? $booking->HandoverConfirmedAt->format('d M Y, g:i A') : 'N/A' }}</p>
+                    </div>
+
+                    <div class="payment-success" style="background: #dbeafe; color: #1e40af;">
+                        <i class="fas fa-clock"></i> Rental in Progress - Ends {{ $booking->EndDate->format('d M Y') }}
+                    </div>
+
+                    @if($booking->payment)
+                        <div class="payment-info">
+                            <div class="payment-info-row">
+                                <span>Transaction ID:</span>
+                                <span>{{ $booking->payment->TransactionID }}</span>
+                            </div>
+                            <div class="payment-info-row">
+                                <span>Payment Date:</span>
+                                <span>{{ $booking->payment->PaymentDate ? $booking->payment->PaymentDate->format('d M Y, g:i A') : 'N/A' }}</span>
                             </div>
                             <div class="payment-info-row">
                                 <span>Amount Paid:</span>

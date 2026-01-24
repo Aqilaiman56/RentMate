@@ -28,16 +28,22 @@ class Booking extends Model
         'TotalPaid',
         'Status',
         'ReturnConfirmed',
-        'BookingDate'
+        'BookingDate',
+        'OwnerHandoverConfirmed',
+        'RenterHandoverConfirmed',
+        'HandoverConfirmedAt'
     ];
 
     protected $casts = [
         'StartDate' => 'date',
         'EndDate' => 'date',
         'BookingDate' => 'datetime',
+        'HandoverConfirmedAt' => 'datetime',
         'ServiceFeeAmount' => 'decimal:2',
         'TotalPaid' => 'decimal:2',
-        'ReturnConfirmed' => 'boolean'
+        'ReturnConfirmed' => 'boolean',
+        'OwnerHandoverConfirmed' => 'boolean',
+        'RenterHandoverConfirmed' => 'boolean'
     ];
 
     /**
@@ -122,5 +128,32 @@ class Booking extends Model
                      ->where('EndDate', '>=', $endDate);
               });
         });
+    }
+
+    /**
+     * Check if handover is complete (both parties confirmed)
+     */
+    public function isHandoverComplete()
+    {
+        return $this->OwnerHandoverConfirmed && $this->RenterHandoverConfirmed;
+    }
+
+    /**
+     * Check if booking is awaiting handover confirmation
+     */
+    public function isAwaitingHandover()
+    {
+        return in_array($this->Status, ['confirmed', 'Confirmed'])
+            && $this->StartDate <= now()
+            && !$this->isHandoverComplete();
+    }
+
+    /**
+     * Check if handover can be confirmed (on or after start date)
+     */
+    public function canConfirmHandover()
+    {
+        return in_array($this->Status, ['confirmed', 'Confirmed'])
+            && $this->StartDate <= now();
     }
 }

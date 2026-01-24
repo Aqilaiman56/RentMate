@@ -43,3 +43,18 @@ Schedule::command('bookings:complete-expired')
 // Update item availability every hour
 Schedule::command('items:update-availability')
     ->hourly();
+
+// Send booking ending reminders daily at 9 AM
+Schedule::command('bookings:send-ending-reminders --days=1')
+    ->daily()
+    ->at('09:00');
+
+// Send same-day booking ending reminders at 8 AM
+Schedule::command('bookings:send-ending-reminders --days=0')
+    ->daily()
+    ->at('08:00');
+
+// Send handover reminders on rental start date at 7 AM
+Schedule::command('bookings:send-handover-reminders')
+    ->daily()
+    ->at('07:00');

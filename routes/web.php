@@ -120,6 +120,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/booking/{id}/complete', [BookingController::class, 'complete'])->name('booking.complete');
     Route::post('/booking/{id}/approve', [BookingController::class, 'approve'])->name('booking.approve');
     Route::post('/booking/{id}/reject', [BookingController::class, 'reject'])->name('booking.reject');
+    Route::post('/booking/{id}/confirm-handover', [BookingController::class, 'confirmHandover'])->name('booking.confirmHandover');
     Route::get('/api/items/{itemId}/unavailable-dates', [BookingController::class, 'getUnavailableDates'])->name('booking.unavailable_dates');
 });
 
